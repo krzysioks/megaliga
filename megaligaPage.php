@@ -1,6 +1,7 @@
 <?php
 /*
-Template Name: Megaliga ver 1.0
+Template Name: Megaliga ver 2.0
+Description: Shows schedule and scoreboard of given round for one group in the ligue
  */
 ?>
 <?php get_header(); ?>
@@ -22,7 +23,7 @@ $current_user = wp_get_current_user();
 //8 - length of "kolejka" string which is in every title of składy subpage
 $round_number = substr($title, 0, strlen($title) - 8);
 $userId = $current_user->ID;
-//$userId = 48;//14;
+// $userId = 48;//14;
 
 //handle submission
 if ($_POST['submitScore']) {
@@ -155,7 +156,7 @@ function drawSchedule($queryTeam1Result, $queryTeam2Result, $gameIdentificationD
 {
     $margin = $side == 'left' ? 'marginRight40' : '';
     echo '<table class="scheduleTable ' . $margin . '" border="0">';
-    echo '  <tr><td colspan="6" class="scheduleTableName textLeft">Grupa ' . ucfirst($groupName) . '</td></tr>';
+    echo '  <tr><td colspan="6" class="scheduleTableName textLeft">Grupa ' . $groupName . '</td></tr>';
     echo '  <tr>
                 <th colspan="3" class="scheduleHeader textLeft">megaliga</th>
                 <th colspan="3" class="scheduleHeader textRight">' . $round_number . '. kolejka</th>
@@ -894,41 +895,25 @@ function getAllGameData($query, $round_number)
 }
 
 //get teams for Dolce ligue
-$getSchedule4DolceTeam1Query = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
+$getSchedule4Team1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 3 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
 
-$getSchedule4DolceTeam2Query = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
-
-//get teams for Gabbama ligue
-$getSchedule4GabbanaTeam1Query = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
-
-$getSchedule4GabbanaTeam2Query = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
+$getSchedule4Team2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 3 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
 
 //get data for the scoreboard
 //get all games for Dolce for given round
-$getGames4DolceQuery = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 1 AND round_number = ' . $round_number);
-$scoreBoradDolceData = getAllGameData($getGames4DolceQuery, $round_number);
-
-//get all games for Gabbana for given round
-$getGames4GabbanaQuery = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $round_number);
-$scoreBoradGabbanaData = getAllGameData($getGames4GabbanaQuery, $round_number);
+$getGames = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 3 AND round_number = ' . $round_number);
+$scoreBoradData = getAllGameData($getGames, $round_number);
 
 //content of the megaliga page
 the_content();
 echo '<div class="scheduleContainer">';
-drawSchedule($getSchedule4DolceTeam1Query, $getSchedule4DolceTeam2Query, $getGames4DolceQuery, 'dolce', 'left', $round_number);
-drawSchedule($getSchedule4GabbanaTeam1Query, $getSchedule4GabbanaTeam2Query, $getGames4GabbanaQuery, 'gabbana', 'right', $round_number);
+drawSchedule($getSchedule4Team1, $getSchedule4Team2, $getGames, 'Dolce&Gabbana', 'left', $round_number);
 echo '</div>';
 echo '<div>';
 echo '  <div class="marginTop10">';
-echo '      <span class="scoreTableName">Wyniki Dolce</span>';
+echo '      <span class="scoreTableName">Wyniki Dolce&Gabbana</span>';
 echo '  </div>';
-foreach ($scoreBoradDolceData as $gameData) {
-    drawScoreBoard($gameData, $userId);
-}
-echo '  <div class="marginTop10">';
-echo '      <span class="scoreTableName">Wyniki Gabbana</span>';
-echo '  </div>';
-foreach ($scoreBoradGabbanaData as $gameData) {
+foreach ($scoreBoradData as $gameData) {
     drawScoreBoard($gameData, $userId);
 }
 echo '</div>';

@@ -1,7 +1,8 @@
 <?php
 /*
-Template Name: Roster ver 2.0
-Description: Shows roster for the teams for one group in the ligue
+Template Name: RosterPlayoff ver 2.0
+Description: Shows playoff roster for the teams for one group in the ligue.
+To mark team as reached playoff stage -> set value of megaliga_user_data.rached_playoff = 1 for desired team
  */
 ?>
 <?php get_header(); ?>
@@ -10,10 +11,7 @@ Description: Shows roster for the teams for one group in the ligue
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                 <header class="header">
 
-                    <h1 class="entry-title">
-                        <?php the_title('składy: '); ?>
-                    </h1>
-                    <?php edit_post_link(); ?>
+                    <h1 class="entry-title"><?php the_title('składy play-off: '); ?></h1> <?php edit_post_link(); ?>
                 </header>
                 <div class="entry-content">
                     <?php if (has_post_thumbnail()) {
@@ -28,18 +26,21 @@ Description: Shows roster for the teams for one group in the ligue
                     //8 - length of "kolejka" string which is in every title of składy subpage
                     $round_number = substr($title, 0, strlen($title) - 8);
                     $userId = $current_user->ID;
-                    // $userId = 50;
-                    //$userId = 20;
-                    // $userId = 38;
 
-                    //defining if roster submission form should be
-                    $isUserMegaligaMemberQuery = $wpdb->get_results('SELECT user_data_id FROM megaliga_user_data WHERE ID = ' . $userId);
-                    $showRosterForm = $userId != 0 && count($isUserMegaligaMemberQuery) == 1;
+                    //values for test
+                    //$round_number = 1;
+                    // $userId = 44;
+                    // $userId = 46;
+
+                    //defining if roster submission form should be displayed (only for member of megaliga who reached playoff stage)
+                    $isUserMegaligaMemberReachedPlayoffQuery = $wpdb->get_results('SELECT user_data_id FROM megaliga_user_data WHERE ID = ' . $userId . ' AND reached_playoff = 1');
+                    $showRosterForm = $userId != 0 && count($isUserMegaligaMemberReachedPlayoffQuery) == 1;
 
                     //handling submission
                     if ($_POST['submitStartingLineup']) {
                         //get list of all available players in the team
-                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user = ' . $userId);
+                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user_playoff = ' . $userId);
+
                         $i = 1;
                         $submitDataArray = array();
                         //iterate through complete roster of the team
@@ -60,31 +61,31 @@ Description: Shows roster for the teams for one group in the ligue
                         }
 
                         //check if to insert new record or update already existing
-                        $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
+                        $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup_playoff WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
 
                         $submitDataArray['round_number'] = $round_number;
                         $submitDataArray['ID'] = $userId;
                         $submitDataArray['setplays'] = $_POST['setplayInput'];
 
                         if (count($checkIfRecordExist) == 1) {
-                            //if starting lineup has already been set for the given round -> before update remove currently selected players from megaliga_scores. So there want be redundant records
-                            $checkIfPlayerScoreExistQuery = $wpdb->get_results('SELECT id_scores FROM megaliga_scores WHERE id_starting_lineup = ' . $checkIfRecordExist[0]->id_starting_lineup . ' AND (id_player = ' . $checkIfRecordExist[0]->player1 . ' OR id_player = ' . $checkIfRecordExist[0]->player2 . ' OR id_player = ' . $checkIfRecordExist[0]->player3 . ' OR id_player = ' . $checkIfRecordExist[0]->player4 . ' OR id_player = ' . $checkIfRecordExist[0]->player5 . ')');
+                            //if starting lineup has already been set for the given round -> before update remove currently selected players from megaliga_scores_playoff. So there want be redundant records
+                            $checkIfPlayerScoreExistQuery = $wpdb->get_results('SELECT id_scores FROM megaliga_scores_playoff WHERE id_starting_lineup = ' . $checkIfRecordExist[0]->id_starting_lineup . ' AND (id_player = ' . $checkIfRecordExist[0]->player1 . ' OR id_player = ' . $checkIfRecordExist[0]->player2 . ' OR id_player = ' . $checkIfRecordExist[0]->player3 . ' OR id_player = ' . $checkIfRecordExist[0]->player4 . ' OR id_player = ' . $checkIfRecordExist[0]->player5 . ')');
 
-                            //remove players from megaliga_scores
+                            //remove players from megaliga_scores_playoff
                             foreach ($checkIfPlayerScoreExistQuery as $playerToRemove) {
-                                $wpdb->delete('megaliga_scores', array('id_scores' => $playerToRemove->id_scores));
+                                $wpdb->delete('megaliga_scores_playoff', array('id_scores' => $playerToRemove->id_scores));
                             }
 
                             //clear schedule score
-                            $getIdScheduleQuery = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule WHERE round_number = ' . $round_number . ' AND (id_user_team1 = ' . $userId . ' OR id_user_team2 = ' . $userId . ')');
+                            $getIdScheduleQuery = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE round_number = ' . $round_number . ' AND (id_user_team1 = ' . $userId . ' OR id_user_team2 = ' . $userId . ')');
 
                             $removeScoreWhere = array('id_schedule' => $getIdScheduleQuery[0]->id_schedule);
-                            $wpdb->update('megaliga_schedule', array('team1_score' => null, 'team2_score' => null), $removeScoreWhere);
+                            $wpdb->update('megaliga_schedule_playoff', array('team1_score' => null, 'team2_score' => null), $removeScoreWhere);
 
                             $where = array('id_starting_lineup' => $checkIfRecordExist[0]->id_starting_lineup);
-                            $wpdb->update('megaliga_starting_lineup', $submitDataArray, $where);
+                            $wpdb->update('megaliga_starting_lineup_playoff', $submitDataArray, $where);
                         } else {
-                            $wpdb->insert('megaliga_starting_lineup', $submitDataArray);
+                            $wpdb->insert('megaliga_starting_lineup_playoff', $submitDataArray);
                         }
                     }
 
@@ -92,12 +93,11 @@ Description: Shows roster for the teams for one group in the ligue
                     function drawRosterForm($queryResult, $userId, $round_number, $groupName)
                     {
                         global $wpdb;
-
                         //get list of all available players in the team
-                        $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user = ' . $userId);
+                        $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_playoff = ' . $userId);
 
                         //get data about already selected players, setplays
-                        $getStartingLineupDataQuery = $wpdb->get_results('SELECT player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
+                        $getStartingLineupDataQuery = $wpdb->get_results('SELECT player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup_playoff WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
                         $selectedPlayers = array($getStartingLineupDataQuery[0]->player1, $getStartingLineupDataQuery[0]->player2, $getStartingLineupDataQuery[0]->player3, $getStartingLineupDataQuery[0]->player4, $getStartingLineupDataQuery[0]->player5);
 
                         echo '<form action="" method="post">';
@@ -167,12 +167,13 @@ Description: Shows roster for the teams for one group in the ligue
                     {
                         foreach ($queryResult as $field) {
                             global $wpdb;
+                            //$idGroupName = 'id_user_'.$groupName;
 
                             //get list of all available players in the team
-                            $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user = ' . $field->ID);
+                            $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_playoff = ' . $field->ID);
 
                             //get data about already selected players, setplays
-                            $getStartingLineupDataQuery = $wpdb->get_results('SELECT player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $field->ID);
+                            $getStartingLineupDataQuery = $wpdb->get_results('SELECT player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup_playoff WHERE round_number = ' . $round_number . ' AND ID = ' . $field->ID);
                             $selectedPlayers = array($getStartingLineupDataQuery[0]->player1, $getStartingLineupDataQuery[0]->player2, $getStartingLineupDataQuery[0]->player3, $getStartingLineupDataQuery[0]->player4, $getStartingLineupDataQuery[0]->player5);
 
                             echo '<div class="rosterContainer teamContainerDimentions">';
@@ -242,26 +243,25 @@ Description: Shows roster for the teams for one group in the ligue
                     }
 
 
-                    //content of the roster page
+                    //content of the team page
                     echo '<div>';
 
                     if ($showRosterForm) {
-                        $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url FROM megaliga_user_data, wp_users, megaliga_team_names WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id');
+                        $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
+
                         drawRosterForm($getRosterSubmissionFormDataQuery, $userId, $round_number, 'Dolce&Gabbana');
                     }
 
-                    //get roster for all teams
-                    $getRosterForRound = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_user_data.ID FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id AND megaliga_user_data.ligue_groups_id = 3');
+                    //get roster for all teams that reached playoff stage
+                    $getRosterForPlayoffRoundQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_user_data.ID, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id AND megaliga_user_data.reached_playoff = 1');
 
-                    drawRosters($getRosterForRound, $round_number, 'Dolce&Gabbana');
+                    drawRosters($getRosterForPlayoffRoundQuery, $round_number, 'Dolce&Gabbana');
 
                     echo '</div>';
                     ?>
 
 
-                    <div class="entry-links">
-                        <?php wp_link_pages(); ?>
-                    </div>
+                    <div class="entry-links"><?php wp_link_pages(); ?></div>
                 </div>
             </article>
             <?php if (!post_password_required()) comments_template('', true); ?>
