@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Draft Playoff ver 2.0
+Template Name: Draft Playoff ver 3.0
 Description: Shows draft for playoff stage for one group in the ligue
  */
 ?>
@@ -27,45 +27,97 @@ Description: Shows draft for playoff stage for one group in the ligue
 
                     $getCheckIfUserReachedPlayoff = $wpdb->get_results('SELECT reached_playoff FROM megaliga_user_data WHERE ID = ' . $userId);
 
-                    //handle submission
-                    if ($_POST['submitDraft']) {
-                        //update megaliga_players table
-                        $data = array(
-                            'id_user_playoff' => $userId
-                        );
-                        $where = array('player_id' => $_POST['draftPlayer']);
-                        $wpdb->update('megaliga_players', $data, $where, array('%d'), array('%d'));
-
-                        //calculate credit data if draft credit mode is on
-                        if ($getDraftWindowState[0]->playoff_draft_credit_enabled) {
-                            //get team's left credit to calculate new one
-                            $getTeamCreditBalance = $wpdb->get_results('SELECT credit_balance_playoff FROM megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId);
-
-                            $getDraftedPlayerCredit = $wpdb->get_results('SELECT credit_playoff FROM megaliga_players WHERE player_id = ' . $_POST['draftPlayer']);
-
-                            //calculate new Credit Balance of the team
-                            $newTeamCreditBalance = $getTeamCreditBalance[0]->credit_balance_playoff - $getDraftedPlayerCredit[0]->credit_playoff;
-
-                            //prevents from setting the negative value of given team  credit balance
-                            if ($newTeamCreditBalance < 0) {
-                                $newTeamCreditBalance = 0;
-                            }
-
-                            //update megaliga_user_data
-                            $updateCreditData = array(
-                                'credit_balance_playoff' => $newTeamCreditBalance
-                            );
-                            $where = array('ID' => $userId);
-                            $wpdb->update('megaliga_user_data', $updateCreditData, $where, array('%d'), array('%d'));
-                        }
-                    }
-
-                    function drawDraftForm($draftWindowState, $getCheckIfUserReachedPlayoff, $userId)
+                    //function sets next draft round - needed to know for who draftForm will be available
+                    function setNextDraftRound($userId)
                     {
                         global $wpdb;
 
-                        //draft form will be shown if user taking part in game is logged in and draft window is open and user reached playoff stage
-                        if (is_user_logged_in() && $draftWindowState[0]->playoff_draft_window_open && $getCheckIfUserReachedPlayoff[0]->reached_playoff) {
+                        $getDraftCurrentRound = $wpdb->get_results('SELECT playoff_draft_current_round FROM megaliga_draft_data');
+                        $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_playoff_draft_order WHERE draft_order = ' . $getDraftCurrentRound[0]->playoff_draft_current_round);
+
+                        //prevention against form resubmission - do not increment current round number if id of logged user differs from id of user which draft round is now
+                        if ($getDraftTurnUserId[0]->ID != $userId) {
+                            return;
+                        }
+
+                        //check how many rounds are defined in db.
+                        $getNumberOfRounds = $wpdb->get_results('SELECT COUNT(*) as "round_number" FROM megaliga_playoff_draft_order');
+
+                        //if current round == number of defined rounds -> start from 9th round else increment round number
+                        $nextRoundNumber = $getDraftCurrentRound[0]->playoff_draft_current_round == $getNumberOfRounds[0]->round_number ? 9 : $getDraftCurrentRound[0]->playoff_draft_current_round + 1;
+
+                        //update draft_current_round in megaliga_draft_data
+                        $updateCurrentRound = array(
+                            'playoff_draft_current_round' => $nextRoundNumber
+                        );
+                        $whereCurrentRound = array('id_draft' => 1);
+                        $wpdb->update('megaliga_draft_data', $updateCurrentRound, $whereCurrentRound);
+                    }
+
+                    //handle submission
+                    if ($_POST['submitDraft']) {
+                        //check if system tries to subimt same data again
+                        $getCheckIfUserAlreadyChosenPlayer = $wpdb->get_results('SELECT id_user_playoff FROM megaliga_players WHERE player_id = ' . $_POST['draftPlayer']);
+
+                        //prevention against form resubmission - update only those players who has no user assigned.
+                        if (!$getCheckIfUserAlreadyChosenPlayer[0]->id_user_playoff) {
+                            //number with which player is drafted is important in the game -> get it for given user and assign to drafted player. It will help to sort team's roster from the first drafted player to the last
+                            $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number_playoff FROM megaliga_user_data WHERE ID = ' . $userId);
+
+                            //update megaliga_players table
+                            $data = array(
+                                'id_user_playoff' => $userId,
+                                'drafted_with_number_playoff' => $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number_playoff
+                            );
+                            $where = array('player_id' => $_POST['draftPlayer']);
+                            $wpdb->update('megaliga_players', $data, $where, array('%d'), array('%d'));
+
+                            //increment number with which player in next round will be drafted will be drafted
+                            $player_next_draft_number = $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number_playoff + 1;
+
+                            //update number with which player in next round will be drafted for given user
+                            $data = array(
+                                'player_draft_number_playoff' => $player_next_draft_number
+                            );
+                            $where = array('ID' => $userId);
+                            $wpdb->update('megaliga_user_data', $data, $where);
+
+                            //calculate credit data if draft credit mode is on
+                            if ($getDraftWindowState[0]->playoff_draft_credit_enabled) {
+                                //get team's left credit to calculate new one
+                                $getTeamCreditBalance = $wpdb->get_results('SELECT credit_balance_playoff FROM megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId);
+
+                                $getDraftedPlayerCredit = $wpdb->get_results('SELECT credit_playoff FROM megaliga_players WHERE player_id = ' . $_POST['draftPlayer']);
+
+                                //calculate new Credit Balance of the team
+                                $newTeamCreditBalance = $getTeamCreditBalance[0]->credit_balance_playoff - $getDraftedPlayerCredit[0]->credit_playoff;
+
+                                //prevents from setting the negative value of given team  credit balance
+                                if ($newTeamCreditBalance < 0) {
+                                    $newTeamCreditBalance = 0;
+                                }
+
+                                //update megaliga_user_data
+                                $updateCreditData = array(
+                                    'credit_balance_playoff' => $newTeamCreditBalance
+                                );
+                                $where = array('ID' => $userId);
+                                $wpdb->update('megaliga_user_data', $updateCreditData, $where, array('%d'), array('%d'));
+                            }
+                            setNextDraftRound($userId);
+                        }
+                    }
+
+                    //handle submission (user decide to leave his turn)
+                    if ($_POST['passDraft']) {
+                        setNextDraftRound($userId);
+                    }
+
+                    function drawDraftForm($draftWindowState, $getCheckIfUserReachedPlayoff, $getDraftTurnUserId, $userId)
+                    {
+                        global $wpdb;
+                        //draft form will be shown if user taking part in game is logged in and draft window is open and user reached playoff stage and it is his turn to draft player
+                        if (is_user_logged_in() && $draftWindowState[0]->playoff_draft_window_open && $getCheckIfUserReachedPlayoff[0]->reached_playoff && $getDraftTurnUserId[0]->ID == $userId) {
                             //$draftWindowState[0]->playoff_draft_credit_enabled - flag indicates if draftCredit mode is on (players in draft has value and user cannot draft player he cannot afford)
 
                             $getUserData = $wpdb->get_results('SELECT megaliga_user_data.credit_balance_playoff, megaliga_team_names.name, wp_users.user_login FROM megaliga_user_data, megaliga_team_names, wp_users WHERE megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId);
@@ -138,7 +190,10 @@ Description: Shows draft for playoff stage for one group in the ligue
                                 echo '              <option value="' . $option['value'] . '">' . $option['label'] . '</option>';
                             }
                             echo '              </select>';
-                            echo '              <input class="submitDraftPlayer" type="submit" name="submitDraft" value="Wybierz">';
+                            echo '              <div class="flexDirectionRow">';
+                            echo '                  <input class="submitDraftPlayer" type="submit" name="submitDraft" value="Wybierz">';
+                            echo '                  <input class="submitDraftPlayer" type="submit" name="passDraft" value="Pas">';
+                            echo '              </div>';
                             echo '          </div>';
                             echo '      </form>';
                             echo '  </div>';
@@ -146,8 +201,12 @@ Description: Shows draft for playoff stage for one group in the ligue
                         }
                     }
 
+                    //check whose turn for draft is now
+                    $getDraftCurrentRound = $wpdb->get_results('SELECT playoff_draft_current_round FROM megaliga_draft_data');
+                    $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_playoff_draft_order WHERE draft_order = ' . $getDraftCurrentRound[0]->playoff_draft_current_round);
+
                     //content of the draft page
-                    drawDraftForm($getDraftWindowState, $getCheckIfUserReachedPlayoff, $userId);
+                    drawDraftForm($getDraftWindowState, $getCheckIfUserReachedPlayoff, $getDraftTurnUserId, $userId);
                     the_content();
                     ?>
 
