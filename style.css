@@ -1,0 +1,893 @@
+/*
+Theme Name:     Services Child
+Description:    Child theme for Services
+Author:         Krzysztof Pielak
+Template:       services
+*/
+
+body {
+    color: black;
+}
+
+img {
+    max-width: none !important;
+    height: auto;
+}
+
+#wrapper {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+#header {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#search {
+    display: none;
+}
+
+#header-nav {
+    position: fixed;
+    width: 100%;
+    padding: 10px 5%;
+    background: rgba(0, 0, 0, 1);
+    z-index: 1000;
+}
+
+#footer {
+    padding: 5%;
+    background: rgba(0, 0, 0, 1);
+}
+
+#menu .menu-icon {
+    font-size: 30px;
+}
+
+#menu ul li ul li {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#menu ul li:hover ul li a {
+    width: 250px;
+    font-size: 18px;
+    color: #fff;
+    text-align: left;
+    line-height: 20px;
+    padding: 5px;
+    border: 0px;
+    background: rgba(0, 0, 0, 0);
+}
+
+#menu li ul {
+    display: none;
+    position: absolute;
+    top: 25px;
+    left: 0;
+    padding-top: 17px;
+    z-index: 1000;
+}
+
+#menu ul li:hover ul li a:hover {
+    color: #c40000;
+    width: 100%;
+}
+
+#site-description {
+    padding: 0px 5% 10%;
+}
+
+@media all and (max-width: 769px) {
+    #site-description {
+        padding: 50px 5% 10%;
+    }
+
+    #header-sidebar .widget-container {
+        width: 30%;
+    }
+}
+
+@media all and (max-width: 1440px) {
+    .teamContainerDimentions {
+        width: 100% !important;
+    }
+
+    #header-sidebar .widget-container {
+        width: 40%;
+    }
+}
+
+@media all and (max-width: 1610px) {
+    .playoffLadderflexDirection {
+        flex-direction: column !important;
+    }
+
+    .playoffPhaseTitlePosition {
+        margin-left: 5px !important;
+        text-align: left !important;
+    }
+
+    .winnerMargin {
+        margin-left: 0px !important;
+    }
+
+    .winnerContainer {
+        display: flex;
+        flex-direction: row;
+        width: 350px;
+        height: 30px;
+        margin-left: 5px !important;
+    }
+    .pairLadderContainer {
+        display: flex;
+        width: 360px;
+        height: 120px;
+        margin: 5px 0px 5px 5px !important;
+    }
+}
+
+@media all and (max-width: 900px) {
+    .draftCol1 {
+        width: 100% !important;
+    }
+    .draftCol2 {
+        width: 100% !important;
+    }
+    .draftFormContainer {
+        flex-direction: column !important;
+    }
+    .draftPlayer {
+        width: 100% !important;
+    }
+}
+
+@media all and (max-width: 480px) {
+    .draftCol1 {
+        width: 100% !important;
+    }
+    .draftCol2 {
+        width: 100% !important;
+    }
+    .draftFormContainer {
+        flex-direction: column !important;
+    }
+    .draftPlayer {
+        width: 100% !important;
+    }
+    .menu {
+        overflow-x: hidden;
+        height: 300px;
+    }
+    #site-description {
+        padding: 100px 5% 10%;
+    }
+
+    #header-sidebar .widget-container {
+        width: 90%;
+    }
+
+    .scheduleContainer {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .marginRight40 {
+        margin-right: 0px !important;
+    }
+
+    .scheduleTable {
+        width: 100% !important;
+    }
+
+    .teamContainerDimentions {
+        width: 100% !important;
+    }
+
+    .teamContainerRow1 {
+        flex-direction: column !important;
+    }
+
+    .teamContainer {
+        flex-direction: column !important;
+    }
+
+    .teamImgContainer {
+        width: 100% !important;
+    }
+
+    .teamOverviewContainer {
+        width: 100% !important;
+    }
+
+    .teamRosterContainer {
+        width: 100% !important;
+    }
+
+    .teamOverviewTeamName {
+        font-size: 15px !important;
+    }
+
+    .spinner {
+        width: 35px !important;
+    }
+
+    .scheduleScore {
+        font-size: 12px !important;
+    }
+
+    /*playoff standings page*/
+    .playoffLadderflexDirection {
+        flex-direction: column !important;
+    }
+
+    .playoffPhaseTitlePosition {
+        margin-left: 5px !important;
+        text-align: left !important;
+    }
+
+    .winnerMargin {
+        margin-left: 0px !important;
+    }
+
+    .winnerContainer {
+        display: flex;
+        flex-direction: row;
+        width: 240px !important;
+        height: 30px;
+        margin-left: 5px !important;
+    }
+    .pairLadderContainer {
+        display: flex;
+        width: 250px !important;
+        height: 120px;
+        margin: 5px 0px 5px 5px !important;
+    }
+    .playoffLadderContent {
+        width: 140px !important;
+        font-weight: bold;
+        font-size: 12px;
+        position: relative;
+        top: 7px;
+        left: 5px;
+    }
+    .pairLegendContainer {
+        width: 250px !important;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+    .score {
+        width: 35px !important;
+        font-weight: bold;
+        font-size: 12px;
+        position: relative;
+        top: 0px;
+        padding: 7px 0px 0px 5px;
+        border-left: solid 1px #c40000;
+    }
+    .playoffPhaseTitle {
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .seedNumberContainer {
+        position: relative;
+        top: 17px;
+        width: 10px;
+        font-size: 10px;
+    }
+    .teamLadderContainer {
+        display: flex;
+        flex-direction: row;
+        width: 250px !important;
+        height: 30px;
+    }
+    .teamNameContainer {
+        display: flex;
+        flex-direction: row;
+        width: 240px !important;
+        height: 30px;
+        background-color: white;
+    }
+    .legendRound1Margin {
+        margin-right: 27px !important;
+    }
+
+    .legendRound2Margin {
+        margin-right: 28px !important;
+    }
+}
+
+.sub-menu {
+    background: rgba(0, 0, 0, 1);
+}
+
+@media all and (max-width: 768px) {
+    #menu {
+        background: rgba(0, 0, 0, 1);
+    }
+    #menu label.toggle {
+        display: flex;
+        justify-content: flex-start;
+    }
+    #menu .toggle:hover {
+        cursor: pointer;
+    }
+
+    #menu ul li:hover {
+        background: rgba(0, 0, 0, 1);
+    }
+
+    #menu ul li:hover a {
+        color: #c40000 !important;
+    }
+
+    .teamContainerDimentions {
+        width: 100% !important;
+    }
+
+    .scheduleScore {
+        font-size: 12px !important;
+    }
+}
+
+@media all and (max-height: 800px) {
+    .jsgrid .jsgrid-grid-body {
+        height: 300px !important;
+    }
+}
+
+@media all and (max-height: 500px) {
+    .jsgrid .jsgrid-grid-body {
+        height: 200px !important;
+    }
+}
+
+input,
+textarea {
+    background: #d4d4d4;
+}
+
+.displayFlex {
+    display: flex;
+}
+
+.flexDirectionRow {
+    flex-direction: row;
+}
+
+.flexDirectionColumn {
+    flex-direction: column;
+}
+
+/*schedule table in megaliga-> kolejka n sub page*/
+.scheduleContainer {
+    display: flex;
+}
+
+.scheduleTable {
+    width: 45%;
+}
+
+.scheduleTableName {
+    font-weight: bold;
+    font-size: 20px;
+    padding: 10px;
+}
+
+.scheduleHeader {
+    font-weight: bold;
+    font-size: 18px;
+    border-bottom: solid 1px #c40000;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.scheduleTd {
+    padding: 5px 5px 5px 5px;
+    font-size: 15px;
+    vertical-align: middle;
+}
+
+.scheduleTdImg {
+    width: 40px;
+}
+
+.scheduleScore {
+    padding: 5px 0px 5px 2px;
+    font-size: 15px;
+    vertical-align: middle;
+    font-weight: bold;
+    width: 40px;
+}
+
+.scheduleScoreRight {
+    width: 20px;
+    padding-right: 2px;
+}
+
+.scheduleNoScoreLeft {
+    padding-left: 10px;
+}
+
+.even {
+    background-color: #eeeeee;
+}
+
+.odd {
+    background-color: #fff;
+}
+
+.scoreSeparator {
+    background-color: rgb(75, 75, 75);
+}
+
+.textLeft {
+    text-align: left;
+}
+
+.textRight {
+    text-align: right;
+}
+
+.marginRight40 {
+    margin-right: 40px;
+}
+
+.marginTop10 {
+    margin-top: 10px;
+}
+
+.marginTop100 {
+    margin-top: 100px;
+}
+
+.marginLeft10 {
+    margin-left: 10px;
+}
+
+.floatLeft {
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.floatRight {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+}
+
+.left {
+    align-self: flex-start;
+}
+
+.center {
+    justify-content: center;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.padding10 {
+    padding: 10px;
+}
+
+.paddingLeft10 {
+    padding-left: 10px;
+}
+
+.marginBottom20 {
+    margin-bottom: 20px !important;
+}
+
+.marginBottom10 {
+    margin-bottom: 10px !important;
+}
+
+.marginBottom5 {
+    margin-bottom: 5px !important;
+}
+
+.marginBottom40 {
+    margin-bottom: 40px;
+}
+
+.marginTop10 {
+    margin-top: 10px !important;
+}
+
+.marginTop20 {
+    margin-top: 20px !important;
+}
+
+.marginTop40 {
+    margin-top: 40px !important;
+}
+
+.marginRight20 {
+    margin-right: 20px;
+}
+
+.marginRight5 {
+    margin-right: 5px;
+}
+
+.marginRight45 {
+    margin-right: 45px;
+}
+
+.marginRight50 {
+    margin-right: 50px;
+}
+
+.fontSize12 {
+    font-size: 12px;
+}
+
+/*team page*/
+.teamContainer {
+    display: flex;
+    flex-direction: row;
+    background-color: #b3b3b3;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.rosterContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #b3b3b3;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.teamContainerRow1 {
+    display: flex;
+    flex-direction: row;
+}
+
+.teamContainerDimentions {
+    width: 70%;
+}
+
+.teamImgContainer {
+    /* width: 20%; */
+    width: 200px;
+    margin-right: 10px;
+}
+
+.teamOverviewContainer {
+    width: 40%;
+}
+
+.teamRosterContainer {
+    width: 40%;
+}
+
+.teamOverviewRow {
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+}
+
+.teamOverviewLabel {
+    align-self: flex-end;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.teamOverviewRosterLabel {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.teamOverviewRosterPlayerName {
+    font-size: 12px;
+    color: #c40000;
+}
+
+.teamOverviewRosterTeamName {
+    font-size: 10px;
+}
+
+.teamOverviewContent {
+    font-size: 15px;
+    font-weight: bold;
+    color: #c40000;
+}
+
+.teamOverviewTeamName {
+    font-size: 21px;
+    font-weight: bold;
+    color: #c40000;
+}
+
+.teamRosterContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.teamRosterCheckbox {
+    position: relative;
+    top: 2px;
+}
+
+.setplayInput {
+    width: 50%;
+}
+
+.setplayContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.spinner {
+    margin: 0px;
+    padding: 3px;
+    width: 35px;
+}
+
+/*megaliga page*/
+.scoreBoardTable {
+    width: 100%;
+    border: solid 1px #111;
+    background: #fff;
+}
+.scoreTableName {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.setplayName {
+    font-size: 15px;
+}
+
+.scoreHeader {
+    font-weight: bold;
+    font-size: 15px;
+    border-bottom: solid 1px #c40000;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.heatInput {
+    width: 30px;
+    padding: 5px;
+}
+
+.commentInput {
+    padding: 5px;
+    width: 100%;
+}
+
+.standingsHeader {
+    padding: 10px 10px 10px 0px;
+}
+
+/*playoff standings page*/
+.playoffLadder {
+    background-color: #58585859;
+}
+
+.playoffLadderflexDirection {
+    flex-direction: row;
+}
+
+.playoffLadderContent {
+    width: 200px;
+    font-weight: bold;
+    position: relative;
+    top: 7px;
+    left: 5px;
+}
+
+.runnerUpName {
+    font-weight: normal;
+}
+
+.winnerName {
+    width: 200px;
+    font-weight: bold;
+    font-size: 20px;
+    position: relative;
+    top: 30px;
+    left: 37px;
+}
+
+.pairLegendContainer {
+    width: 360px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.pairLegend {
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.legendRound1Margin {
+    margin-right: 45px;
+}
+
+.legendRound2Margin {
+    margin-right: 50px;
+}
+
+.score {
+    width: 50px;
+    font-weight: bold;
+    position: relative;
+    top: 0px;
+    padding: 7px 0px 0px 5px;
+    border-left: solid 1px #c40000;
+}
+
+.playoffPhaseTitle {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.pairLadderContainer {
+    display: flex;
+    width: 360px;
+    height: 120px;
+    margin: 5px 40px 5px 40px;
+}
+
+.seedNumberContainer {
+    position: relative;
+    top: 17px;
+    width: 10px;
+    font-size: 12px;
+}
+
+.teamLadderContainer {
+    display: flex;
+    flex-direction: row;
+    width: 360px;
+    height: 30px;
+}
+
+.teamNameContainer {
+    display: flex;
+    flex-direction: row;
+    width: 350px;
+    height: 30px;
+    background-color: white;
+}
+
+.winnerContainer {
+    display: flex;
+    flex-direction: row;
+    width: 350px;
+    height: 30px;
+}
+
+.winnerMargin {
+    margin-left: 100px;
+}
+
+.playoffPhaseTitlePosition {
+    text-align: center;
+}
+
+.winner {
+    background-color: #71cc6e;
+}
+
+/*history page*/
+.roundName {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+/*draft page*/
+.draftPlayer {
+    font-size: 15px !important;
+    height: 30px !important;
+    width: 75%;
+    margin-top: 5px;
+}
+
+.submitDrawPositionOrder {
+    width: 100px !important;
+    margin-bottom: 50px;
+}
+
+.submitDraftPlayer {
+    width: 120px;
+    margin: 15px 0px 40px 0px;
+}
+
+.draftFormContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.draftCol1 {
+    width: 30%;
+    margin-bottom: 10px;
+}
+
+.draftCol2 {
+    width: 70%;
+    margin-bottom: 10px;
+}
+
+.draftCreditBalanceOk {
+    font-size: 15px;
+    font-weight: bold;
+    color: forestgreen;
+}
+
+.draftHelmet {
+    width: 100px;
+    height: 100px;
+}
+
+.draftPositionPresentation {
+    font-size: 30px;
+    font-weight: bold;
+    color: #c40000;
+    position: relative;
+    top: 30px;
+}
+
+.jsgrid-grid-body {
+    overflow: auto !important;
+}
+
+.jsgrid .jsgrid-grid-body {
+    border-top: none;
+    height: 700px;
+}
+
+/* conflicted css declaration from services.css with bbPress.css declaration causing errors in showing topics in forum */
+.entry-content ul,
+.widget-container ul,
+.comment-body ul,
+.entry-content ol,
+.widget-container ol,
+.comment-body ol {
+    text-indent: 0px;
+    margin: 0px 0 0px 0px;
+}
+.entry-content ol,
+.widget-container ol,
+.comment-body ol {
+    list-style: decimal inside;
+    text-indent: 0px;
+}
+.entry-content ul ul,
+.widget-container ul ul,
+.comment-body ul ul,
+.entry-content ol ol,
+.widget-container ol ol,
+.comment-body ol ol {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.entry-content ul li:before,
+.widget-container ul li:before,
+.comment-body ul li:before {
+    content: '';
+}
+.entry-content li,
+.widget-container li,
+.comment-body li {
+    line-height: 125%;
+    margin: 0px 0;
+}
+
+/*hiding url and email inputs in comment form used on trybuna page*/
+.comment-form-url,
+.comment-form-email,
+.comment-notes {
+    display: none;
+}
