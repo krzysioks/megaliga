@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Teams megaliga 2.0
+Template Name: Teams
  */
 ?>
 <?php get_header(); ?>

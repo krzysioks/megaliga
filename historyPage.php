@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: History ver 2.0
+Template Name: History
 Description: Shows score tables for regular and playoff (were applicable) part of season from previous seasons (without current). Data is stored in megaliga_hisotry table. To know which season is current get megaliga_season.current. If 1 -> season is current; 0 -> not current
  *
  *HARDCODED PART - need change if in the future groups names will change, or its number will change

@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Draft ver 3.0
+Template Name: Draft
 Description: Shows draft form for regular season for one group in the ligue
  */
 ?>

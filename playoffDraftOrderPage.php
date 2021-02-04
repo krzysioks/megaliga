@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Playoff draft order ver 3.0
+Template Name: Playoff Draft Order
 Description: Shows playoff draft order table for one group in the ligue
  */
 ?>

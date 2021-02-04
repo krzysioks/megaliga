@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Megaliga ver 2.0
+Template Name: Megaliga
 Description: Shows schedule and scoreboard of given round for one group in the ligue
  */
 ?>

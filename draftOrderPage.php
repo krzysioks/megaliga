@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Draft order ver 3.0
+Template Name: Draft Order
 Description: Shows draft order table for one group in the ligue
  */
 ?>

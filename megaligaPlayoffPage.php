@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: MegaligaPlayoff ver 2.0
+Template Name: Megaliga Playoff
 Description: Shows playoff schedule and scoreboard of given round for one group in the ligue
  */
 ?>

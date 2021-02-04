@@ -1,6 +1,6 @@
 <?php
 /*
-Template Name: Roster ver 2.0
+Template Name: Roster
 Description: Shows roster for the teams for one group in the ligue
  */
 ?>
