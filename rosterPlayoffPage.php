@@ -90,7 +90,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                     }
 
                     //draws roster submission form
-                    function drawRosterForm($queryResult, $userId, $round_number, $groupName)
+                    function drawRosterForm($queryResult, $userId, $round_number)
                     {
                         global $wpdb;
                         //get list of all available players in the team
@@ -113,7 +113,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                         echo '          </div>';
                         echo '          <div class="teamOverviewRow">';
                         echo '              <span class="teamOverviewLabel">grupa:</span>';
-                        echo '              <span class="teamOverviewContent">' . $groupName . '</span>';
+                        echo '              <span class="teamOverviewContent">' . $queryResult[0]->group_name . '</span>';
                         echo '          </div>';
                         echo '          <div class="teamOverviewRow">';
                         echo '              <span class="teamOverviewLabel">trener:</span>';
@@ -163,7 +163,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                     }
 
                     //draws rosters for all teams for given ligue group
-                    function drawRosters($queryResult, $round_number, $groupName)
+                    function drawRosters($queryResult, $round_number)
                     {
                         foreach ($queryResult as $field) {
                             global $wpdb;
@@ -188,7 +188,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                             echo '          </div>';
                             echo '          <div class="teamOverviewRow">';
                             echo '              <span class="teamOverviewLabel">grupa:</span>';
-                            echo '              <span class="teamOverviewContent">' . $groupName . '</span>';
+                            echo '              <span class="teamOverviewContent">' . $field->group_name . '</span>';
                             echo '          </div>';
                             echo '          <div class="teamOverviewRow">';
                             echo '              <span class="teamOverviewLabel">trener:</span>';
@@ -249,13 +249,13 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                     if ($showRosterForm) {
                         $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
 
-                        drawRosterForm($getRosterSubmissionFormDataQuery, $userId, $round_number, 'Dolce&Gabbana');
+                        drawRosterForm($getRosterSubmissionFormDataQuery, $userId, $round_number);
                     }
 
                     //get roster for all teams that reached playoff stage
                     $getRosterForPlayoffRoundQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_user_data.ID, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id AND megaliga_user_data.reached_playoff = 1');
 
-                    drawRosters($getRosterForPlayoffRoundQuery, $round_number, 'Dolce&Gabbana');
+                    drawRosters($getRosterForPlayoffRoundQuery, $round_number);
 
                     echo '</div>';
                     ?>

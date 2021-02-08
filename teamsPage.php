@@ -1,6 +1,7 @@
 <?php
 /*
 Template Name: Teams
+Description: Shows teams for 2 groups
  */
 ?>
 <?php get_header(); ?>
@@ -21,7 +22,7 @@ Template Name: Teams
                     <?php
                     global $wpdb;
 
-                    function drawTeam($queryResult, $groupName)
+                    function drawTeam($queryResult)
                     {
                         foreach ($queryResult as $field) {
                             global $wpdb;
@@ -42,7 +43,7 @@ Template Name: Teams
                             echo '      </div>';
                             echo '      <div class="teamOverviewRow">';
                             echo '          <span class="teamOverviewLabel">grupa:</span>';
-                            echo '          <span class="teamOverviewContent">' . $groupName . '</span>';
+                            echo '          <span class="teamOverviewContent">' . $field->group_name . '</span>';
                             echo '      </div>';
                             echo '      <div class="teamOverviewRow">';
                             echo '          <span class="teamOverviewLabel">trener:</span>';
@@ -76,11 +77,11 @@ Template Name: Teams
                     }
 
                     //get teams for Dolce&Gabbana ligue
-                    $getUserData = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.ID, megaliga_user_data.logo_url FROM megaliga_user_data, wp_users, megaliga_team_names WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ligue_groups_id = 3 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id');
+                    $getUserData = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.ID, megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id ORDER BY megaliga_ligue_groups.name');
 
                     //content of the team page
                     echo '<div>';
-                    drawTeam($getUserData, 'Dolce&Gabbana');
+                    drawTeam($getUserData);
                     echo '</div>';
                     ?>
 

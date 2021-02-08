@@ -29,7 +29,7 @@ Description: Shows roster for the teams for one group in the ligue
                     $round_number = substr($title, 0, strlen($title) - 8);
                     $userId = $current_user->ID;
                     // $userId = 50;
-                    //$userId = 20;
+                    // $userId = 20;
                     // $userId = 38;
 
                     //defining if roster submission form should be
@@ -89,7 +89,7 @@ Description: Shows roster for the teams for one group in the ligue
                     }
 
                     //draws roster submission form
-                    function drawRosterForm($queryResult, $userId, $round_number, $groupName)
+                    function drawRosterForm($queryResult, $userId, $round_number)
                     {
                         global $wpdb;
 
@@ -113,7 +113,7 @@ Description: Shows roster for the teams for one group in the ligue
                         echo '          </div>';
                         echo '          <div class="teamOverviewRow">';
                         echo '              <span class="teamOverviewLabel">grupa:</span>';
-                        echo '              <span class="teamOverviewContent">' . $groupName . '</span>';
+                        echo '              <span class="teamOverviewContent">' . $queryResult[0]->group_name . '</span>';
                         echo '          </div>';
                         echo '          <div class="teamOverviewRow">';
                         echo '              <span class="teamOverviewLabel">trener:</span>';
@@ -163,7 +163,7 @@ Description: Shows roster for the teams for one group in the ligue
                     }
 
                     //draws rosters for all teams for given ligue group
-                    function drawRosters($queryResult, $round_number, $groupName)
+                    function drawRosters($queryResult, $round_number)
                     {
                         foreach ($queryResult as $field) {
                             global $wpdb;
@@ -187,7 +187,7 @@ Description: Shows roster for the teams for one group in the ligue
                             echo '          </div>';
                             echo '          <div class="teamOverviewRow">';
                             echo '              <span class="teamOverviewLabel">grupa:</span>';
-                            echo '              <span class="teamOverviewContent">' . $groupName . '</span>';
+                            echo '              <span class="teamOverviewContent">' . $field->group_name . '</span>';
                             echo '          </div>';
                             echo '          <div class="teamOverviewRow">';
                             echo '              <span class="teamOverviewLabel">trener:</span>';
@@ -246,14 +246,14 @@ Description: Shows roster for the teams for one group in the ligue
                     echo '<div>';
 
                     if ($showRosterForm) {
-                        $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url FROM megaliga_user_data, wp_users, megaliga_team_names WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id');
-                        drawRosterForm($getRosterSubmissionFormDataQuery, $userId, $round_number, 'Dolce&Gabbana');
+                        $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id');
+                        drawRosterForm($getRosterSubmissionFormDataQuery, $userId, $round_number);
                     }
 
                     //get roster for all teams
-                    $getRosterForRound = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_user_data.ID FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id AND megaliga_user_data.ligue_groups_id = 3');
+                    $getRosterForRound = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_user_data.ID, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id ORDER BY megaliga_ligue_groups.name');
 
-                    drawRosters($getRosterForRound, $round_number, 'Dolce&Gabbana');
+                    drawRosters($getRosterForRound, $round_number);
 
                     echo '</div>';
                     ?>
