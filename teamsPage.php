@@ -22,6 +22,17 @@ Description: Shows teams for 2 groups
                     <?php
                     global $wpdb;
 
+                    $current_user = wp_get_current_user();
+                    $userId = $current_user->ID;
+                    // $userId = 20;
+
+                    //get conditions to show group lottery form
+                    $isGroupLotteryOpenQuery = $wpdb->get_results('SELECT group_lottery_open FROM megaliga_draft_data');
+                    $megaligaUserDataQuery = $wpdb->get_results('SELECT user_data_id, ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
+
+
+
+
                     function drawTeam($queryResult)
                     {
                         foreach ($queryResult as $field) {
@@ -76,11 +87,48 @@ Description: Shows teams for 2 groups
                         }
                     }
 
-                    //get teams for Dolce&Gabbana ligue
+                    //TODO implement this function
+                    function drawGroupLotteryForm($isGroupLotteryOpenQuery, $megaligaUserDataQuery, $userId)
+                    {
+                        global $wpdb;
+                        //show group lottery form if user is logged in and is megaliga player and group lottery is open 
+                        $showGroupLotteryForm = is_user_logged_in() && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1 && count($megaligaUserDataQuery) == 1;
+
+                        if ($showGroupLotteryForm) {
+                            $getUserName = $wpdb->get_results('SELECT user_login FROM wp_users WHERE ID = ' . $userId);
+
+                            //show form lottery if user has not yet choosen group                        
+                            if ($megaligaUserDataQuery[0]->ligue_groups_id == 4) {
+                                echo '<div class="displayFlex flexDirectionColumn">';
+                                echo '  <div class="displayFlex flexDirectionRow">';
+                                echo '    <span class="teamOverviewContent">' . $getUserName[0]->user_login . '</span><span>, wylosouj przydział do grupy</span>';
+                                echo '  </div>';
+                                echo '  <input class="submitDraftPlayer" type="submit" name="submitLottry" value="Wylosuj">';
+                                echo '</div>';
+                            } else {
+                                //show notification about group to which user has been added
+                                $getGroupName = $wpdb->get_results('SELECT name FROM megaliga_ligue_groups WHERE ligue_groups_id = ' . $megaligaUserDataQuery[0]->ligue_groups_id);
+
+                                echo '<div class="displayFlex flexDirectionColumn  marginY20">';
+                                echo '  <div class="displayFlex flexDirectionRow">';
+                                echo '    <span class="teamOverviewContent">' . $getUserName[0]->user_login . '</span><span>, Twoja drużyna została przydzielona do grupy:</span>';
+                                echo '  </div>';
+                                echo '  <div class="marginTop10">';
+                                echo '    <span class="teamOverviewTeamName">' . $getGroupName[0]->name . '</span>';
+                                echo '  </div>';
+                                echo '</div>';
+                            }
+                        } else if (is_user_logged_in() && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1 && count($megaligaUserDataQuery) == 1 && $megaligaUserDataQuery[0]->ligue_groups_id != 4) {
+                        }
+                    }
+
+                    //get teams for Dolce and Gabbana ligue groups
                     $getUserData = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.ID, megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id ORDER BY megaliga_ligue_groups.name');
+
 
                     //content of the team page
                     echo '<div>';
+                    // drawGroupLotteryForm($isGroupLotteryOpenQuery, $megaligaUserDataQuery, $userId);
                     drawTeam($getUserData);
                     echo '</div>';
                     ?>

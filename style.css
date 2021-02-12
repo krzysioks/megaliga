@@ -448,6 +448,10 @@ textarea {
     margin-left: 10px;
 }
 
+.marginY20 {
+    margin-bottom: 20px;
+}
+
 .floatLeft {
     flex-direction: column;
     justify-content: flex-start;
