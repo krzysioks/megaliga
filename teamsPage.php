@@ -24,13 +24,33 @@ Description: Shows teams for 2 groups
 
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
-                    // $userId = 20;
+                    // $userId = 52;
 
                     //get conditions to show group lottery form
                     $isGroupLotteryOpenQuery = $wpdb->get_results('SELECT group_lottery_open FROM megaliga_draft_data');
-                    $megaligaUserDataQuery = $wpdb->get_results('SELECT user_data_id, ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
 
+                    //form submission
+                    if ($_POST['submitLottery']) {
+                        //check if system tries to subimt same data again and group lottery is open
+                        $getCheckIfUserTeamAlreadyAssignedToGroup = $wpdb->get_results('SELECT ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
 
+                        if ($getCheckIfUserTeamAlreadyAssignedToGroup[0]->ligue_groups_id == 4 && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1) {
+                            $getDolceTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1');
+                            $getGabbanaTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2');
+
+                            $lotteryNumber = mt_rand(0, 10);
+
+                            $updateUserGroupAssigmentData = array();
+                            $whereUpdateUserGroupAssigment = array('ID' => $userId);
+                            //team is assigned to dolce if $lotteryNumber <= 5 and there is still space in dolce group OR $lotteryNumber > 5 and there is no space in Gabbana group
+                            if ($lotteryNumber <= 5 && $getDolceTeamNumber[0]->dolce < 6 || $lotteryNumber > 5 && $getGabbanaTeamNumber[0]->gabbana == 6) {
+                                $updateUserGroupAssigmentData['ligue_groups_id'] = 1;
+                            } else {
+                                $updateUserGroupAssigmentData['ligue_groups_id'] = 2;
+                            }
+                            $wpdb->update('megaliga_user_data', $updateUserGroupAssigmentData, $whereUpdateUserGroupAssigment);
+                        }
+                    }
 
 
                     function drawTeam($queryResult)
@@ -87,10 +107,10 @@ Description: Shows teams for 2 groups
                         }
                     }
 
-                    //TODO implement this function
-                    function drawGroupLotteryForm($isGroupLotteryOpenQuery, $megaligaUserDataQuery, $userId)
+                    function drawGroupLotteryForm($isGroupLotteryOpenQuery, $userId)
                     {
                         global $wpdb;
+                        $megaligaUserDataQuery = $wpdb->get_results('SELECT user_data_id, ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
                         //show group lottery form if user is logged in and is megaliga player and group lottery is open 
                         $showGroupLotteryForm = is_user_logged_in() && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1 && count($megaligaUserDataQuery) == 1;
 
@@ -99,12 +119,14 @@ Description: Shows teams for 2 groups
 
                             //show form lottery if user has not yet choosen group                        
                             if ($megaligaUserDataQuery[0]->ligue_groups_id == 4) {
-                                echo '<div class="displayFlex flexDirectionColumn">';
-                                echo '  <div class="displayFlex flexDirectionRow">';
-                                echo '    <span class="teamOverviewContent">' . $getUserName[0]->user_login . '</span><span>, wylosouj przydział do grupy</span>';
+                                echo '<form action="" method="post">';
+                                echo '  <div class="displayFlex flexDirectionColumn">';
+                                echo '    <div class="displayFlex flexDirectionRow">';
+                                echo '      <span class="teamOverviewContent">' . $getUserName[0]->user_login . '</span><span>, wylosouj przydział do grupy</span>';
+                                echo '    </div>';
+                                echo '    <input class="submitDraftPlayer" type="submit" name="submitLottery" value="Wylosuj">';
                                 echo '  </div>';
-                                echo '  <input class="submitDraftPlayer" type="submit" name="submitLottry" value="Wylosuj">';
-                                echo '</div>';
+                                echo '</form>';
                             } else {
                                 //show notification about group to which user has been added
                                 $getGroupName = $wpdb->get_results('SELECT name FROM megaliga_ligue_groups WHERE ligue_groups_id = ' . $megaligaUserDataQuery[0]->ligue_groups_id);
@@ -118,7 +140,6 @@ Description: Shows teams for 2 groups
                                 echo '  </div>';
                                 echo '</div>';
                             }
-                        } else if (is_user_logged_in() && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1 && count($megaligaUserDataQuery) == 1 && $megaligaUserDataQuery[0]->ligue_groups_id != 4) {
                         }
                     }
 
@@ -128,7 +149,7 @@ Description: Shows teams for 2 groups
 
                     //content of the team page
                     echo '<div>';
-                    // drawGroupLotteryForm($isGroupLotteryOpenQuery, $megaligaUserDataQuery, $userId);
+                    drawGroupLotteryForm($isGroupLotteryOpenQuery, $userId);
                     drawTeam($getUserData);
                     echo '</div>';
                     ?>
