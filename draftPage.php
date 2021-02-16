@@ -26,7 +26,7 @@ Description: Shows draft form for regular season for one group in the ligue
                     // $userId = 20; //46; //14;
 
                     //check if draft window is open
-                    $getDraftWindowState = $wpdb->get_results('SELECT draft_window_open, draft_credit_enabled FROM megaliga_draft_data');
+                    $getDraftWindowState = $wpdb->get_results('SELECT draft_window_open, draft_credit_enabled, draft_round1_order_lottery_open FROM megaliga_draft_data');
 
                     //function sets next draft round - needed to know for who draftForm will be available
                     function setNextDraftRound($userId)
@@ -206,6 +206,7 @@ Description: Shows draft form for regular season for one group in the ligue
                     $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round FROM megaliga_draft_data');
                     $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
+                    // drawDraftLotteryRound1Form($getDraftWindowState, $userId);
                     //content of the draft page
                     drawDraftForm($getDraftWindowState, $getDraftTurnUserId, $userId);
                     the_content();

@@ -852,6 +852,10 @@ textarea {
     height: 700px;
 }
 
+.width_100 {
+    width: 100%;
+}
+
 /* conflicted css declaration from services.css with bbPress.css declaration causing errors in showing topics in forum */
 .entry-content ul,
 .widget-container ul,
