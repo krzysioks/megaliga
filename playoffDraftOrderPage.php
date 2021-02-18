@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Playoff Draft Order
-Description: Shows playoff draft order table for one group in the ligue
+Description: Shows playoff draft order table for two group in the ligue
  */
 ?>
 <?php get_header(); ?>
@@ -107,53 +107,97 @@ Description: Shows playoff draft order table for one group in the ligue
                         return $standingsData;
                     }
 
-                    //assessing first 4 teams in the leage which currently reach playoff
-                    $getUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 3');
-                    $getSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule FROM megaliga_schedule WHERE id_ligue_group = 3');
-                    $standings = calculateStandingsData($getSchedule, $getUserID);
-
-                    //for those 4 teams playoff draft order will be set. It is dynamic table which will change during season while teams change their positions in the table
-                    $i = 1;
-                    $teamsReachedPlayoff = array();
-                    foreach ($standings as $team) {
-                        $getTeamId = $wpdb->get_results('SELECT team_names_id FROM megaliga_user_data WHERE megaliga_user_data.ID = ' . $team['ID']);
-                        if ($i <= 4) {
-                            $teamsReachedPlayoff[$i] = array("ID" => $team['ID'], "team_names_id" => $getTeamId[0]->team_names_id);
+                    //function returns 2 teams which has 1,2 place in group table
+                    function getReachedPlayoffTeams($standings, $numberOfTeamsPassing)
+                    {
+                        global $wpdb;
+                        $i = 1;
+                        $teamsReachedPlayoff = array();
+                        foreach ($standings as $team) {
+                            $getTeamId = $wpdb->get_results('SELECT team_names_id FROM megaliga_user_data WHERE megaliga_user_data.ID = ' . $team['ID']);
+                            if ($i <= $numberOfTeamsPassing) {
+                                $teamsReachedPlayoff[$i] = array("ID" => $team['ID'], "team_names_id" => $getTeamId[0]->team_names_id);
+                            }
+                            $i++;
                         }
-                        $i++;
+
+                        return $teamsReachedPlayoff;
                     }
 
-                    //order in which teams will be drafting players
-                    $playoffDraftOrderArray = array(1, 2, 3, 4, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4);
-                    //check if megaliga_playoff_draft_order has already records -> UPDATE or is empty -> INSERT
-                    $getNumberOfRounds = $wpdb->get_results('SELECT COUNT(*) as "size" FROM megaliga_playoff_draft_order');
+                    //function return ID of user, which team reached playoff
+                    function getReachedPlayoffID($teamsReachedPlayoff)
+                    {
+                        $reachedPlayoffIDarray = array();
+                        foreach ($teamsReachedPlayoff as $teamReachedPlayoff) {
+                            array_push($reachedPlayoffIDarray, $teamReachedPlayoff['ID']);
+                        }
 
-                    if ($getNumberOfRounds[0]->size == 0) {
+                        return $reachedPlayoffIDarray;
+                    }
+
+                    //assessing first 4 (2 from each group) teams in the leage which currently reach playoff
+                    $getDolceUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1');
+                    $getGabbanaUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 2');
+
+                    $getDolceSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule FROM megaliga_schedule WHERE id_ligue_group = 1');
+                    $getGabbanaSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule FROM megaliga_schedule WHERE id_ligue_group = 2');
+
+                    $standingsDolce = calculateStandingsData($getDolceSchedule, $getDolceUserID);
+                    $standingsGabbana = calculateStandingsData($getGabbanaSchedule, $getGabbanaUserID);
+
+                    //get 2 best teams from each group
+                    $teamsReachedPlayoffDolce = getReachedPlayoffTeams($standingsDolce, 2);
+                    $teamsReachedPlayoffGabbana = getReachedPlayoffTeams($standingsGabbana, 2);
+
+                    //calculate standings data for those 4 selected teams to sort them from the best to the worst
+                    //get ID of teams that reached playoff
+                    $reachedPlayoffDolceIDarray = getReachedPlayoffID($teamsReachedPlayoffDolce);
+                    $reachedPlayoffGabbanaIDarray = getReachedPlayoffID($teamsReachedPlayoffGabbana);
+
+                    //filter standings to get standings for 4 teams that reached playoffs
+                    $reachedPlayoffStandings = array();
+                    foreach ($reachedPlayoffDolceIDarray as $ID) {
+                        $reachedPlayoffStandings[$ID] = $standingsDolce[$ID];
+                    }
+                    foreach ($reachedPlayoffGabbanaIDarray as $ID) {
+                        $reachedPlayoffStandings[$ID] = $standingsGabbana[$ID];
+                    }
+
+                    //sort them to get order from best to the worst
+                    uasort($reachedPlayoffStandings, 'compareTeams');
+
+                    //for those 4 (2 from each group) teams playoff draft order will be set. It is dynamic table which will change during season while teams change their positions in the table
+                    $teamsReachedPlayoff = getReachedPlayoffTeams($reachedPlayoffStandings, 4);
+
+                    //update draft order table only if there are any teams that reached playoff (case when teams are not yet assigned to groups)
+                    if (count($teamsReachedPlayoff)) {
+                        //order in which teams will be drafting players
+                        $playoffDraftOrderArray = array(1, 2, 3, 4, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4, 4, 3, 2, 1, 1, 2, 3, 4);
+                        //check if megaliga_playoff_draft_order has already records -> UPDATE or is empty -> INSERT
+                        $getNumberOfRounds = $wpdb->get_results('SELECT COUNT(*) as "size" FROM megaliga_playoff_draft_order');
+
+
                         $i = 1;
                         foreach ($playoffDraftOrderArray as $value) {
-                            //prepare data for submission
+                            // prepare data for submission
                             $submitDataArray = array();
                             $submitDataArray['draft_order'] = $i;
                             $submitDataArray['ID'] = $teamsReachedPlayoff[$value]['ID'];
                             $submitDataArray['team_names_id'] = $teamsReachedPlayoff[$value]['team_names_id'];
 
-                            $wpdb->insert('megaliga_playoff_draft_order', $submitDataArray);
-                            $i++;
-                        }
-                    } else {
-                        $i = 1;
-                        foreach ($playoffDraftOrderArray as $value) {
-                            //prepare data for submission
-                            $submitDataArray = array();
-                            $submitDataArray['ID'] = $teamsReachedPlayoff[$value]['ID'];
-                            $submitDataArray['team_names_id'] = $teamsReachedPlayoff[$value]['team_names_id'];
+                            if (!$getNumberOfRounds[0]->size) {
+                                $wpdb->insert('megaliga_playoff_draft_order', $submitDataArray);
+                            } else {
+                                //update if records already exists
+                                $where = array('draft_order' => $i);
+                                $wpdb->update('megaliga_playoff_draft_order', $submitDataArray, $where);
+                            }
 
-                            //update if records already exists
-                            $where = array('draft_order' => $i);
-                            $wpdb->update('megaliga_playoff_draft_order', $submitDataArray, $where);
                             $i++;
                         }
                     }
+
+
                     //get info about whose turn is now if playoff draft is open
                     $getDraftWindowState = $wpdb->get_results('SELECT playoff_draft_window_open, playoff_draft_current_round FROM megaliga_draft_data');
                     $getTeamId = $wpdb->get_results('SELECT team_names_id FROM megaliga_playoff_draft_order WHERE draft_order = ' . $getDraftWindowState[0]->playoff_draft_current_round);
