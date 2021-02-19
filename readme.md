@@ -109,3 +109,11 @@ id_schedule id_user_team1 id_user_team2 round_number team1_score team2_score
 -   stage – semifinal|final|3rdplace
 -   id_schedule_round1/2 – id_schedule z tabeli megaliga_schedule_playoff wskazujący na rekord reprezentujący mecz dla rundy odpowiednio 1/2 dla tej pary w danej fazie playoff
 -   seed_number_team1/2 miejsce jakie dana drużyna zajmowała po zakończeniu sezonu zasadniczego (tzw. numer rozstawienia)
+
+Tests:
+
+1. set dolce teams
+   UPDATE `megaliga_user_data` SET `ligue_groups_id`= 1 WHERE team_names_id IN (4,19,17,12,5,13)
+
+2. set gabbana teams
+   UPDATE `megaliga_user_data` SET `ligue_groups_id`= 2 WHERE team_names_id IN (21, 18,16,6,3,20)
