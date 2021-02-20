@@ -24,7 +24,7 @@ Description: Shows draft form for regular season for one group in the ligue
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
                     // $userId = 20; //46; //14;
-
+                    // $userId = 47;
                     //check if draft window is open
                     $getDraftWindowState = $wpdb->get_results('SELECT draft_window_open, draft_credit_enabled, draft_round1_order_lottery_open FROM megaliga_draft_data');
 
@@ -111,6 +111,85 @@ Description: Shows draft form for regular season for one group in the ligue
                     //handle submission (user decide to leave his turn)
                     if ($_POST['passDraft']) {
                         setNextDraftRound($userId);
+                    }
+
+                    if ($_POST['submitDraftLotteryOrderDraw']) {
+                        //check if user has already draw draft order; prevent from redrawing draft order when F5 or reload of page is done
+                        $getUserData = $wpdb->get_results('SELECT is_draw_round1_draft_order, ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
+                        $getUserName = $wpdb->get_results('SELECT user_login FROM wp_users WHERE wp_users.ID = ' . $userId);
+
+                        if (!$getUserData[0]->is_draw_round1_draft_order) {
+                            $score = random_int(1, 100);
+                            //translating score to draft lottery draw order
+                            //get left number of order position to draw
+                            $getOrderPositionToDraw = $wpdb->get_results('SELECT position_name FROM megaliga_draft_order WHERE is_selected = 0 AND ligue_groups_id = ' . $getUserData[0]->ligue_groups_id);
+
+                            $numberOfOrderPositionToDraw = count($getOrderPositionToDraw);
+
+                            $drawPosition = 0;
+                            $stageNumber = 1;
+                            //max score to achive - is lowering with each stage
+                            $availablePoints = 100;
+                            // echo 'score: ' . $score . '</br>';
+                            foreach ($getOrderPositionToDraw as $orderPosition) {
+                                // echo '$stageNumber: ' . $stageNumber . '</br>';
+                                // echo '$availablePoints: ' . $availablePoints . '</br>';
+                                $stageLimit = 100 - ((100 / $numberOfOrderPositionToDraw) * $stageNumber);
+                                // echo '$stageLimit: ' . $stageLimit . ' $numberOfOrderPositionToDraw: ' . $numberOfOrderPositionToDraw . '</br>';
+                                if ($score <= $availablePoints && $score > $stageLimit) {
+                                    $drawPosition = $orderPosition->position_name;
+                                    break;
+                                } else {
+                                    $availablePoints = $stageLimit;
+                                    $stageNumber++;
+                                }
+                                // echo '</br></br>';
+                            }
+                            // echo '$drawPosition: ' . $drawPosition;
+
+                            //save ID of user to table to column representing draw position; this table is used to generate table with draft order in all rounds of draft
+                            $position2orderMapper = array('1' => 'one', '2' => 'two', '3' => 'three', '4' => 'four', '5' => 'five', '6' => 'six');
+                            $updateUserPositionOrder = array();
+                            $updateUserPositionOrder[$position2orderMapper[$drawPosition]] = $userId;
+
+                            $where = array('ligue_groups_id' => $getUserData[0]->ligue_groups_id);
+                            $wpdb->update('megaliga_1round_draft_order_lottery_outcome', $updateUserPositionOrder, $where);
+
+                            //lock position order draw by the user, so that it want be draw by other users
+                            $updateLockPositionOrder = array(
+                                'is_selected' => '1'
+                            );
+                            $where = array('position_name' => $drawPosition, 'ligue_groups_id' => $getUserData[0]->ligue_groups_id);
+                            $wpdb->update('megaliga_draft_order', $updateLockPositionOrder, $where);
+
+                            //indicate, that user has already draw draft order, so that draft order form will not be shown again
+                            $updateDraftOrderDrawDoneFlag = array(
+                                'is_draw_round1_draft_order' => '1'
+                            );
+                            $where = array('ID' => $userId);
+                            $wpdb->update('megaliga_user_data', $updateDraftOrderDrawDoneFlag, $where);
+
+                            $helmetMapper = array('1' => 'biały', '2' => 'fioletowy', '3' => 'niebieski', '4' => 'żółty', '5' => 'czerwony', '6' => 'pomarańczowy', '7' => 'zielony', '8' => 'czarny');
+                            $orderMapper = array('1' => 'pierwszy', '2' => 'drugi', '3' => 'trzeci', '4' => 'czwarty', '5' => 'piąty', '6' => 'szósty', '7' => 'siódmy', '8' => 'ósmy');
+
+                            //presentation of draw outcome for user
+                            echo '<div class="displayFlex center flexDirectionColumn">';
+                            echo '  <div class="marginBottom10">';
+                            echo '      <span class="scoreTableName">' . $getUserName[0]->user_login . ', wylosowałeś:</span>';
+                            echo '  </div>';
+                            echo '  <div class="displayFlex flexDirectionRow center marginBottom10">';
+                            echo '      <img src="http://megaliga.eu/wp-content/uploads/2019/03/kask' . $drawPosition . '.png" class="draftHelmet">';
+                            echo '      <span class="draftPositionPresentation marginLeft10">' . $drawPosition . '</span>';
+                            echo '  </div>';
+                            echo '  <div class="marginBottom40">';
+                            echo '  <span class="scoreTableName">' . $helmetMapper[$drawPosition] . ' kask. Jesteś ' . $orderMapper[$drawPosition] . ' w kolejności w 1 rundzie draftu</span>';
+                            echo '  </div>';
+                            echo '</div>';
+                        } else {
+                            echo '<div class="marginBottom20">';
+                            echo '  <span class="left scoreTableName">' . $getUserName[0]->user_login . ', dokonałeś już losowania kolejności wyboru w pierwszej rundzie draftu</span>';
+                            echo ' </div>';
+                        }
                     }
 
                     function drawDraftForm($draftWindowState, $getDraftTurnUserId, $userId)
@@ -202,11 +281,36 @@ Description: Shows draft form for regular season for one group in the ligue
                         }
                     }
 
+                    function drawDraftLotteryRound1Form($draftWindowState, $userId)
+                    {
+                        global $wpdb;
+
+                        $getIfUserAlreadyDrawDfratLotteryOrder = $wpdb->get_results('SELECT is_draw_round1_draft_order FROM megaliga_user_data WHERE ID = ' . $userId);
+
+                        //show form if user logged in and round 1 draft lottery is open and user is megaliga member
+                        if (is_user_logged_in() && $draftWindowState[0]->draft_round1_order_lottery_open && count($getIfUserAlreadyDrawDfratLotteryOrder)) {
+
+                            //if previous condition met, check if user has not already draw draft order
+                            if (!$getIfUserAlreadyDrawDfratLotteryOrder[0]->is_draw_round1_draft_order) {
+                                $getUserName = $wpdb->get_results('SELECT user_login FROM wp_users WHERE wp_users.ID = ' . $userId);
+
+                                echo '<div class="draftFormContainer">';
+                                echo '  <form action="" method="post">';
+                                echo '      <div class="displayFlex flexDirectionColumn">';
+                                echo '          <span class="left scoreTableName marginBottom5">' . $getUserName[0]->user_login . ', naciśnij guzik "Losuj" aby wylosować kolejność wyboru w pierwszej rundzie draftu: </span>';
+                                echo '          <input class="submitDraftPlayer" type="submit" name="submitDraftLotteryOrderDraw" value="Losuj">';
+                                echo '          </div>';
+                                echo '  </form>';
+                                echo '</div>';
+                            }
+                        }
+                    }
+
                     //check whose turn for draft is now
                     $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round FROM megaliga_draft_data');
                     $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
-                    // drawDraftLotteryRound1Form($getDraftWindowState, $userId);
+                    drawDraftLotteryRound1Form($getDraftWindowState, $userId);
                     //content of the draft page
                     drawDraftForm($getDraftWindowState, $getDraftTurnUserId, $userId);
                     the_content();

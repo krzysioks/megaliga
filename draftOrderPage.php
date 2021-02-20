@@ -26,15 +26,15 @@ Description: Shows draft order table for two group in the ligue
 
                     $getUserData = $wpdb->get_results('SELECT ID, team_names_id FROM megaliga_user_data');
 
-                    function updateDraftOrderTable($getDraftOrder, $draftOrderTableName, $teamId2userIdMapper)
+                    function updateDraftOrderTable($getDraftOrder, $draftOrderTableName, $userId2teamIdMapper)
                     {
                         global $wpdb;
 
-                        //map team_names_id to order position
-                        $draftOrder2teamIdMapper = array();
+                        //map user id to order position
+                        $draftOrder2userIdMapper = array();
                         $i = 1;
                         foreach ($getDraftOrder as $data) {
-                            $draftOrder2teamIdMapper[$i] = $data;
+                            $draftOrder2userIdMapper[$i] = $data;
                             $i++;
                         }
 
@@ -47,10 +47,11 @@ Description: Shows draft order table for two group in the ligue
                         $i = 1;
                         foreach ($draftOrderArray as $value) {
                             // prepare data for submission
+                            $userId = $draftOrder2userIdMapper[$value];
                             $submitDataArray = array();
                             $submitDataArray['draft_order'] = $i;
-                            $submitDataArray['ID'] = $teamId2userIdMapper[$draftOrder2teamIdMapper[$value]];
-                            $submitDataArray['team_names_id'] = $draftOrder2teamIdMapper[$value];
+                            $submitDataArray['ID'] = $userId;
+                            $submitDataArray['team_names_id'] = $userId2teamIdMapper[$userId];
 
                             if (!$getNumberOfRounds[0]->size) {
                                 $wpdb->insert($draftOrderTableName, $submitDataArray);
@@ -69,13 +70,13 @@ Description: Shows draft order table for two group in the ligue
                         $getDraftOrder = $wpdb->get_results('SELECT one, two, three, four, five, six FROM megaliga_1round_draft_order_lottery_outcome');
                         $getUserData = $wpdb->get_results('SELECT ID, team_names_id FROM megaliga_user_data');
 
-                        $teamId2userIdMapper = array();
+                        $userId2teamIdMapper = array();
                         foreach ($getUserData as $userData) {
-                            $teamId2userIdMapper[$userData->team_names_id] = $userData->ID;
+                            $userId2teamIdMapper[$userData->ID] = $userData->team_names_id;
                         }
 
-                        updateDraftOrderTable($getDraftOrder[0], 'megaliga_season_draft_order_dolce', $teamId2userIdMapper);
-                        updateDraftOrderTable($getDraftOrder[1], 'megaliga_season_draft_order_gabbana', $teamId2userIdMapper);
+                        updateDraftOrderTable($getDraftOrder[0], 'megaliga_season_draft_order_dolce', $userId2teamIdMapper);
+                        updateDraftOrderTable($getDraftOrder[1], 'megaliga_season_draft_order_gabbana', $userId2teamIdMapper);
                     }
 
 
