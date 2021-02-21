@@ -24,7 +24,7 @@ Description: Shows draft form for regular season for one group in the ligue
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
                     // $userId = 20; //46; //14;
-                    // $userId = 47;
+                    // $userId = 20;
                     //check if draft window is open
                     $getDraftWindowState = $wpdb->get_results('SELECT draft_window_open, draft_credit_enabled, draft_round1_order_lottery_open FROM megaliga_draft_data');
 
@@ -32,9 +32,9 @@ Description: Shows draft form for regular season for one group in the ligue
                     function setNextDraftRound($userId)
                     {
                         global $wpdb;
-
-                        $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round FROM megaliga_draft_data');
-                        $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
+                        $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
+                        $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round_' . $getGroupName[0]->name . ' as "draft_current_round" FROM megaliga_draft_data');
+                        $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
                         //prevention against form resubmission - do not increment current round number if id of logged user differs from id of user which draft round is now
                         if ($getDraftTurnUserId[0]->ID != $userId) {
@@ -42,33 +42,32 @@ Description: Shows draft form for regular season for one group in the ligue
                         }
 
                         //check how many rounds are defined in db.
-                        $getNumberOfRounds = $wpdb->get_results('SELECT COUNT(*) as "round_number" FROM megaliga_season_draft_order');
+                        $getNumberOfRounds = $wpdb->get_results('SELECT COUNT(*) as "round_number" FROM megaliga_season_draft_order_' . $getGroupName[0]->name);
 
                         //if current round == number of defined rounds -> start from 1st round else increment round number
                         $nextRoundNumber = $getDraftCurrentRound[0]->draft_current_round == $getNumberOfRounds[0]->round_number ? 1 : $getDraftCurrentRound[0]->draft_current_round + 1;
 
-                        //update draft_current_round in megaliga_draft_data
-                        $updateCurrentRound = array(
-                            'draft_current_round' => $nextRoundNumber
-                        );
+                        $updateCurrentRound = array();
+                        $updateCurrentRound['draft_current_round_' . $getGroupName[0]->name] = $nextRoundNumber;
                         $whereCurrentRound = array('id_draft' => 1);
                         $wpdb->update('megaliga_draft_data', $updateCurrentRound, $whereCurrentRound);
                     }
 
                     //handle submission (player drafted)
                     if ($_POST['submitDraft']) {
+                        $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
                         //check if system tries to subimt same data again
-                        $getCheckIfUserAlreadyChosenPlayer = $wpdb->get_results('SELECT id_user FROM megaliga_players WHERE player_id = ' . $_POST['draftPlayer']);
+                        $getCheckIfUserAlreadyChosenPlayer = $wpdb->get_results('SELECT id_user_' . $getGroupName[0]->name . ' as "id_user" FROM megaliga_players WHERE player_id = ' . $_POST['draftPlayer']);
 
                         //prevention against form resubmission - update only those players who has no user assigned.
                         if (!$getCheckIfUserAlreadyChosenPlayer[0]->id_user) {
                             //number with which player is drafted is important in the game -> get it for given user and assign to drafted player. It will help to sort team's roster from the first drafted player to the last
                             $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number FROM megaliga_user_data WHERE ID = ' . $userId);
+
                             //update megaliga_players table
-                            $data = array(
-                                'id_user' => $userId,
-                                'drafted_with_number' => $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number
-                            );
+                            $data = array();
+                            $data['id_user_' . $getGroupName[0]->name] = $userId;
+                            $data['drafted_with_number_' . $getGroupName[0]->name] = $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number;
                             $where = array('player_id' => $_POST['draftPlayer']);
                             $wpdb->update('megaliga_players', $data, $where);
 
@@ -192,92 +191,101 @@ Description: Shows draft form for regular season for one group in the ligue
                         }
                     }
 
-                    function drawDraftForm($draftWindowState, $getDraftTurnUserId, $userId)
+                    function drawDraftForm($draftWindowState, $userId)
                     {
                         global $wpdb;
 
-                        //draft form will be shown if user taking part in game is logged in and draft window is open and it is his turn to draft player
-                        // echo 'isLoggedIn: ' . is_user_logged_in() . ' </br>draft open: ' . $draftWindowState[0]->draft_window_open . '</br> draftTurnUserId: ' . $getDraftTurnUserId[0]->ID . '</br> userId: ' . $userId;
-                        if (is_user_logged_in() && $draftWindowState[0]->draft_window_open && $getDraftTurnUserId[0]->ID == $userId) {
-                            //$draftWindowState[0]->draft_credit_enabled - flag indicates if draftCredit mode is on (players in draft has value and user cannot draft player he cannot afford)
-                            $getUserData = $wpdb->get_results('SELECT megaliga_user_data.credit_balance, megaliga_team_names.name, wp_users.user_login FROM megaliga_user_data, megaliga_team_names, wp_users WHERE megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId);
+                        $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
 
-                            if ($draftWindowState[0]->draft_credit_enabled) {
-                                $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name, credit FROM megaliga_players WHERE id_user IS NULL AND credit <= ' . $getUserData[0]->credit_balance . ' ORDER BY credit DESC');
-                            } else {
-                                $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user IS NULL');
-                            }
+                        //draft form will be shown if user taking part in game is logged in and draft window is open and is megaliga member...
+                        // echo 'isLoggedIn: ' . is_user_logged_in() . ' </br>draft open: ' . $draftWindowState[0]->draft_window_open . '</br> userId: ' . $userId . '</br>is user megaliga member: ' . count($getGroupName);
+                        if (is_user_logged_in() && $draftWindowState[0]->draft_window_open && count($getGroupName)) {
+                            //check whose turn for draft is now
+                            $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round_' . $getGroupName[0]->name . ' as "draft_current_round" FROM megaliga_draft_data');
+                            $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
-                            //create option list for select with players to draft
-                            if ($draftWindowState[0]->draft_credit_enabled) {
-                                foreach ($getPlayersToDraft as $player) {
-                                    $options[] = array('label' => $player->ekstraliga_player_name . ' (' . $player->credit . ')', 'value' => $player->player_id);
+                            //...and it is his turn to draft player
+                            if ($getDraftTurnUserId[0]->ID == $userId) {
+                                //$draftWindowState[0]->draft_credit_enabled - flag indicates if draftCredit mode is on (players in draft has value and user cannot draft player he cannot afford)
+                                $getUserData = $wpdb->get_results('SELECT megaliga_user_data.credit_balance, megaliga_team_names.name, wp_users.user_login FROM megaliga_user_data, megaliga_team_names, wp_users WHERE megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId);
+
+                                if ($draftWindowState[0]->draft_credit_enabled) {
+                                    $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name, credit FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' IS NULL AND credit <= ' . $getUserData[0]->credit_balance . ' ORDER BY ekstraliga_player_name');
+                                } else {
+                                    $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' IS NULL ORDER BY ekstraliga_player_name');
                                 }
-                            } else {
-                                foreach ($getPlayersToDraft as $player) {
-                                    $options[] = array('label' => $player->ekstraliga_player_name, 'value' => $player->player_id);
+
+                                //create option list for select with players to draft
+                                if ($draftWindowState[0]->draft_credit_enabled) {
+                                    foreach ($getPlayersToDraft as $player) {
+                                        $options[] = array('label' => $player->ekstraliga_player_name . ' (' . $player->credit . ')', 'value' => $player->player_id);
+                                    }
+                                } else {
+                                    foreach ($getPlayersToDraft as $player) {
+                                        $options[] = array('label' => $player->ekstraliga_player_name, 'value' => $player->player_id);
+                                    }
                                 }
-                            }
 
-                            //show draft if there are players to draft
-                            if (!count($options)) {
-                                return;
-                            }
-
-                            $getAlreadyDrafterPlayers = $wpdb->get_results('SELECT ekstraliga_player_name, credit FROM megaliga_players WHERE id_user = ' . $userId . ' ORDER BY credit DESC');
-
-                            if ($draftWindowState[0]->draft_credit_enabled) {
-                                $creditBalanceCss = $getUserData[0]->credit_balance > 0 ? 'draftCreditBalanceOk' : 'teamOverviewContent';
-                            }
-
-                            // $getSeasonName = $wpdb->get_results('SELECT season_name FROM megaliga_season WHERE current = 1');
-                            echo '<div class="draftFormContainer">';
-                            echo '  <div class="displayFlex flexDirectionColumn draftCol1">';
-                            echo '      <div class="displayFlex flexDirectionRow">';
-                            echo '          <span class="left scoreTableName marginRight5 marginBottom5">Draft do zespołu:</span><span class="teamOverviewContent marginBottom5">' . $getUserData[0]->name . '</span>';
-                            echo '      </div>';
-                            echo '      <div class="displayFlex flexDirectionRow">';
-
-                            if ($draftWindowState[0]->draft_credit_enabled) {
-                                echo '          <span class="left scoreTableName marginRight5 marginBottom5">Pozostały kredyt:</span><span class="' . $creditBalanceCss . ' marginBottom5">' . $getUserData[0]->credit_balance . '</span>';
-                            }
-
-                            echo '      </div>';
-                            echo '      <div class="displayFlex flexDirectionColumn">';
-                            echo '          <span class="left scoreTableName marginRight5 marginBottom5">Dotychczas wybrani zawodnicy:</span>';
-
-                            $i = 1;
-                            if ($draftWindowState[0]->draft_credit_enabled) {
-                                foreach ($getAlreadyDrafterPlayers as $player) {
-                                    echo '<span class="fontSize12">' . $i . '. ' . $player->ekstraliga_player_name . ' (' . $player->credit . ')</span>';
-                                    $i++;
+                                //show draft if there are players to draft
+                                if (!count($options)) {
+                                    return;
                                 }
-                            } else {
-                                foreach ($getAlreadyDrafterPlayers as $player) {
-                                    echo '<span class="fontSize12">' . $i . '. ' . $player->ekstraliga_player_name . '</span>';
-                                    $i++;
-                                }
-                            }
 
-                            echo '      </div>';
-                            echo '  </div>';
-                            echo '  <div class="draftCol2">';
-                            echo '      <form action="" method="post">';
-                            echo '          <div class="displayFlex flexDirectionColumn">';
-                            echo '              <span class="left scoreTableName marginBottom5">' . $getUserData[0]->user_login . ' wybierz zawodnika w tej turze draftu: </span>';
-                            echo '              <select class="draftPlayer" name="draftPlayer" id="draftPlayer">';
-                            foreach ($options as $option) {
-                                echo '              <option value="' . $option['value'] . '">' . $option['label'] . '</option>';
+                                $getAlreadyDrafterPlayers = $wpdb->get_results('SELECT ekstraliga_player_name, credit, drafted_with_number_' . $getGroupName[0]->name . ' FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' = ' . $userId . ' ORDER BY drafted_with_number_' . $getGroupName[0]->name . ' ASC');
+
+                                if ($draftWindowState[0]->draft_credit_enabled) {
+                                    $creditBalanceCss = $getUserData[0]->credit_balance > 0 ? 'draftCreditBalanceOk' : 'teamOverviewContent';
+                                }
+
+                                // $getSeasonName = $wpdb->get_results('SELECT season_name FROM megaliga_season WHERE current = 1');
+                                echo '<div class="draftFormContainer">';
+                                echo '  <div class="displayFlex flexDirectionColumn draftCol1">';
+                                echo '      <div class="displayFlex flexDirectionRow">';
+                                echo '          <span class="left scoreTableName marginRight5 marginBottom5">Draft do zespołu:</span><span class="teamOverviewContent marginBottom5">' . $getUserData[0]->name . '</span>';
+                                echo '      </div>';
+                                echo '      <div class="displayFlex flexDirectionRow">';
+
+                                if ($draftWindowState[0]->draft_credit_enabled) {
+                                    echo '          <span class="left scoreTableName marginRight5 marginBottom5">Pozostały kredyt:</span><span class="' . $creditBalanceCss . ' marginBottom5">' . $getUserData[0]->credit_balance . '</span>';
+                                }
+
+                                echo '      </div>';
+                                echo '      <div class="displayFlex flexDirectionColumn">';
+                                echo '          <span class="left scoreTableName marginRight5 marginBottom5">Dotychczas wybrani zawodnicy:</span>';
+
+                                $i = 1;
+                                if ($draftWindowState[0]->draft_credit_enabled) {
+                                    foreach ($getAlreadyDrafterPlayers as $player) {
+                                        echo '<span class="fontSize12">' . $i . '. ' . $player->ekstraliga_player_name . ' (' . $player->credit . ')</span>';
+                                        $i++;
+                                    }
+                                } else {
+                                    foreach ($getAlreadyDrafterPlayers as $player) {
+                                        echo '<span class="fontSize12">' . $i . '. ' . $player->ekstraliga_player_name . '</span>';
+                                        $i++;
+                                    }
+                                }
+
+                                echo '      </div>';
+                                echo '  </div>';
+                                echo '  <div class="draftCol2">';
+                                echo '      <form action="" method="post">';
+                                echo '          <div class="displayFlex flexDirectionColumn">';
+                                echo '              <span class="left scoreTableName marginBottom5">' . $getUserData[0]->user_login . ' wybierz zawodnika w tej turze draftu: </span>';
+                                echo '              <select class="draftPlayer" name="draftPlayer" id="draftPlayer">';
+                                foreach ($options as $option) {
+                                    echo '              <option value="' . $option['value'] . '">' . $option['label'] . '</option>';
+                                }
+                                echo '              </select>';
+                                echo '              <div class="flexDirectionRow">';
+                                echo '                  <input class="submitDraftPlayer" type="submit" name="submitDraft" value="Wybierz">';
+                                echo '                  <input class="submitDraftPlayer" type="submit" name="passDraft" value="Pas">';
+                                echo '              </div>';
+                                echo '          </div>';
+                                echo '      </form>';
+                                echo '  </div>';
+                                echo '</div>';
                             }
-                            echo '              </select>';
-                            echo '              <div class="flexDirectionRow">';
-                            echo '                  <input class="submitDraftPlayer" type="submit" name="submitDraft" value="Wybierz">';
-                            echo '                  <input class="submitDraftPlayer" type="submit" name="passDraft" value="Pas">';
-                            echo '              </div>';
-                            echo '          </div>';
-                            echo '      </form>';
-                            echo '  </div>';
-                            echo '</div>';
                         }
                     }
 
@@ -306,13 +314,9 @@ Description: Shows draft form for regular season for one group in the ligue
                         }
                     }
 
-                    //check whose turn for draft is now
-                    $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round FROM megaliga_draft_data');
-                    $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
-
                     drawDraftLotteryRound1Form($getDraftWindowState, $userId);
                     //content of the draft page
-                    drawDraftForm($getDraftWindowState, $getDraftTurnUserId, $userId);
+                    drawDraftForm($getDraftWindowState, $userId);
                     the_content();
                     ?>
 
