@@ -29,7 +29,7 @@ Description: Shows roster for the teams for one group in the ligue
                     $round_number = substr($title, 0, strlen($title) - 8);
                     $userId = $current_user->ID;
                     // $userId = 50;
-                    // $userId = 20;
+                    // $userId = 46;
                     // $userId = 38;
 
                     //defining if roster submission form should be
@@ -38,8 +38,10 @@ Description: Shows roster for the teams for one group in the ligue
 
                     //handling submission
                     if ($_POST['submitStartingLineup']) {
+                        $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
+
                         //get list of all available players in the team
-                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user = ' . $userId);
+                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' = ' . $userId);
                         $i = 1;
                         $submitDataArray = array();
                         //iterate through complete roster of the team
@@ -94,7 +96,7 @@ Description: Shows roster for the teams for one group in the ligue
                         global $wpdb;
 
                         //get list of all available players in the team
-                        $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user = ' . $userId);
+                        $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_' . $queryResult[0]->group_name . ' = ' . $userId);
 
                         //get data about already selected players, setplays
                         $getStartingLineupDataQuery = $wpdb->get_results('SELECT player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
@@ -169,7 +171,7 @@ Description: Shows roster for the teams for one group in the ligue
                             global $wpdb;
 
                             //get list of all available players in the team
-                            $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user = ' . $field->ID);
+                            $getRosterQuery = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_' . $field->group_name . ' = ' . $field->ID);
 
                             //get data about already selected players, setplays
                             $getStartingLineupDataQuery = $wpdb->get_results('SELECT player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $field->ID);

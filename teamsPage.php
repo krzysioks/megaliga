@@ -38,7 +38,7 @@ Description: Shows teams for 2 groups
                             $getDolceTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1');
                             $getGabbanaTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2');
 
-                            $lotteryNumber = mt_rand(0, 10);
+                            $lotteryNumber = random_int(0, 10);
 
                             $updateUserGroupAssigmentData = array();
                             $whereUpdateUserGroupAssigment = array('ID' => $userId);
@@ -58,7 +58,7 @@ Description: Shows teams for 2 groups
                         foreach ($queryResult as $field) {
                             global $wpdb;
                             //get regular season roster for given team
-                            $getRegularSeasonRoster = $wpdb->get_results('SELECT ekstraliga_player_name FROM megaliga_players WHERE id_user = ' . $field->ID . ' ORDER BY drafted_with_number ASC');
+                            $getRegularSeasonRoster = $wpdb->get_results('SELECT ekstraliga_player_name FROM megaliga_players WHERE id_user_' . $field->group_name . ' = ' . $field->ID . ' ORDER BY drafted_with_number_' . $field->group_name . ' ASC');
 
                             //get playoff roster for given team
                             $getPlayoffRoster = $wpdb->get_results('SELECT ekstraliga_player_name FROM megaliga_players WHERE id_user_playoff = ' . $field->ID . ' ORDER BY drafted_with_number_playoff ASC');
