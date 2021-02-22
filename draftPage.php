@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Draft
-Description: Shows draft form for regular season for one group in the ligue
+Description: Shows draft form for regular season for two groups in the ligue
  */
 ?>
 <?php get_header(); ?>

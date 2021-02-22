@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Draft Playoff
-Description: Shows draft for playoff stage for one group in the ligue
+Description: Shows draft for playoff stage for two groups in the ligue
  */
 ?>
 <?php get_header(); ?>

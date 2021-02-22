@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Playoff Draft Order
-Description: Shows playoff draft order table for two group in the ligue
+Description: Shows playoff draft order table for two groups in the ligue
  */
 ?>
 <?php get_header(); ?>

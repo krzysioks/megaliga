@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Roster Playoff
-Description: Shows playoff roster for the teams for one group in the ligue.
+Description: Shows playoff roster for the teams for two groups in the ligue.
 To mark team as reached playoff stage -> set value of megaliga_user_data.rached_playoff = 1 for desired team
  */
 ?>
