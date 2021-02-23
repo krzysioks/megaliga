@@ -8,6 +8,7 @@ megaliga – instrukcja obsługi v.4.0
    player_draft_number_playoff = 1
    (jeżeli wykorzystywane) w kolumnie credit_balance i credit_balance_playoff wstaw wartość kredytu przyznawanego dla każdego gracza
    ligue_groups_id = 4 – reset przydziału do grupy
+   is_rookie - 1 - jeżeli jest to pierwszy sezon drużyny; 0 - drużyna obecna w lidze co najmniej 2 sezony
 
 3. W tabeli megaliga_draft_data wstaw:
 
@@ -31,6 +32,11 @@ megaliga – instrukcja obsługi v.4.0
     - is_selected = 0
 
 6. Uruchom losowanie przydziału do grup w widoku "Zespoły" poprzez ustawienie w kolumnie group_lottery_open.megaliga_draft_data = 1
+
+-   losowanie odbywa się z podziałem na koszyki
+    a) 1 koszyk - 8 drużyn będących co najmniej 2 sezony
+    b) 2 koszyk - 4 drużyny będące beniaminkiem
+-   w danej grupie są 4 drużyny weterani i 2 drużyny beniaminki
 
 7. Kolejność wyboru w drafcie w fazie playoff generuje się automatycznie
 
@@ -64,7 +70,10 @@ megaliga – instrukcja obsługi v.4.0
 12. Wprowadź rozpiskę meczy dla każdej z 10 kolejek rundy zasadniczej do tabeli megaliga_schedule
 
 -   po 5 kolejkach rozpoczyna się runda rewanżowa, gdzie zwycięzca dwumeczu otrzymuje dodatkowy punkt
--   w tabeli megaliga_schedule w kolumnie id_rematch_schedule dla kolejek rewanżowych podaj id_schedule pierwszego spotkania
+-   jeżeli drużyny grają ze sobą 2 razy:
+    -   w tabeli megaliga_schedule w kolumnie id_rematch_schedule dla kolejek rewanżowych podaj id_schedule pierwszego spotkania
+-   jeżeli drużyny grają ze sobą 3 razy:
+    -   w tabeli megaliga_schedule dla reokrdu opisującego 3 spotkanie w kolumnie id_rematch_schedule podaj id_schedule pierwszego spotkania, w kolumnie id_rematch_schedule2 podaj id_schedule drugiego spotkania
 -   każda drużyna rozgrywa mecz i rewanż z każdą z pozostałych 5 drużyn. Zwycięzca każdego z pojedynków ( liczy się suma małych punktów) otrzymuję w dodatkowy punkt po rozegranym meczu rundy rewanżowej
 
 13. Wyczyść rekordy z następujących tabel:

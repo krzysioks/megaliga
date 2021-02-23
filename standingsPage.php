@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Standings
-Description: Shows standings of the regular season for one group in the ligue
+Description: Shows standings of the regular season for two groups in the ligue
  */
 ?>
 <?php get_header(); ?>
@@ -25,13 +25,13 @@ Description: Shows standings of the regular season for one group in the ligue
                         $retval = strnatcmp($b['points'], $a['points']);
                         // if points are identical, sort balance
                         if (!$retval) {
-                            $retval = (integer)$b['balance'] - (integer)$a['balance'];
+                            $retval = (int)$b['balance'] - (int)$a['balance'];
                             //$retval = strnatcmp((integer)$b['balance'], (integer)$a['balance']);
                         }
 
                         //if balance identical -> sort by totalScore
                         if (!$retval) {
-                            $retval = (integer)$b['totalScore'] - (integer)$a['totalScore'];
+                            $retval = (int)$b['totalScore'] - (int)$a['totalScore'];
                             //$retval = strnatcmp((integer)$b['balance'], (integer)$a['balance']);
                         }
 
@@ -88,19 +88,34 @@ Description: Shows standings of the regular season for one group in the ligue
 
                                 //if $game is played during rematch round -> add bonus point for team that has better balance after 2 matches
                                 if ($game->id_rematch_schedule !== null) {
+                                    // print_r($game);
+                                    // echo '<br>';
                                     $getRematchSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule);
 
                                     //count total points scored by each team during both rounds (1st and rematch)
                                     $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule[0]->id_user_team1 ? $game->team1_score + $getRematchSchedule[0]->team1_score : $game->team1_score + $getRematchSchedule[0]->team2_score;
                                     $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule[0]->id_user_team2 ? $game->team2_score + $getRematchSchedule[0]->team2_score : $game->team2_score + $getRematchSchedule[0]->team1_score;
 
+                                    //if given teams play more than 2 times witch each other -> take into account also third match
+                                    if ($game->id_rematch_schedule2 !== null) {
+                                        // echo '3rd match </br>';
+                                        $getRematchSchedule2 = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule2);
+
+                                        $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule2[0]->id_user_team1 ? $team1MatchupScore + $getRematchSchedule2[0]->team1_score : $team1MatchupScore + $getRematchSchedule2[0]->team2_score;
+                                        $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule2[0]->id_user_team2 ? $team2MatchupScore + $getRematchSchedule2[0]->team2_score : $team2MatchupScore + $getRematchSchedule2[0]->team1_score;
+                                    }
+                                    // echo '$team1MatchupScore: ' . $team1MatchupScore . '   $team2MatchupScore: ' . $team2MatchupScore . '</br>';
+
                                     //when team 1 wins the matchup
                                     if ($team1MatchupScore > $team2MatchupScore) {
+                                        // echo 'team one gets extra point</br>';
                                         $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 1;
                                     } else if ($team1MatchupScore < $team2MatchupScore) {
+                                        // echo 'team two gets extra point</br>';
                                         //when team 2 wins the matchup
                                         $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
                                     }
+                                    // echo '<br><br>';
                                 }
                             }
                         }
@@ -149,15 +164,19 @@ Description: Shows standings of the regular season for one group in the ligue
                         echo '</table>';
                     }
 
-                    $getUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 3');
+                    $getDolceUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1');
+                    $getGabbanaUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 2');
 
-                    $getSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule FROM megaliga_schedule WHERE id_ligue_group = 3');
+                    $getDolceSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 1');
+                    $getGabbanaSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 2');
 
-                    $standings = calculateStandingsData($getSchedule, $getUserID);
+                    $standingsDolce = calculateStandingsData($getDolceSchedule, $getDolceUserID);
+                    $standingsGabbana = calculateStandingsData($getGabbanaSchedule, $getGabbanaUserID);
 
                     //content of the team page
                     echo '<div class="scheduleContainer">';
-                    drawStandings($standings, 'left', 'Dolce&Gabanna');
+                    drawStandings($standingsDolce, 'left', 'dolce');
+                    drawStandings($standingsGabbana, 'right', 'gabbana');
                     echo '</div>';
                     ?>
 
@@ -165,8 +184,8 @@ Description: Shows standings of the regular season for one group in the ligue
                 </div>
             </article>
             <?php if (!post_password_required()) comments_template('', true); ?>
-        <?php endwhile;
-endif; ?>
+    <?php endwhile;
+    endif; ?>
 </main>
 <?php get_sidebar(); ?>
 <?php get_footer(); ?>

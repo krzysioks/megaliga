@@ -24,7 +24,7 @@ Description: Shows teams for 2 groups
 
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
-                    // $userId = 52;
+                    // $userId = 47;
 
                     //get conditions to show group lottery form
                     $isGroupLotteryOpenQuery = $wpdb->get_results('SELECT group_lottery_open FROM megaliga_draft_data');
@@ -35,20 +35,43 @@ Description: Shows teams for 2 groups
                         $getCheckIfUserTeamAlreadyAssignedToGroup = $wpdb->get_results('SELECT ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
 
                         if ($getCheckIfUserTeamAlreadyAssignedToGroup[0]->ligue_groups_id == 4 && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1) {
-                            $getDolceTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1');
-                            $getGabbanaTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2');
+                            function assignTeam($getDolceTeamNumber, $getGabbanaTeamNumber, $limit, $userId)
+                            {
+                                global $wpdb;
 
-                            $lotteryNumber = random_int(0, 10);
+                                $lotteryNumber = random_int(0, 10);
+                                $updateUserGroupAssigmentData = array();
+                                $whereUpdateUserGroupAssigment = array('ID' => $userId);
 
-                            $updateUserGroupAssigmentData = array();
-                            $whereUpdateUserGroupAssigment = array('ID' => $userId);
-                            //team is assigned to dolce if $lotteryNumber <= 5 and there is still space in dolce group OR $lotteryNumber > 5 and there is no space in Gabbana group
-                            if ($lotteryNumber <= 5 && $getDolceTeamNumber[0]->dolce < 6 || $lotteryNumber > 5 && $getGabbanaTeamNumber[0]->gabbana == 6) {
-                                $updateUserGroupAssigmentData['ligue_groups_id'] = 1;
-                            } else {
-                                $updateUserGroupAssigmentData['ligue_groups_id'] = 2;
+                                //team is assigned to dolce if $lotteryNumber <= 5 and there is still space in dolce group OR $lotteryNumber > 5 and there is no space in Gabbana group
+                                if ($lotteryNumber <= 5 && $getDolceTeamNumber[0]->dolce < $limit || $lotteryNumber > 5 && $getGabbanaTeamNumber[0]->gabbana == $limit) {
+                                    $updateUserGroupAssigmentData['ligue_groups_id'] = 1;
+                                } else {
+                                    $updateUserGroupAssigmentData['ligue_groups_id'] = 2;
+                                }
+
+                                $wpdb->update('megaliga_user_data', $updateUserGroupAssigmentData, $whereUpdateUserGroupAssigment);
                             }
-                            $wpdb->update('megaliga_user_data', $updateUserGroupAssigmentData, $whereUpdateUserGroupAssigment);
+
+                            //check if user is rookie (this influence from which bucket will be draw)
+                            $getIsRookie = $wpdb->get_results('SELECT is_rookie FROM megaliga_user_data WHERE ID = ' . $userId);
+
+                            //get number of already assigned teams from 1st bucket for dolce
+                            $getDolceFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 0');
+                            //get number of already assigned teams from 2nd bucket for dolce
+                            $getDolceSecondBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 1');
+
+                            //get number of already assigned teams from 1st bucket for dolce
+                            $getGabbanaFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 0');
+                            //get number of already assigned teams from 2nd bucket for dolce
+                            $getGabbanaSecondBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 1');
+
+                            //if user is rookie -> there cannot be more than 2 rookie teams in the group
+                            if ($getIsRookie[0]->is_rookie) {
+                                assignTeam($getDolceSecondBucketTeamNumber,  $getGabbanaSecondBucketTeamNumber, 2, $userId);
+                            } else {
+                                assignTeam($getDolceFirstBucketTeamNumber,  $getGabbanaFirstBucketTeamNumber, 4, $userId);
+                            }
                         }
                     }
 
