@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Roster
-Description: Shows roster for the teams for one group in the ligue
+Description: Shows roster for the teams for two groups in the ligue
  */
 ?>
 <?php get_header(); ?>
@@ -28,8 +28,7 @@ Description: Shows roster for the teams for one group in the ligue
                     //8 - length of "kolejka" string which is in every title of składy subpage
                     $round_number = substr($title, 0, strlen($title) - 8);
                     $userId = $current_user->ID;
-                    // $userId = 50;
-                    // $userId = 46;
+                    // $userId = 14;
                     // $userId = 38;
 
                     //defining if roster submission form should be
@@ -38,10 +37,10 @@ Description: Shows roster for the teams for one group in the ligue
 
                     //handling submission
                     if ($_POST['submitStartingLineup']) {
-                        $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
+                        $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $_POST['userId'] . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
 
                         //get list of all available players in the team
-                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' = ' . $userId);
+                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' = ' . $_POST['userId']);
                         $i = 1;
                         $submitDataArray = array();
                         //iterate through complete roster of the team
@@ -62,10 +61,10 @@ Description: Shows roster for the teams for one group in the ligue
                         }
 
                         //check if to insert new record or update already existing
-                        $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
+                        $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $_POST['userId']);
 
                         $submitDataArray['round_number'] = $round_number;
-                        $submitDataArray['ID'] = $userId;
+                        $submitDataArray['ID'] = $_POST['userId'];
                         $submitDataArray['setplays'] = $_POST['setplayInput'];
 
                         if (count($checkIfRecordExist) == 1) {
@@ -78,7 +77,7 @@ Description: Shows roster for the teams for one group in the ligue
                             }
 
                             //clear schedule score
-                            $getIdScheduleQuery = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule WHERE round_number = ' . $round_number . ' AND (id_user_team1 = ' . $userId . ' OR id_user_team2 = ' . $userId . ')');
+                            $getIdScheduleQuery = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule WHERE round_number = ' . $round_number . ' AND (id_user_team1 = ' . $_POST['userId'] . ' OR id_user_team2 = ' . $_POST['userId'] . ')');
 
                             $removeScoreWhere = array('id_schedule' => $getIdScheduleQuery[0]->id_schedule);
                             $wpdb->update('megaliga_schedule', array('team1_score' => null, 'team2_score' => null), $removeScoreWhere);
@@ -159,6 +158,36 @@ Description: Shows roster for the teams for one group in the ligue
                         echo '  </div>';
                         echo '  <div>';
                         echo '      <input type="submit" name="submitStartingLineup" value="Zatwierdź skład">';
+                        echo '      <input type="hidden" name="userId" value="' . $userId . '">';
+                        echo '  </div>';
+                        echo '</div>';
+                        echo '</form>';
+                    }
+
+                    function drawEmergencyTeamSelectionForm($selectedValue)
+                    {
+                        global $wpdb;
+                        $getTeams = $wpdb->get_results('SELECT megaliga_team_names.name, megaliga_user_data.ID FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id');
+
+                        echo '<form action="" method="post">';
+                        echo '<div class="rosterContainer teamContainerDimentions">';
+                        echo '  <div>';
+                        echo '      <span class="emergencyTeamSelectionTitle">Formularz awaryjnego przydziału składu</span>';
+                        echo '  </div>';
+                        echo '  <div class="displayFlex flexDirectionRow marginTop20">';
+                        echo '      <div class="marginTop10"><span class="teamOverviewLabel">Drużyna:</span></div>';
+                        echo '            <select class="teamSelect" name="team" id="selectTeam">';
+                        foreach ($getTeams as $option) {
+                            if ($selectedValue == $option->ID) {
+                                echo '            <option selected value="' . $option->ID . '">' . $option->name . '</option>';
+                            } else {
+                                echo '            <option value="' . $option->ID . '">' . $option->name . '</option>';
+                            }
+                        }
+                        echo '            </select>';
+                        echo '  </div>';
+                        echo '  <div>';
+                        echo '      <input type="submit" name="submitEmergencyTeamSelection" value="Wybierz">';
                         echo '  </div>';
                         echo '</div>';
                         echo '</form>';
@@ -243,9 +272,22 @@ Description: Shows roster for the teams for one group in the ligue
                         }
                     }
 
+                    if ($_POST['submitEmergencyTeamSelection']) {
+                        $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $_POST['team'] . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id');
+
+                        echo '<div class="rosterContainer teamContainerDimentions">';
+                        drawEmergencyTeamSelectionForm($_POST['team']);
+                        drawRosterForm($getRosterSubmissionFormDataQuery, $_POST['team'], $round_number);
+                        echo '</div>';
+                    }
 
                     //content of the roster page
                     echo '<div>';
+
+                    //draw emergencyTeamSelection form if user is admin and team has not already been chosen
+                    if (($userId == 14 || $userId == 48) && !isset($_POST['submitEmergencyTeamSelection'])) {
+                        drawEmergencyTeamSelectionForm('');
+                    }
 
                     if ($showRosterForm) {
                         $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id');

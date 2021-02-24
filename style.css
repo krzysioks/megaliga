@@ -440,6 +440,10 @@ textarea {
     margin-top: 10px;
 }
 
+.marginTop20 {
+    margin-top: 20px;
+}
+
 .marginTop100 {
     margin-top: 100px;
 }
@@ -635,6 +639,20 @@ textarea {
     width: 35px;
 }
 
+/*roster page*/
+.emergencyTeamSelectionTitle {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.teamSelect {
+    font-size: 15px !important;
+    height: 30px !important;
+    width: 200px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
 /*megaliga page*/
 .scoreBoardTable {
     width: 100%;
@@ -796,6 +814,7 @@ textarea {
     height: 30px !important;
     width: 75%;
     margin-top: 5px;
+    cursor: pointer;
 }
 
 .submitDrawPositionOrder {

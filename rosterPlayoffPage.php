@@ -39,7 +39,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                     //handling submission
                     if ($_POST['submitStartingLineup']) {
                         //get list of all available players in the team
-                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user_playoff = ' . $userId);
+                        $getRosterQuery = $wpdb->get_results('SELECT player_id FROM megaliga_players WHERE id_user_playoff = ' . $_POST['userId']);
 
                         $i = 1;
                         $submitDataArray = array();
@@ -61,10 +61,10 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                         }
 
                         //check if to insert new record or update already existing
-                        $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup_playoff WHERE round_number = ' . $round_number . ' AND ID = ' . $userId);
+                        $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup_playoff WHERE round_number = ' . $round_number . ' AND ID = ' . $_POST['userId']);
 
                         $submitDataArray['round_number'] = $round_number;
-                        $submitDataArray['ID'] = $userId;
+                        $submitDataArray['ID'] = $_POST['userId'];
                         $submitDataArray['setplays'] = $_POST['setplayInput'];
 
                         if (count($checkIfRecordExist) == 1) {
@@ -77,7 +77,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                             }
 
                             //clear schedule score
-                            $getIdScheduleQuery = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE round_number = ' . $round_number . ' AND (id_user_team1 = ' . $userId . ' OR id_user_team2 = ' . $userId . ')');
+                            $getIdScheduleQuery = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE round_number = ' . $round_number . ' AND (id_user_team1 = ' . $_POST['userId'] . ' OR id_user_team2 = ' . $_POST['userId'] . ')');
 
                             $removeScoreWhere = array('id_schedule' => $getIdScheduleQuery[0]->id_schedule);
                             $wpdb->update('megaliga_schedule_playoff', array('team1_score' => null, 'team2_score' => null), $removeScoreWhere);
@@ -157,6 +157,36 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                         echo '  </div>';
                         echo '  <div>';
                         echo '      <input type="submit" name="submitStartingLineup" value="Zatwierdź skład">';
+                        echo '      <input type="hidden" name="userId" value="' . $userId . '">';
+                        echo '  </div>';
+                        echo '</div>';
+                        echo '</form>';
+                    }
+
+                    function drawEmergencyTeamSelectionForm($selectedValue)
+                    {
+                        global $wpdb;
+                        $getTeams = $wpdb->get_results('SELECT megaliga_team_names.name, megaliga_user_data.ID FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1');
+
+                        echo '<form action="" method="post">';
+                        echo '<div class="rosterContainer teamContainerDimentions">';
+                        echo '  <div>';
+                        echo '      <span class="emergencyTeamSelectionTitle">Formularz awaryjnego przydziału składu</span>';
+                        echo '  </div>';
+                        echo '  <div class="displayFlex flexDirectionRow marginTop20">';
+                        echo '      <div class="marginTop10"><span class="teamOverviewLabel">Drużyna:</span></div>';
+                        echo '            <select class="teamSelect" name="team" id="selectTeam">';
+                        foreach ($getTeams as $option) {
+                            if ($selectedValue == $option->ID) {
+                                echo '            <option selected value="' . $option->ID . '">' . $option->name . '</option>';
+                            } else {
+                                echo '            <option value="' . $option->ID . '">' . $option->name . '</option>';
+                            }
+                        }
+                        echo '            </select>';
+                        echo '  </div>';
+                        echo '  <div>';
+                        echo '      <input type="submit" name="submitEmergencyTeamSelection" value="Wybierz">';
                         echo '  </div>';
                         echo '</div>';
                         echo '</form>';
@@ -242,9 +272,22 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                         }
                     }
 
+                    if ($_POST['submitEmergencyTeamSelection']) {
+                        $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $_POST['team'] . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_ligue_groups.ligue_groups_id = megaliga_user_data.ligue_groups_id');
+
+                        echo '<div class="rosterContainer teamContainerDimentions">';
+                        drawEmergencyTeamSelectionForm($_POST['team']);
+                        drawRosterForm($getRosterSubmissionFormDataQuery, $_POST['team'], $round_number);
+                        echo '</div>';
+                    }
 
                     //content of the team page
                     echo '<div>';
+
+                    //draw emergencyTeamSelection form if user is admin and team has not already been chosen
+                    if (($userId == 14 || $userId == 48) && !isset($_POST['submitEmergencyTeamSelection'])) {
+                        drawEmergencyTeamSelectionForm('');
+                    }
 
                     if ($showRosterForm) {
                         $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
