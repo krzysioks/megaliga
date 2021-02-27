@@ -20,7 +20,7 @@ Description: Shows draft for playoff stage for two groups in the ligue
                     global $wpdb;
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
-                    // $userId = 20; //46 //14;
+                    // $userId = 27; //46 //14;
 
                     //check if draft window is open
                     $getDraftWindowState = $wpdb->get_results('SELECT playoff_draft_window_open, playoff_draft_credit_enabled FROM megaliga_draft_data');
@@ -125,7 +125,7 @@ Description: Shows draft for playoff stage for two groups in the ligue
                             if ($draftWindowState[0]->playoff_draft_credit_enabled) {
                                 $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name, credit_playoff FROM megaliga_players WHERE id_user_playoff IS NULL AND credit <= ' . $getUserData[0]->credit_balance_playoff . ' ORDER BY credit_playoff DESC');
                             } else {
-                                $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_playoff IS NULL');
+                                $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_playoff IS NULL ORDER BY ekstraliga_player_name');
                             }
 
                             //create option list for select with players to draft

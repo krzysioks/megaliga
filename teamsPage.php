@@ -24,7 +24,7 @@ Description: Shows teams for 2 groups
 
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
-                    // $userId = 47;
+                    // $userId = 56;
 
                     //get conditions to show group lottery form
                     $isGroupLotteryOpenQuery = $wpdb->get_results('SELECT group_lottery_open FROM megaliga_draft_data');

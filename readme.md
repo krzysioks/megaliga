@@ -137,3 +137,5 @@ Tests:
 
 2. set gabbana teams
    UPDATE `megaliga_user_data` SET `ligue_groups_id`= 2 WHERE team_names_id IN (21, 18,16,6,3,20)
+
+Przepraszamy, megaliga jest chwilowo niedostępna. Trwają prace przygotowawcze do nowego sezonu 2021

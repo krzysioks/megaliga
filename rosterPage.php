@@ -29,7 +29,7 @@ Description: Shows roster for the teams for two groups in the ligue
                     $round_number = substr($title, 0, strlen($title) - 8);
                     $userId = $current_user->ID;
                     // $userId = 14;
-                    // $userId = 38;
+                    // $userId = 14;
 
                     //defining if roster submission form should be
                     $isUserMegaligaMemberQuery = $wpdb->get_results('SELECT user_data_id FROM megaliga_user_data WHERE ID = ' . $userId);

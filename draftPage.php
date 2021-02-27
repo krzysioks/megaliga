@@ -24,7 +24,7 @@ Description: Shows draft form for regular season for two groups in the ligue
                     $current_user = wp_get_current_user();
                     $userId = $current_user->ID;
                     // $userId = 20; //46; //14;
-                    // $userId = 20;
+                    // $userId = 46;
                     //check if draft window is open
                     $getDraftWindowState = $wpdb->get_results('SELECT draft_window_open, draft_credit_enabled, draft_round1_order_lottery_open FROM megaliga_draft_data');
 
@@ -210,7 +210,7 @@ Description: Shows draft form for regular season for two groups in the ligue
                                 $getUserData = $wpdb->get_results('SELECT megaliga_user_data.credit_balance, megaliga_team_names.name, wp_users.user_login FROM megaliga_user_data, megaliga_team_names, wp_users WHERE megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId);
 
                                 if ($draftWindowState[0]->draft_credit_enabled) {
-                                    $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name, credit FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' IS NULL AND credit <= ' . $getUserData[0]->credit_balance . ' ORDER BY ekstraliga_player_name');
+                                    $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name, credit FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' IS NULL AND credit <= ' . $getUserData[0]->credit_balance . ' ORDER BY credit DESC');
                                 } else {
                                     $getPlayersToDraft = $wpdb->get_results('SELECT player_id, ekstraliga_player_name FROM megaliga_players WHERE id_user_' . $getGroupName[0]->name . ' IS NULL ORDER BY ekstraliga_player_name');
                                 }
