@@ -34,7 +34,7 @@ Description: Shows draft form for regular season for two groups in the ligue
                         global $wpdb;
                         $getGroupName = $wpdb->get_results('SELECT megaliga_ligue_groups.name FROM megaliga_ligue_groups, megaliga_user_data WHERE megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');
                         $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round_' . $getGroupName[0]->name . ' as "draft_current_round" FROM megaliga_draft_data');
-                        $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
+                        $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
                         //prevention against form resubmission - do not increment current round number if id of logged user differs from id of user which draft round is now
                         if ($getDraftTurnUserId[0]->ID != $userId) {
