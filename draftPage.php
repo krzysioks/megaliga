@@ -202,7 +202,8 @@ Description: Shows draft form for regular season for two groups in the ligue
                         if (is_user_logged_in() && $draftWindowState[0]->draft_window_open && count($getGroupName)) {
                             //check whose turn for draft is now
                             $getDraftCurrentRound = $wpdb->get_results('SELECT draft_current_round_' . $getGroupName[0]->name . ' as "draft_current_round" FROM megaliga_draft_data');
-                            $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE id_season_draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
+
+                            $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
                             //...and it is his turn to draft player
                             if ($getDraftTurnUserId[0]->ID == $userId) {
