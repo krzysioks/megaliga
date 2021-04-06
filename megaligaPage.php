@@ -23,7 +23,7 @@ Description: Shows schedule and scoreboard of given round for 2 groups in the li
                     //8 - length of "kolejka" string which is in every title of składy subpage
                     $round_number = substr($title, 0, strlen($title) - 8);
                     $userId = $current_user->ID;
-                    $userId = 48; //14;
+                    // $userId = 48; //14;
 
                     //handle submission
                     if ($_POST['submitScore']) {

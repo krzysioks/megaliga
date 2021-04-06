@@ -19,7 +19,7 @@
         &copy;
         <?php echo esc_html(date_i18n(__('Y', 'services'))); ?>
         <?php echo esc_html(get_bloginfo('name'));
-        echo ' ver. 4.0.2' ?>
+        echo ' ver. 4.0.3' ?>
     </div>
 </footer>
 </div>
