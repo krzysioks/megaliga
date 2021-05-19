@@ -29,12 +29,25 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
 
                     //values for test
                     //$round_number = 1;
-                    // $userId = 44;
+                    // $userId = 20;
                     // $userId = 46;
+                    // $userId = 14;
+
+                    //handling submision of form's status
+                    if ($_POST['submitFormStatus']) {
+                        $submitDataArray = array();
+                        $submitDataArray['is_open'] = $_POST['is_open'];
+                        $where = array('round_number' => $round_number, 'season_stage' => 'playoff');
+                        $wpdb->update('megaliga_starting_lineup_status', $submitDataArray, $where);
+                    }
 
                     //defining if roster submission form should be displayed (only for member of megaliga who reached playoff stage)
                     $isUserMegaligaMemberReachedPlayoffQuery = $wpdb->get_results('SELECT user_data_id FROM megaliga_user_data WHERE ID = ' . $userId . ' AND reached_playoff = 1');
-                    $showRosterForm = $userId != 0 && count($isUserMegaligaMemberReachedPlayoffQuery) == 1;
+
+                    //check if roster form is enabled (this option prevent from resubmission of roster by user after score for given round has been calculated)
+                    $isFormEnabled = $wpdb->get_results('SELECT is_open FROM megaliga_starting_lineup_status WHERE round_number = ' . $round_number . ' AND season_stage = "playoff"');
+
+                    $showRosterForm = $userId != 0 && count($isUserMegaligaMemberReachedPlayoffQuery) == 1 && $isFormEnabled[0]->is_open;
 
                     //handling submission
                     if ($_POST['submitStartingLineup']) {
@@ -163,6 +176,18 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                         echo '</form>';
                     }
 
+                    function drawToggleFormStatusButton($isFormEnabled, $round_number)
+                    {
+                        $buttonTitle = $isFormEnabled[0]->is_open ? 'Zablokuj wybór składów' : 'Odblokuj wybór składów';
+
+                        echo '<form action="" method="post">';
+                        echo '  <div class="marginBottom20">';
+                        echo '      <input type="submit" name="submitFormStatus" value="' . $buttonTitle . '">';
+                        echo '      <input type="hidden" name="is_open" value="' . !$isFormEnabled[0]->is_open . '">';
+                        echo '  </div>';
+                        echo '</form>';
+                    }
+
                     function drawEmergencyTeamSelectionForm($selectedValue)
                     {
                         global $wpdb;
@@ -284,10 +309,21 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                     //content of the team page
                     echo '<div>';
 
-                    //draw emergencyTeamSelection form if user is admin and team has not already been chosen
-                    if (($userId == 14 || $userId == 48) && !isset($_POST['submitEmergencyTeamSelection'])) {
-                        drawEmergencyTeamSelectionForm('');
+                    if (!$isFormEnabled[0]->is_open) {
+                        echo '<div class="marginBottom20">';
+                        echo '<span class="scoreTableName">Wybór składów w tej rundzie został zakończony.</Span>';
+                        echo '</div>';
                     }
+
+                    if ($userId == 14 || $userId == 48) {
+                        drawToggleFormStatusButton($isFormEnabled, $round_number);
+                        //draw emergencyTeamSelection form if user is admin and team has not already been chosen
+                        if (!isset($_POST['submitEmergencyTeamSelection'])) {
+                            drawEmergencyTeamSelectionForm('');
+                        }
+                    }
+
+
 
                     if ($showRosterForm) {
                         $getRosterSubmissionFormDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_team_names.name as "team_name", megaliga_user_data.logo_url, megaliga_ligue_groups.name as "group_name" FROM megaliga_user_data, wp_users, megaliga_team_names, megaliga_ligue_groups WHERE megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId . ' AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ligue_groups_id = megaliga_ligue_groups.ligue_groups_id');

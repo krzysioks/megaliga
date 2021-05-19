@@ -31,7 +31,10 @@ megaliga – instrukcja obsługi v.4.0
 
     - is_selected = 0
 
-6. Uruchom losowanie przydziału do grup w widoku "Zespoły" poprzez ustawienie w kolumnie group_lottery_open.megaliga_draft_data = 1
+6. W tabeli megaliga_starting_lineup_status w polu "is_open" wstaw wartość 1 dla wszystkich rekordów.
+   Pole to odpowiada za blokowanie formularza wyboru składu dla danej kolejki w sezonie zasadniczym i w playoff
+
+7. Uruchom losowanie przydziału do grup w widoku "Zespoły" poprzez ustawienie w kolumnie group_lottery_open.megaliga_draft_data = 1
 
 -   losowanie odbywa się z podziałem na koszyki
     a) 1 koszyk - 8 drużyn będących co najmniej 2 sezony
