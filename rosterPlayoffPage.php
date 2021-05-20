@@ -176,7 +176,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                         echo '</form>';
                     }
 
-                    function drawToggleFormStatusButton($isFormEnabled, $round_number)
+                    function drawToggleFormStatusButton($isFormEnabled)
                     {
                         $buttonTitle = $isFormEnabled[0]->is_open ? 'Zablokuj wybór składów' : 'Odblokuj wybór składów';
 
@@ -316,7 +316,7 @@ To mark team as reached playoff stage -> set value of megaliga_user_data.rached_
                     }
 
                     if ($userId == 14 || $userId == 48) {
-                        drawToggleFormStatusButton($isFormEnabled, $round_number);
+                        drawToggleFormStatusButton($isFormEnabled);
                         //draw emergencyTeamSelection form if user is admin and team has not already been chosen
                         if (!isset($_POST['submitEmergencyTeamSelection'])) {
                             drawEmergencyTeamSelectionForm('');
