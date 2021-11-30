@@ -91,28 +91,31 @@ function my_login_logo_one()
 add_action('login_enqueue_scripts', 'my_login_logo_one');
 
 add_action('admin_post_handle_csv_export', 'handle_csv_export_callback');
-add_action('admin_post_nopriv_handle_csv_export', 'handle_csv_export_callback');
+// add_action('admin_post_nopriv_handle_csv_export', 'handle_csv_export_callback');
 
 function handle_csv_export_callback()
 {
+    $current_user = wp_get_current_user();
+    $userId = $current_user->ID;
     global $wpdb;
-    if ($_POST['submitExportMegaliga'] || $_POST['submitEksportPlayoff']) {
+
+    if (($_POST['submitExportMegaliga'] || $_POST['submitEksportPlayoff']) && is_user_logged_in() && ($userId == 14 || $userId == 48 || $userId == 1)) {
         //TODO round number will be taken from forEach loop (14 - megaliga; 4 - playoff)
         //TODO 1st step - logic for 1 round of megaliga
         //TODO 2nd step - add logic to fetch all 14 rounds at once
         //TODO 3rd step - add logic for playoff
 
         //export scoreboard data for given game
-        function getScoreBoardExportData($scoreBoardData, $f, $delimiter, $round_number)
+        function getScoreBoardExportData($scoreBoardData, $f, $delimiter, $round_number, $dbName)
         {
             global $wpdb;
 
             //get score data for team1
             $idStartingLineup = ($scoreBoardData['team1StartingLineup']->id_starting_lineup) ? $scoreBoardData['team1StartingLineup']->id_starting_lineup : 0;
-            $getScoreDataTeam1Query = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_scores WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND id_starting_lineup = ' . $idStartingLineup . ' ORDER BY starting_order ASC');
+            $getScoreDataTeam1Query = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_scores' . $dbName . ' WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND id_starting_lineup = ' . $idStartingLineup . ' ORDER BY starting_order ASC');
 
             //get score for team1 trainer
-            $getScoreDataTeam1TrainerQuery = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_trainer_score WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND ID = ' . $scoreBoardData['id_user_team1']);
+            $getScoreDataTeam1TrainerQuery = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_trainer_score' . $dbName . ' WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND ID = ' . $scoreBoardData['id_user_team1']);
 
             if ($scoreBoardData['player1DataTeam1']->ekstraliga_player_name != '') {
                 $row = array($round_number, $scoreBoardData['player1DataTeam1']->ekstraliga_player_name, $scoreBoardData['team1Data']->team_name, $getScoreDataTeam1Query[0]->heat1, $getScoreDataTeam1Query[0]->heat2, $getScoreDataTeam1Query[0]->heat3, $getScoreDataTeam1Query[0]->heat4, $getScoreDataTeam1Query[0]->heat5, $getScoreDataTeam1Query[0]->heat6, $getScoreDataTeam1Query[0]->heat7, $getScoreDataTeam1Query[0]->setplays, $getScoreDataTeam1Query[0]->comment);
@@ -145,10 +148,10 @@ function handle_csv_export_callback()
 
             //get score data for team2
             $idStartingLineup2 = ($scoreBoardData['team2StartingLineup']->id_starting_lineup) ? $scoreBoardData['team2StartingLineup']->id_starting_lineup : 0;
-            $getScoreDataTeam2Query = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_scores WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND id_starting_lineup = ' . $idStartingLineup2 . ' ORDER BY starting_order ASC');
+            $getScoreDataTeam2Query = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_scores' . $dbName . ' WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND id_starting_lineup = ' . $idStartingLineup2 . ' ORDER BY starting_order ASC');
 
             //get score for team2 trainer
-            $getScoreDataTeam2TrainerQuery = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_trainer_score WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND ID = ' . $scoreBoardData['id_user_team2']);
+            $getScoreDataTeam2TrainerQuery = $wpdb->get_results('SELECT heat1, heat2, heat3, heat4, heat5, heat6, heat7, setplays, comment FROM megaliga_trainer_score' . $dbName . ' WHERE id_schedule = ' . $scoreBoardData['id_schedule'] . ' AND ID = ' . $scoreBoardData['id_user_team2']);
 
             if ($scoreBoardData['player1DataTeam2']->ekstraliga_player_name != '') {
                 $row = array($round_number, $scoreBoardData['player1DataTeam2']->ekstraliga_player_name, $scoreBoardData['team2Data']->team_name, $getScoreDataTeam2Query[0]->heat1, $getScoreDataTeam2Query[0]->heat2, $getScoreDataTeam2Query[0]->heat3, $getScoreDataTeam2Query[0]->heat4, $getScoreDataTeam2Query[0]->heat5, $getScoreDataTeam2Query[0]->heat6, $getScoreDataTeam2Query[0]->heat7, $getScoreDataTeam2Query[0]->setplays, $getScoreDataTeam2Query[0]->comment);
@@ -179,7 +182,7 @@ function handle_csv_export_callback()
             fputcsv($f, $row, $delimiter);
         }
 
-        function getAllGameData($query, $round_number)
+        function getAllGameData($query, $round_number, $dbName)
         {
             global $wpdb;
             $returnData = array();
@@ -198,7 +201,7 @@ function handle_csv_export_callback()
                 $game['team1Data'] = $getTeam1DataQuery[0];
 
                 //get team's 1 starting lineup for the game
-                $getTeam1StartingLineupQuery = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup WHERE megaliga_starting_lineup.ID = ' . $gameField->id_user_team1 . ' AND megaliga_starting_lineup.round_number = ' . $round_number);
+                $getTeam1StartingLineupQuery = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup' . $dbName . ' WHERE megaliga_starting_lineup' . $dbName . '.ID = ' . $gameField->id_user_team1 . ' AND megaliga_starting_lineup' . $dbName . '.round_number = ' . $round_number);
                 $game['team1StartingLineup'] = $getTeam1StartingLineupQuery[0];
 
                 //get data related with team2
@@ -206,7 +209,7 @@ function handle_csv_export_callback()
                 $game['team2Data'] = $getTeam2DataQuery[0];
 
                 //get team's 2 starting lineup for the game
-                $getTeam2StartingLineupQuery = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup WHERE megaliga_starting_lineup.ID = ' . $gameField->id_user_team2 . ' AND megaliga_starting_lineup.round_number = ' . $round_number);
+                $getTeam2StartingLineupQuery = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5, setplays FROM megaliga_starting_lineup' . $dbName . ' WHERE megaliga_starting_lineup' . $dbName . '.ID = ' . $gameField->id_user_team2 . ' AND megaliga_starting_lineup' . $dbName . '.round_number = ' . $round_number);
                 $game['team2StartingLineup'] = $getTeam2StartingLineupQuery[0];
 
                 //get data for players of team1
@@ -240,45 +243,59 @@ function handle_csv_export_callback()
             return $returnData;
         }
 
-        $typeOfExport = $_POST['submitExportMegaliga'] ? 'megaliga' : 'playoff';
-        $round_number = 1;
-        //get data for the scoreboard
-        //get all games for Dolce for given round
-        $getGames4Dolce = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 1 AND round_number = ' . $round_number);
-        $scoreBoradDolceData = getAllGameData($getGames4Dolce, $round_number);
-
-        //get all games for Gabbana for given round
-        $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $round_number);
-        $scoreBoradGabbanaData = getAllGameData($getGames4Gabbana, $round_number);
-
+        $typeOfExport = $_POST['submitExportMegaliga'] == 'Eksport megaliga' ? 'megaliga' : 'playoff';
+        $dbName = $typeOfExport == 'megaliga' ? '' : '_playoff';
         $delimiter = ',';
         $fileName = 'export_' . $typeOfExport . '.csv';
-
         // Create a file pointer
         $f = fopen('php://output', 'w');
-
         fputs($f, $bom = (chr(0xEF) . chr(0xBB) . chr(0xBF)));
 
         // Set column headers
         $header = array('Runda', 'Zawodnik', 'Drużyna', 'Bieg 1', 'Bieg 2', 'Bieg 3', 'Bieg 4', 'Bieg 5', 'Bieg 6', 'Bieg 7', 'Zagrywki', 'Komentarz');
         fputcsv($f, $header, $delimiter);
 
-        //export data for Dolce 
-        $groupNameDolce = array('Dolce', '', '', '', '', '', '', '', '', '', '', '');
-        fputcsv($f, $groupNameDolce, $delimiter);
-        foreach ($scoreBoradDolceData as $gameData) {
-            getScoreBoardExportData($gameData, $f, $delimiter, $round_number);
+        $roundSize = $typeOfExport == 'megaliga' ? 14 : 4;
+
+        if ($typeOfExport == 'megaliga') {
+            for ($round_number = 1; $round_number <= $roundSize; $round_number++) {
+                //get data for the scoreboard
+                //get all games for Dolce for given round
+                $getGames4Dolce = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule' . $dbName . ' WHERE id_ligue_group = 1 AND round_number = ' . $round_number);
+                $scoreBoradDolceData = getAllGameData($getGames4Dolce, $round_number, $dbName);
+
+                //get all games for Gabbana for given round
+                $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule' . $dbName . ' WHERE id_ligue_group = 2 AND round_number = ' . $round_number);
+                $scoreBoradGabbanaData = getAllGameData($getGames4Gabbana, $round_number, $dbName);
+
+                //export data for Dolce 
+                $groupNameDolce = array('Dolce', '', '', '', '', '', '', '', '', '', '', '');
+                fputcsv($f, $groupNameDolce, $delimiter);
+                foreach ($scoreBoradDolceData as $gameData) {
+                    getScoreBoardExportData($gameData, $f, $delimiter, $round_number, $dbName);
+                }
+
+                //export data for Gabbana
+                $groupNameGabbana = array('Gabbana', '', '', '', '', '', '', '', '', '', '', '');
+                fputcsv($f, $groupNameGabbana, $delimiter);
+                foreach ($scoreBoradGabbanaData as $gameData) {
+                    getScoreBoardExportData($gameData, $f, $delimiter, $round_number, $dbName);
+                }
+            }
+        } else {
+            for ($round_number = 1; $round_number <= $roundSize; $round_number++) {
+                //get data for the scoreboard
+                //get all games for playoff for given round
+                $getGames4Playoff = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule_playoff WHERE round_number = ' . $round_number);
+                $scoreBoradPlayoffData = getAllGameData($getGames4Playoff, $round_number, $dbName);
+
+                //export data
+                foreach ($scoreBoradPlayoffData as $gameData) {
+                    getScoreBoardExportData($gameData, $f, $delimiter, $round_number, $dbName);
+                }
+            }
         }
 
-        //export data for Gabbana
-        $groupNameGabbana = array('Gabbana', '', '', '', '', '', '', '', '', '', '', '');
-        fputcsv($f, $groupNameGabbana, $delimiter);
-        foreach ($scoreBoradGabbanaData as $gameData) {
-            getScoreBoardExportData($gameData, $f, $delimiter, $round_number);
-        }
-
-        // Move back to beginning of file 
-        // fseek($f, 0);
 
         // Set headers to download file rather than displayed 
         header('Content-Type: text/csv');

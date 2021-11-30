@@ -28,20 +28,22 @@ Description: Allows to export score table from megaliga or playoff page
                     $userId = $current_user->ID;
                     // $userId = 48; //14;
 
-                    //content of export page
-                    echo '<div>';
-                    echo '  <form action="' . esc_attr(admin_url('admin-post.php')) . '" method="post">';
-                    echo '      <input type="hidden" name="action" value="handle_csv_export">';
-                    echo '      <div>';
-                    echo '          <div>';
-                    echo '              <input type="submit" name="submitExportMegaliga" value="Eksport megaliga" >';
-                    echo '          </div>';
-                    echo '          <div>';
-                    echo '              <input type="submit" name="submitEksportPlayoff" value="Eksport playoff" formtarget="_blank">';
-                    echo '          </div>';
-                    echo '      </div>';
-                    echo '  </form>';
-                    echo '</div>';
+                    if (is_user_logged_in() && ($userId == 14 || $userId == 48 || $userId == 1)) {
+                        //content of export page
+                        echo '<div>';
+                        echo '  <form action="' . esc_attr(admin_url('admin-post.php')) . '" method="post">';
+                        echo '      <input type="hidden" name="action" value="handle_csv_export" />';
+                        echo '      <div>';
+                        echo '          <div>';
+                        echo '              <input type="submit" name="submitExportMegaliga" value="Eksport megaliga" />';
+                        echo '          </div>';
+                        echo '          <div>';
+                        echo '              <input type="submit" name="submitEksportPlayoff" value="Eksport playoff" />';
+                        echo '          </div>';
+                        echo '      </div>';
+                        echo '  </form>';
+                        echo '</div>';
+                    }
 
                     ?>
                     <div class="entry-links"><?php wp_link_pages(); ?></div>
