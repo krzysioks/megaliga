@@ -1,8 +1,8 @@
-/*
-Theme Name:     Services Child
-Description:    Child theme for Services
+/* 
+Theme Name:     Hestia Child
+Description:    Child theme for Hestia
 Author:         Krzysztof Pielak
-Template:       services
+Template:       hestia
 */
 
 body {
@@ -14,20 +14,20 @@ img {
     height: auto;
 }
 
-#wrapper {
+/* #wrapper {
     max-width: 100%;
     margin: 0 auto;
-}
+} */
 
-#header {
+/* #header {
     background-color: rgba(0, 0, 0, 0);
-}
+} */
 
 #search {
     display: none;
 }
 
-#header-nav {
+/* #header-nav {
     position: fixed;
     width: 100%;
     padding: 10px 5%;
@@ -74,9 +74,9 @@ img {
 #menu ul li:hover ul li a:hover {
     color: #c40000;
     width: 100%;
-}
+} */
 
-#site-description {
+/* #site-description {
     padding: 0px 5% 10%;
 }
 
@@ -88,16 +88,16 @@ img {
     #header-sidebar .widget-container {
         width: 30%;
     }
-}
+} */
 
 @media all and (max-width: 1440px) {
     .teamContainerDimentions {
         width: 100% !important;
     }
 
-    #header-sidebar .widget-container {
+    /* #header-sidebar .widget-container {
         width: 40%;
-    }
+    } */
 }
 
 @media all and (max-width: 1610px) {
@@ -157,17 +157,17 @@ img {
     .draftPlayer {
         width: 100% !important;
     }
-    .menu {
+    /* .menu {
         overflow-x: hidden;
         height: 300px;
-    }
-    #site-description {
+    } */
+    /* #site-description {
         padding: 100px 5% 10%;
     }
 
     #header-sidebar .widget-container {
         width: 90%;
-    }
+    } */
 
     .scheduleContainer {
         display: flex;
@@ -300,12 +300,12 @@ img {
     }
 }
 
-.sub-menu {
+/* .sub-menu {
     background: rgba(0, 0, 0, 1);
-}
+} */
 
 @media all and (max-width: 768px) {
-    #menu {
+    /* #menu {
         background: rgba(0, 0, 0, 1);
     }
     #menu label.toggle {
@@ -322,7 +322,7 @@ img {
 
     #menu ul li:hover a {
         color: #c40000 !important;
-    }
+    } */
 
     .teamContainerDimentions {
         width: 100% !important;
@@ -333,7 +333,7 @@ img {
     }
 }
 
-@media all and (max-height: 800px) {
+/* @media all and (max-height: 800px) {
     .jsgrid .jsgrid-grid-body {
         height: 300px !important;
     }
@@ -343,12 +343,12 @@ img {
     .jsgrid .jsgrid-grid-body {
         height: 200px !important;
     }
-}
+} */
 
-input,
+/* input,
 textarea {
     background: #d4d4d4;
-}
+} */
 
 .displayFlex {
     display: flex;
@@ -862,14 +862,14 @@ textarea {
     top: 30px;
 }
 
-.jsgrid-grid-body {
+/* .jsgrid-grid-body {
     overflow: auto !important;
 }
 
 .jsgrid .jsgrid-grid-body {
     border-top: none;
     height: 700px;
-}
+} */
 
 .width_100 {
     width: 100%;

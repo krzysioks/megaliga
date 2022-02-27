@@ -1,18 +1,49 @@
 <?php
-function my_theme_enqueue_styles()
+
+if (!defined('ABSPATH')) exit;
+
+if (!function_exists('hestia_child_parent_css')) :
+    function hestia_child_parent_css()
+    {
+        //TODO this is only for DEV. Remove "?v='.time()" for production
+        wp_enqueue_style('hestia_child_parent', trailingslashit(get_template_directory_uri()) . 'style.css', array('bootstrap'));
+        if (is_rtl()) {
+            wp_enqueue_style('hestia_child_parent_rtl', trailingslashit(get_template_directory_uri()) . 'style-rtl.css', array('bootstrap'));
+        }
+    }
+endif;
+add_action('wp_enqueue_scripts', 'hestia_child_parent_css', 10);
+
+/**
+ * Import options from the parent theme
+ *
+ * @since 1.0.0
+ */
+function hestia_child_get_parent_options()
 {
-
-    $parent_style = 'services-style'; // This is 'servicesstyle' for the Services theme.
-
-    wp_enqueue_style($parent_style, get_template_directory_uri() . '/style.css');
-    wp_enqueue_style(
-        'child-style',
-        get_stylesheet_directory_uri() . '/style.css',
-        array($parent_style),
-        wp_get_theme()->get('Version')
-    );
+    $hestia_mods = get_option('theme_mods_hestia');
+    if (!empty($hestia_mods)) {
+        foreach ($hestia_mods as $hestia_mod_k => $hestia_mod_v) {
+            set_theme_mod($hestia_mod_k, $hestia_mod_v);
+        }
+    }
 }
-add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles');
+add_action('after_switch_theme', 'hestia_child_get_parent_options');
+
+// function my_theme_enqueue_styles()
+// {
+
+//     $parent_style = 'services-style'; // This is 'servicesstyle' for the Services theme.
+
+//     wp_enqueue_style($parent_style, get_template_directory_uri() . '/style.css');
+//     wp_enqueue_style(
+//         'child-style',
+//         get_stylesheet_directory_uri() . '/style.css',
+//         array($parent_style),
+//         wp_get_theme()->get('Version')
+//     );
+// }
+// add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles');
 
 add_action('login_head', 'hide_login_nav');
 function hide_login_nav()
