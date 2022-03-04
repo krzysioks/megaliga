@@ -43,6 +43,37 @@ if ((bool) $hide_top_bar === false) {
 </head>
 
 <body <?php body_class(); ?>>
+
+	<?php
+
+	// login modal
+	$loginFormProps = array(
+		'label_username'    => 'Użytkownik',
+		'label_password' => 'Hasło',
+		'label_remember'      => 'zapamiętaj mnie',
+		'label_log_in' => 'Zaloguj'
+	);
+
+	echo '<div id="megaligaLoginModal" class="megaliga-modal">';
+	echo "	<div class='megaliga-modal__content'>";
+	echo '		<div class="modal-header displayFlex flexDirectionRow">';
+	echo '			<div class="modal-title__text">';
+	echo    '			<h5 class="modal-title modal-title__lg">Logowanie do megaligi</h5>';
+	echo    '			<h5 class="modal-title modal-title__sm">Logowanie</h5>';
+	echo '			</div>';
+	echo '			<div class="modal-title__close">';
+	echo    '			<button type="button" class="close" onclick="closeLoginModal()" data-dismiss="modal" aria-label="Close">';
+	echo      '				<span aria-hidden="true">&times;</span>';
+	echo    '			</button>';
+	echo '			</div>';
+	echo  '		</div>';
+	echo '		<div class="megaliga-login-form">';
+	wp_login_form($loginFormProps);
+	echo '		</div>';
+	echo '	</div>';
+	echo '</div>';
+	?>
+
 	<?php wp_body_open(); ?>
 	<div class="<?php echo esc_attr($wrapper_div_classes); ?>">
 		<header class="header <?php echo esc_attr($header_class); ?>">
@@ -53,18 +84,3 @@ if ((bool) $hide_top_bar === false) {
 			hestia_after_header_trigger();
 			?>
 		</header>
-		<?php
-
-		// $loginFormProps = array(
-		// 	'label_username'    => 'Użytkownik',
-		// 	'label_password' => 'Hasło',
-		// 	'label_remember'      => 'zapamiętaj mnie',
-		// 	'label_log_in' => 'Zaloguj'
-		// );
-
-		// TODO make modal out of it
-		// echo '<div class="sign-on-wrapper">';
-		// wp_login_form($loginFormProps);
-
-		// echo '</div>';
-		?>
