@@ -18,6 +18,25 @@
 		var loginModal = document.getElementById('megaligaLoginModal');
 		loginModal.style.display = "none";
 	}
+
+	function initLoginModal() {
+		var loginMenuItem = document.querySelector('#menu-item-2283 a[title="Zaloguj"]');
+		var loginModal = document.getElementById('megaligaLoginModal');
+
+		if (loginMenuItem) {
+			loginMenuItem.setAttribute('href', '#');
+			loginMenuItem.onclick = function() {
+				loginModal.style.display = "block";
+			}
+		}
+	}
+
+	window.onclick = function(event) {
+		var loginModal = document.getElementById('megaligaLoginModal');
+		if (event.target == loginModal) {
+			loginModal.style.display = "none";
+		}
+	}
 </script>
 </body>
 
