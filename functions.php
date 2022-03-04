@@ -1,18 +1,33 @@
 <?php
 
-if (!defined('ABSPATH')) exit;
+// if (!defined('ABSPATH')) exit;
 
-if (!function_exists('hestia_child_parent_css')) :
-    function hestia_child_parent_css()
-    {
-        //TODO this is only for DEV. Remove "?v='.time()" for production
-        wp_enqueue_style('hestia_child_parent', trailingslashit(get_template_directory_uri()) . 'style.css', array('bootstrap'));
-        if (is_rtl()) {
-            wp_enqueue_style('hestia_child_parent_rtl', trailingslashit(get_template_directory_uri()) . 'style-rtl.css', array('bootstrap'));
-        }
-    }
-endif;
-add_action('wp_enqueue_scripts', 'hestia_child_parent_css', 10);
+// if (!function_exists('hestia_child_parent_css')) :
+//     function hestia_child_parent_css()
+//     {
+//         wp_enqueue_style('hestia_child_parent', trailingslashit(get_template_directory_uri()) . 'style.css', array('bootstrap'));
+//         if (is_rtl()) {
+//             wp_enqueue_style('hestia_child_parent_rtl', trailingslashit(get_template_directory_uri()) . 'style-rtl.css', array('bootstrap'));
+//         }
+//     }
+// endif;
+// add_action('wp_enqueue_scripts', 'hestia_child_parent_css', 10);
+
+
+function my_theme_enqueue_styles()
+{
+
+    $parent_style = 'hestia_child_parent';
+
+    wp_enqueue_style($parent_style, get_template_directory_uri() . '/style.css', array('bootstrap'), 11);
+    wp_enqueue_style(
+        'hestia_style',
+        get_stylesheet_directory_uri() . '/style.css',
+        array('bootstrap'),
+        wp_get_theme()->get('Version')
+    );
+}
+add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles', 10);
 
 /**
  * Import options from the parent theme
@@ -30,20 +45,23 @@ function hestia_child_get_parent_options()
 }
 add_action('after_switch_theme', 'hestia_child_get_parent_options');
 
+
+
 // function my_theme_enqueue_styles()
 // {
-
-//     $parent_style = 'services-style'; // This is 'servicesstyle' for the Services theme.
-
+//     $parent_style = 'hestia-parent';
+//     $child_style = 'hestia-child';
 //     wp_enqueue_style($parent_style, get_template_directory_uri() . '/style.css');
 //     wp_enqueue_style(
-//         'child-style',
-//         get_stylesheet_directory_uri() . '/style.css',
+//         $child_style,
+//         get_stylesheet_directory_uri(),
 //         array($parent_style),
 //         wp_get_theme()->get('Version')
 //     );
 // }
 // add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles');
+
+
 
 add_action('login_head', 'hide_login_nav');
 function hide_login_nav()

@@ -53,3 +53,18 @@ if ((bool) $hide_top_bar === false) {
 			hestia_after_header_trigger();
 			?>
 		</header>
+		<?php
+
+		// $loginFormProps = array(
+		// 	'label_username'    => 'Użytkownik',
+		// 	'label_password' => 'Hasło',
+		// 	'label_remember'      => 'zapamiętaj mnie',
+		// 	'label_log_in' => 'Zaloguj'
+		// );
+
+		// TODO make modal out of it
+		// echo '<div class="sign-on-wrapper">';
+		// wp_login_form($loginFormProps);
+
+		// echo '</div>';
+		?>

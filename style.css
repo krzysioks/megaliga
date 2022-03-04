@@ -1,17 +1,28 @@
-/* 
-Theme Name:     Hestia Child
-Description:    Child theme for Hestia
-Author:         Krzysztof Pielak
-Template:       hestia
+/*  
+Theme Name: Hestia Child    
+Theme URI: https://www.themeisle.com/     
+Description: This is a custom child theme I have created.    
+Author: ThemeIsle    
+URI: https://www.themeisle.com/    
+Template: hestia  
+Version: 0.3
 */
-
-body {
+/* body {
     color: black;
 }
 
 img {
     max-width: none !important;
     height: auto;
+} */
+
+.sign-on-wrapper {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    z-index: 1000;
+    width: 300px;
+    background-color: white;
 }
 
 /* #wrapper {
