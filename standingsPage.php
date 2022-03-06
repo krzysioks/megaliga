@@ -151,8 +151,8 @@ do_action('hestia_before_single_page_wrapper');
                                 {
                                     global $wpdb;
                                     $margin = $side == 'left' ? 'marginRight40' : '';
+                                    echo '<div class="scheduleTableName textLeft">Grupa ' . $groupName . '</div>';
                                     echo '<table class="scheduleTable ' . $margin . '" border="0">';
-                                    echo '  <tr><td colspan="8" class="scheduleTableName textLeft">Grupa ' . $groupName . '</td></tr>';
                                     echo '  <tr>
                                     <th class="scheduleHeader textLeft">m</th>
                                     <th class="scheduleHeader standingsHeader textLeft">drużyna</th>
@@ -199,9 +199,13 @@ do_action('hestia_before_single_page_wrapper');
                                 //uncomment if you want to display content of the page added in wp admin panel
                                 // the_content();
                                 //content of the team page
-                                echo '<div class="scheduleContainer">';
+                                echo '<div class="scheduleContainer flexDirectionColumn">';
+                                echo '  <div class="standingsTableContainer">';
                                 drawStandings($standingsDolce, 'left', 'dolce');
+                                echo '  </div>';
+                                echo '  <div class="standingsTableContainer">';
                                 drawStandings($standingsGabbana, 'right', 'gabbana');
+                                echo '  </div>';
                                 echo '</div>';
                                 //custom code ends here
 
@@ -231,5 +235,10 @@ do_action('hestia_before_single_page_wrapper');
             ?>
         </div>
     </div>
-
+    <script type="text/javascript">
+        (function() {
+            var title = document.querySelector('#primary > div.container > div > div > h1');
+            title.innerHTML = 'tabela - ' + title.innerHTML;
+        })();
+    </script>
     <?php get_footer(); ?>
