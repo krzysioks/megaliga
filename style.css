@@ -5,14 +5,18 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.48
+Version: 0.67
 */
 
-/* primary color: #0a00d8 */
-/* secondary color: #0800b3 */
+:root {
+    --megaliga-primary-color: #2268bf;
+    --megaliga-bg-color: #5380b8;
+}
 
-@media all and (max-width: 769px) {
+@media all and (max-width: 1440px) {
     body.custom-background {
+        background-position: top center !important;
+        background-size: auto !important;
         background-image: url('http://megaliga.eu/wp-content/uploads/2022/03/approved_background_original_mobile1-1-scaled.jpg') !important;
     }
 }
@@ -121,7 +125,7 @@ div.container div.row h1.hestia-title {
 
 body {
     /* scrollbar-width: thin; */
-    scrollbar-color: #0a00d8 rgba(255, 255, 255, 0.5);
+    scrollbar-color: var(--megaliga-primary-color) rgba(255, 255, 255, 0.5);
 }
 
 body::-webkit-scrollbar {
@@ -132,13 +136,14 @@ body::-webkit-scrollbar-track {
 }
 
 body::-webkit-scrollbar-thumb {
-    background-color: #0a00d8;
+    background-color: var(--megaliga-primary-color);
 }
 
 @media all and (max-width: 1440px) {
     body {
         scrollbar-width: thin;
-        scrollbar-color: #0a00d8 rgba(255, 255, 255, 0.5);
+        scrollbar-color: var(--megaliga-primary-color) rgba(255, 255, 255, 0.5);
+        background-color: var(--megaliga-bg-color);
     }
 
     body::-webkit-scrollbar {
@@ -149,7 +154,7 @@ body::-webkit-scrollbar-thumb {
     }
 
     body::-webkit-scrollbar-thumb {
-        background-color: #0a00d8;
+        background-color: var(--megaliga-primary-color);
     }
 }
 
@@ -913,7 +918,7 @@ input[type='button'],
 }
 
 footer.footer.footer-black {
-    background: #0800b3;
+    background: var(--megaliga-primary-color);
 }
 
 .hestia-title,
@@ -943,14 +948,15 @@ footer.footer.footer-black {
 .woocommerce ul.products[class*='columns-'] li.product-category h2,
 .woocommerce ul.products[class*='columns-'] li.product-category h2 a,
 .woocommerce ul.products[class*='columns-'] li.product-category h2 a:hover {
-    color: #0a00d8;
+    color: var(--megaliga-primary-color);
     text-decoration: none;
     word-wrap: break-word;
 }
 .hestia-scroll-to-top,
 .hestia-scroll-to-top:hover,
 .hestia-scroll-to-top:focus {
-    background-color: #0a00d8;
+    background-color: var(--megaliga-primary-color);
+    border: solid 2px white;
 }
 /* END of Overrides of parent theme rules */
 
