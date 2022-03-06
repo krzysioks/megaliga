@@ -381,5 +381,11 @@ do_action('hestia_before_single_page_wrapper');
             ?>
         </div>
     </div>
-
+    <script type="text/javascript">
+        (function() {
+            var title = document.querySelector('#primary > div.container > div > div > h1');
+            title.innerHTML = 'składy - ' + title.innerHTML;
+        })();
+    </script>
+    <!-- #primary > div.container > div > div > h1 -->
     <?php get_footer(); ?>

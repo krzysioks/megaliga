@@ -42,7 +42,7 @@ if ((bool) $hide_top_bar === false) {
 	<?php wp_head(); ?>
 </head>
 
-<body onload="initLoginModal()" <?php body_class(); ?>>
+<body onload="megaligaOnLoad()" <?php body_class(); ?>>
 
 	<?php
 

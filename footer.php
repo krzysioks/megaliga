@@ -19,7 +19,7 @@
 		loginModal.style.display = "none";
 	}
 
-	function initLoginModal() {
+	function megaligaOnLoad() {
 		var loginMenuItem = document.querySelector('#menu-item-2283 a[title="Zaloguj"]');
 		var loginModal = document.getElementById('megaligaLoginModal');
 
@@ -29,6 +29,9 @@
 				loginModal.style.display = "block";
 			}
 		}
+
+		var copyrightItem = document.querySelector('div.copyright');
+		copyrightItem.classList.remove("pull-right");
 	}
 
 	window.onclick = function(event) {
