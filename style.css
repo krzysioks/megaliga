@@ -5,12 +5,14 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.78
+Version: 0.126
 */
 
 :root {
     --megaliga-primary-color: #2268bf;
     --megaliga-bg-color: #5380b8;
+    --megaliga-bg-color-light: #bddbff;
+    --megaliga--disabled-color: #d1d1d1;
 }
 
 @media all and (max-width: 1440px) {
@@ -173,21 +175,18 @@ body::-webkit-scrollbar-thumb {
         flex-direction: column !important;
     }
 
-    .playoffPhaseTitlePosition {
-        margin-left: 5px !important;
-        text-align: left !important;
-    }
-
     .winnerMargin {
         margin-left: 0px !important;
     }
 
     .winnerContainer {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+        align-items: center;
         width: 350px;
-        height: 30px;
+        height: 80px;
         margin-left: 5px !important;
+        margin-bottom: 5em !important;
     }
     .pairLadderContainer {
         display: flex;
@@ -275,21 +274,18 @@ body::-webkit-scrollbar-thumb {
         flex-direction: column !important;
     }
 
-    .playoffPhaseTitlePosition {
-        margin-left: 5px !important;
-        text-align: left !important;
-    }
-
     .winnerMargin {
         margin-left: 0px !important;
     }
 
     .winnerContainer {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
+        align-items: center;
         width: 240px !important;
-        height: 30px;
+        height: 80px;
         margin-left: 5px !important;
+        margin-bottom: 5em !important;
     }
     .pairLadderContainer {
         display: flex;
@@ -305,20 +301,15 @@ body::-webkit-scrollbar-thumb {
         top: 7px;
         left: 5px;
     }
-    .pairLegendContainer {
-        width: 250px !important;
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-    }
+
     .score {
         width: 35px !important;
         font-weight: bold;
         font-size: 12px;
         position: relative;
         top: 0px;
-        padding: 7px 0px 0px 5px;
-        border-left: solid 1px #c40000;
+        padding: 7px 0px 4px 5px;
+        border-left: solid 1px var(--megaliga-primary-color);
     }
     .playoffPhaseTitle {
         font-weight: bold;
@@ -326,7 +317,7 @@ body::-webkit-scrollbar-thumb {
     }
     .seedNumberContainer {
         position: relative;
-        top: 17px;
+        top: 8px;
         width: 10px;
         font-size: 10px;
     }
@@ -342,13 +333,6 @@ body::-webkit-scrollbar-thumb {
         width: 240px !important;
         height: 30px;
         background-color: white;
-    }
-    .legendRound1Margin {
-        margin-right: 27px !important;
-    }
-
-    .legendRound2Margin {
-        margin-right: 28px !important;
     }
 }
 
@@ -707,7 +691,9 @@ body::-webkit-scrollbar-thumb {
 
 /*playoff standings page*/
 .playoffLadder {
-    background-color: #58585859;
+    box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.5);
+    border: solid 1px rgb(200 200 200 / 50%);
+    margin-bottom: 2em;
 }
 
 .playoffLadderflexDirection {
@@ -727,32 +713,12 @@ body::-webkit-scrollbar-thumb {
 }
 
 .winnerName {
-    width: 200px;
     font-weight: bold;
-    font-size: 20px;
-    position: relative;
-    top: 30px;
-    left: 37px;
+    font-size: 18px;
 }
 
-.pairLegendContainer {
-    width: 360px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-}
-
-.pairLegend {
-    font-weight: bold;
-    font-size: 12px;
-}
-
-.legendRound1Margin {
-    margin-right: 45px;
-}
-
-.legendRound2Margin {
-    margin-right: 50px;
+.winnerNameContainer {
+    width: 388px;
 }
 
 .score {
@@ -761,26 +727,49 @@ body::-webkit-scrollbar-thumb {
     position: relative;
     top: 0px;
     padding: 7px 0px 0px 5px;
-    border-left: solid 1px #c40000;
 }
 
 .playoffPhaseTitle {
     font-weight: bold;
     font-size: 16px;
+    color: var(--megaliga-primary-color);
+}
+
+.firstStageTable {
+    margin-top: 17em;
+}
+
+.matchupTableFirstRow {
+    margin-bottom: 5px;
+    border-bottom: 2px solid var(--megaliga-primary-color);
+}
+
+.matchupTableFirstRow .playoffLadderContent {
+    top: 3px;
+}
+.matchupTableFirstRow .score {
+    top: -4px;
 }
 
 .pairLadderContainer {
     display: flex;
     width: 360px;
     height: 120px;
-    margin: 5px 40px 5px 40px;
+    margin-right: 1em;
+    margin-left: 1em;
 }
 
 .seedNumberContainer {
     position: relative;
-    top: 17px;
+    top: 8px;
     width: 10px;
     font-size: 12px;
+}
+
+img.winner {
+    border-radius: 50%;
+    box-shadow: 1px 1px 5px gray;
+    border: 3px solid gold;
 }
 
 .teamLadderContainer {
@@ -800,9 +789,11 @@ body::-webkit-scrollbar-thumb {
 
 .winnerContainer {
     display: flex;
-    flex-direction: row;
-    width: 350px;
-    height: 30px;
+    flex-direction: column;
+    align-items: center;
+    width: 388px;
+    height: 80px;
+    margin-bottom: 5em;
 }
 
 .winnerMargin {
@@ -810,11 +801,16 @@ body::-webkit-scrollbar-thumb {
 }
 
 .playoffPhaseTitlePosition {
-    text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .winner {
-    background-color: #71cc6e;
+    color: var(--megaliga-primary-color);
+}
+
+.looser {
+    color: var(--megaliga--disabled-color);
 }
 
 /*history page*/
