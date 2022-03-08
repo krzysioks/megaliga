@@ -109,24 +109,24 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '<div class="playoffPhaseTitlePosition marginTop' . $marginSize . '"><span class="playoffPhaseTitle">' . $title . '</span></div>';
 
                                 echo '<div class="pairLadderContainer flexDirectionColumn">';
-                                echo '  <div class="teamLadderContainer">';
-                                echo '      <div class="seedNumberContainer">' . $data['seedNumberTeam1'] . '</div>';
-                                echo '      <div class="teamNameContainer matchupTableFirstRow' . $team1AddedStyle . '">';
-                                echo '          <span class="playoffLadderContent">' . $data['team1Name'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam1Round1'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam1Round2'] . '</span>';
-                                echo '          <span class="score">' . $totalScoreTeam1 . '</span>';
-                                echo '      </div>';
-                                echo '  </div>';
-                                echo '  <div class="teamLadderContainer">';
-                                echo '      <div class="seedNumberContainer">' . $data['seedNumberTeam2'] . '</div>';
-                                echo '      <div class="teamNameContainer' . $team2AddedStyle . '">';
-                                echo '          <span class="playoffLadderContent">' . $data['team2Name'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam2Round1'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam2Round2'] . '</span>';
-                                echo '          <span class="score">' . $totalScoreTeam2 . '</span>';
-                                echo '      </div>';
-                                echo '  </div>';
+                                echo '    <div class="teamLadderContainer">';
+                                echo '        <div class="seedNumberContainer">' . $data['seedNumberTeam1'] . '</div>';
+                                echo '        <div class="teamNameContainer matchupTableFirstRow' . $team1AddedStyle . '">';
+                                echo '            <span class="playoffLadderContent">' . $data['team1Name'] . '</span>';
+                                echo '            <span class="score">' . $data['scoreTeam1Round1'] . '</span>';
+                                echo '            <span class="score">' . $data['scoreTeam1Round2'] . '</span>';
+                                echo '            <span class="score">' . $totalScoreTeam1 . '</span>';
+                                echo '        </div>';
+                                echo '    </div>';
+                                echo '    <div class="teamLadderContainer">';
+                                echo '        <div class="seedNumberContainer">' . $data['seedNumberTeam2'] . '</div>';
+                                echo '        <div class="teamNameContainer' . $team2AddedStyle . '">';
+                                echo '            <span class="playoffLadderContent">' . $data['team2Name'] . '</span>';
+                                echo '            <span class="score">' . $data['scoreTeam2Round1'] . '</span>';
+                                echo '            <span class="score">' . $data['scoreTeam2Round2'] . '</span>';
+                                echo '            <span class="score">' . $totalScoreTeam2 . '</span>';
+                                echo '        </div>';
+                                echo '    </div>';
                                 echo '</div>';
                             }
 
@@ -189,7 +189,7 @@ do_action('hestia_before_single_page_wrapper');
                                 }
 
                                 //draw 1st semifinal stage
-                                echo '<div class="phaseContainer">';
+                                echo '<div class="phaseContainer order-1">';
                                 echo '<div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">półfinał</span></div>';
                                 drawFirstStageMatchup($semifinalData[0]);
                                 echo '</div>';
@@ -207,7 +207,7 @@ do_action('hestia_before_single_page_wrapper');
                                 $thridPlaceData = getStageData($getThirdPlaceStage[0]);
 
                                 //draw 2nd stage
-                                echo '<div class="phaseContainer">';
+                                echo '<div class="phaseContainer order-3">';
 
                                 //draw results
                                 //draw results only when winner of each matchup is complete
@@ -218,28 +218,33 @@ do_action('hestia_before_single_page_wrapper');
                                     $getWinnerData = $wpdb->get_results('SELECT logo_url FROM megaliga_user_data WHERE reached_playoff = 1 AND ID = ' . $winnerId);
 
                                     $winnerTeamNameKey = $finalData['winner'] . 'Name';
-
-                                    echo '<div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">mistrz megaligi</span></div>';
-                                    echo '<div class="winnerContainer">';
-                                    echo '    <div class="displayFlex">';
-                                    echo '        <img class="winner" src="' . $getWinnerData[0]->logo_url . '" width="75px" height="75px">';
-                                    echo '    </div>';
-                                    echo '    <div class="winnerNameContainer displayFlex center">';
-                                    echo '      <span class="winnerName">' . $finalData[$winnerTeamNameKey] . '</span>';
-                                    echo '    </div>';
+                                    echo '<div class="order-3">';
+                                    echo '  <div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">mistrz megaligi</span></div>';
+                                    echo '  <div class="winnerContainer">';
+                                    echo '      <div class="winnerImgContainer displayFlex">';
+                                    echo '          <img class="winner" src="' . $getWinnerData[0]->logo_url . '" width="75px" height="75px">';
+                                    echo '      </div>';
+                                    echo '      <div class="winnerNameContainer displayFlex center">';
+                                    echo '        <span class="winnerName">' . $finalData[$winnerTeamNameKey] . '</span>';
+                                    echo '      </div>';
+                                    echo '  </div>';
                                     echo '</div>';
                                 }
 
                                 //draw final stage
+                                echo '  <div clas="order-1">';
                                 drawSecondStageMatchup($finalData, 'finał', '20');
+                                echo '  </div>';
                                 //draw 3rd place stage
+                                echo '  <div clas="order-2">';
                                 drawSecondStageMatchup($thridPlaceData, 'mecz o 3 miejsce', '40');
+                                echo '  </div>';
                                 echo '</div>';
 
 
 
                                 //draw 2nd semifinal stage
-                                echo '<div class="phaseContainer">';
+                                echo '<div class="phaseContainer order-2">';
                                 echo '<div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">półfinał</span></div>';
                                 drawFirstStageMatchup($semifinalData[1]);
                                 echo '</div>';

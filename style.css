@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.126
+Version: 0.153
 */
 
 :root {
@@ -175,24 +175,45 @@ body::-webkit-scrollbar-thumb {
         flex-direction: column !important;
     }
 
-    .winnerMargin {
-        margin-left: 0px !important;
-    }
-
     .winnerContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 350px;
-        height: 80px;
-        margin-left: 5px !important;
+        width: 350px !important;
+        margin-right: auto !important;
+        margin-left: auto !important;
         margin-bottom: 5em !important;
     }
+
+    .winnerImgContainer {
+        margin-top: 0.5em !important;
+        margin-bottom: 0.5em !important;
+    }
+
     .pairLadderContainer {
-        display: flex;
-        width: 360px;
-        height: 120px;
-        margin: 5px 0px 5px 5px !important;
+        margin-right: auto !important;
+        margin-left: auto !important;
+    }
+
+    .firstStageTable {
+        margin-top: 1em !important;
+    }
+
+    .order-1 {
+        order: 1;
+    }
+
+    .order-2 {
+        order: 2;
+    }
+
+    .order-3 {
+        order: 3;
+    }
+
+    .order-4 {
+        order: 4;
+    }
+
+    .order-5 {
+        order: 5;
     }
 }
 
@@ -272,67 +293,6 @@ body::-webkit-scrollbar-thumb {
     /*playoff standings page*/
     .playoffLadderflexDirection {
         flex-direction: column !important;
-    }
-
-    .winnerMargin {
-        margin-left: 0px !important;
-    }
-
-    .winnerContainer {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 240px !important;
-        height: 80px;
-        margin-left: 5px !important;
-        margin-bottom: 5em !important;
-    }
-    .pairLadderContainer {
-        display: flex;
-        width: 250px !important;
-        height: 120px;
-        margin: 5px 0px 5px 5px !important;
-    }
-    .playoffLadderContent {
-        width: 140px !important;
-        font-weight: bold;
-        font-size: 12px;
-        position: relative;
-        top: 7px;
-        left: 5px;
-    }
-
-    .score {
-        width: 35px !important;
-        font-weight: bold;
-        font-size: 12px;
-        position: relative;
-        top: 0px;
-        padding: 7px 0px 4px 5px;
-        border-left: solid 1px var(--megaliga-primary-color);
-    }
-    .playoffPhaseTitle {
-        font-weight: bold;
-        font-size: 14px;
-    }
-    .seedNumberContainer {
-        position: relative;
-        top: 8px;
-        width: 10px;
-        font-size: 10px;
-    }
-    .teamLadderContainer {
-        display: flex;
-        flex-direction: row;
-        width: 250px !important;
-        height: 30px;
-    }
-    .teamNameContainer {
-        display: flex;
-        flex-direction: row;
-        width: 240px !important;
-        height: 30px;
-        background-color: white;
     }
 }
 
@@ -690,6 +650,12 @@ body::-webkit-scrollbar-thumb {
 }
 
 /*playoff standings page*/
+.phaseContainer {
+    display: flex;
+    flex-direction: column;
+    overflow-x: scroll;
+}
+
 .playoffLadder {
     box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.5);
     border: solid 1px rgb(200 200 200 / 50%);
@@ -796,10 +762,6 @@ img.winner {
     margin-bottom: 5em;
 }
 
-.winnerMargin {
-    margin-left: 100px;
-}
-
 .playoffPhaseTitlePosition {
     display: flex;
     justify-content: center;
@@ -878,6 +840,11 @@ img.winner {
 }
 
 /* Overrides of parent theme rules */
+@media all and (min-width: 769px) {
+    .container {
+        width: 100%;
+    }
+}
 .navbar button.navbar-toggle,
 .navbar button.navbar-toggle:hover {
     color: var(--megaliga-primary-color);
