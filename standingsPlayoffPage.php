@@ -35,7 +35,7 @@ do_action('hestia_before_single_page_wrapper');
                                 do_action('hestia_page_sidebar');
                             }
                             ?>
-                            <!-- <div class="<?php /*echo esc_attr($wrap_class); */ ?>"> -->
+
                             <?php
                             do_action('hestia_before_page_content');
 
@@ -268,7 +268,7 @@ do_action('hestia_before_single_page_wrapper');
                                 comments_template();
                             endif;
                             ?>
-                            <!-- </div> -->
+
                             <?php
                             if ($sidebar_layout === 'sidebar-right') {
                                 do_action('hestia_page_sidebar');
