@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.153
+Version: 0.156
 */
 
 :root {
@@ -653,7 +653,7 @@ body::-webkit-scrollbar-thumb {
 .phaseContainer {
     display: flex;
     flex-direction: column;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 .playoffLadder {
@@ -840,11 +840,6 @@ img.winner {
 }
 
 /* Overrides of parent theme rules */
-@media all and (min-width: 769px) {
-    .container {
-        width: 100%;
-    }
-}
 .navbar button.navbar-toggle,
 .navbar button.navbar-toggle:hover {
     color: var(--megaliga-primary-color);
