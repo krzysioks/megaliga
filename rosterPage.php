@@ -137,7 +137,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '      <div class="teamImgContainer">';
                                 echo '          <img src="' . $queryResult[0]->logo_url . '" width="200px" height="200px">';
                                 echo '      </div>';
-                                echo '      <div class="teamOverviewContainer">';
+                                echo '      <div class="teamOverviewContainerForm">';
                                 echo '          <div class="teamOverviewRow">';
                                 echo '              <span class="teamOverviewLabel">drużyna:</span>';
                                 echo '              <span class="teamOverviewTeamName">' . $queryResult[0]->team_name . '</span>';
@@ -151,9 +151,9 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '              <span class="teamOverviewContent">' . $queryResult[0]->user_login . '</span>';
                                 echo '          </div>';
                                 echo '      </div>';
-                                echo '      <div class="teamRosterContainer">';
+                                echo '      <div class="teamRosterContainerForm">';
                                 echo '          <span class="teamOverviewRosterLabel">wybierz skład (dokładnie 5 zawodników):</span>';
-                                echo '              <ul>';
+                                echo '              <ul class="noDecoration">';
                                 echo '                  <li>';
                                 echo '                      <span class="teamOverviewRosterTeamName">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr startowy&nbsp;&nbsp; zawodnik</span>';
                                 echo '                  </li>';
@@ -162,6 +162,14 @@ do_action('hestia_before_single_page_wrapper');
                                     function clearSpinner(spinnerId, checkboxId) {
                                         if (!document.getElementById(checkboxId).checked) {
                                             document.getElementById(spinnerId).value = '';
+                                        }
+                                    }
+
+                                    function handleNumberInputOnChange(spinnerId, checkboxId) {
+                                        var spinner = document.getElementById(spinnerId);
+                                        document.getElementById(checkboxId).checked = spinner.value > 0;
+                                        if (spinner.value === '0') {
+                                            spinner.value = '';
                                         }
                                     }
                                 </script>
@@ -174,7 +182,7 @@ do_action('hestia_before_single_page_wrapper');
 
                                     echo '              <li>
                                 <input class="pointer teamRosterCheckbox" type="checkbox" id="player' . $rosterField->player_id . '" ' . $checked . ' name="player' . $rosterField->player_id . '" value="' . $rosterField->player_id . '" onchange="clearSpinner(\'startingNumber' . $rosterField->player_id . '\', \'player' . $rosterField->player_id . '\')">
-                                <input type="number" class="spinner" name="startingNumber' . $rosterField->player_id . '" id="startingNumber' . $rosterField->player_id . '" min="1" max="5" value="' . $startingOrder . '">
+                                <input type="number" class="spinner" name="startingNumber' . $rosterField->player_id . '" id="startingNumber' . $rosterField->player_id . '" onchange="handleNumberInputOnChange(\'startingNumber' . $rosterField->player_id . '\', \'player' . $rosterField->player_id . '\')" min="0" max="5" value="' . $startingOrder . '">
                                 <label for="player' . $rosterField->player_id . '" class="pointer teamOverviewRosterPlayerName">' . $rosterField->ekstraliga_player_name . '</label>
                             </li>';
                                 }
@@ -199,7 +207,7 @@ do_action('hestia_before_single_page_wrapper');
                                 $buttonTitle = $isFormEnabled[0]->is_open ? 'Zablokuj wybór składów' : 'Odblokuj wybór składów';
 
                                 echo '<form action="" method="post">';
-                                echo '  <div class="marginBottom20">';
+                                echo '  <div class="marginLeft1em marginBottom20">';
                                 echo '      <input type="submit" name="submitFormStatus" value="' . $buttonTitle . '">';
                                 echo '      <input type="hidden" name="is_open" value="' . !$isFormEnabled[0]->is_open . '">';
                                 echo '  </div>';
@@ -216,8 +224,8 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '  <div>';
                                 echo '      <span class="emergencyTeamSelectionTitle">Formularz awaryjnego przydziału składu</span>';
                                 echo '  </div>';
-                                echo '  <div class="displayFlex flexDirectionRow marginTop20">';
-                                echo '      <div class="marginTop10"><span class="teamOverviewLabel">Drużyna:</span></div>';
+                                echo '  <div class="displayFlex flexDirectionColumn marginTop20">';
+                                echo '      <div><span class="teamOverviewLabel">Drużyna:</span></div>';
                                 echo '            <select class="teamSelect" name="team" id="selectTeam">';
                                 foreach ($getTeams as $option) {
                                     if ($selectedValue == $option->ID) {
@@ -228,7 +236,7 @@ do_action('hestia_before_single_page_wrapper');
                                 }
                                 echo '            </select>';
                                 echo '  </div>';
-                                echo '  <div>';
+                                echo '  <div class="submitEmergencyTeamSelectionContainer">';
                                 echo '      <input type="submit" name="submitEmergencyTeamSelection" value="Wybierz">';
                                 echo '  </div>';
                                 echo '</div>';
@@ -327,7 +335,7 @@ do_action('hestia_before_single_page_wrapper');
                             echo '<div>';
 
                             if (!$isFormEnabled[0]->is_open) {
-                                echo '<div class="rosterPageMessage marginBottom20">';
+                                echo '<div class="marginLeft1em marginBottom20">';
                                 echo '<span class="scoreTableName">Wybór składów w tej rundzie został zakończony.</Span>';
                                 echo '</div>';
                             }

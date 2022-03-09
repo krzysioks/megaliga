@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.177
+Version: 0.189
 */
 
 :root {
@@ -241,6 +241,14 @@ body::-webkit-scrollbar-thumb {
         padding: 0.4em !important;
     }
 
+    .teamOverviewContainerForm {
+        width: 100% !important;
+    }
+
+    .teamRosterContainerForm {
+        width: 100% !important;
+    }
+
     .teamImgContainer {
         width: 100% !important;
     }
@@ -293,6 +301,11 @@ body::-webkit-scrollbar-thumb {
 @media all and (max-width: 768px) {
     .teamContainerDimentions {
         width: 95% !important;
+    }
+    .playoffLadder {
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
     }
 
     .scheduleScore {
@@ -483,8 +496,16 @@ body::-webkit-scrollbar-thumb {
     margin-right: 50px;
 }
 
+.marginLeft1em {
+    margin-left: 1em;
+}
+
 .fontSize12 {
     font-size: 12px;
+}
+
+.noDecoration {
+    list-style-type: none;
 }
 
 /*team page*/
@@ -512,10 +533,6 @@ body::-webkit-scrollbar-thumb {
     flex-direction: row;
 }
 
-.rosterPageMessage {
-    margin-left: 1em;
-}
-
 .teamImgContainer {
     width: 200px;
     margin-right: 1em;
@@ -525,8 +542,19 @@ body::-webkit-scrollbar-thumb {
     width: 75%;
 }
 
+.teamOverviewContainerForm {
+    width: 50%;
+}
+
 .teamRosterContainer {
     width: 25%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+}
+
+.teamRosterContainerForm {
+    width: 50%;
     display: flex;
     flex-direction: column;
     padding: 1em;
@@ -543,6 +571,10 @@ body::-webkit-scrollbar-thumb {
     font-size: 12px;
     font-weight: bold;
     margin-right: 0.5em;
+}
+
+.submitEmergencyTeamSelectionContainer {
+    margin-top: 1em;
 }
 
 .setplay {
@@ -581,7 +613,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 .setplayInput {
-    width: 50%;
+    width: 100%;
 }
 
 .setplayContainer {
@@ -602,11 +634,11 @@ div.teamRosterContainer ul {
 .emergencyTeamSelectionTitle {
     font-weight: bold;
     font-size: 20px;
+    color: var(--megaliga-primary-color);
 }
 
 .teamSelect {
     font-size: 15px !important;
-    height: 30px !important;
     width: 200px;
     margin-top: 5px;
     cursor: pointer;
