@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.205
+Version: 0.215
 */
 
 :root {
@@ -311,6 +311,34 @@ body::-webkit-scrollbar-thumb {
     .scheduleScore {
         font-size: 12px !important;
     }
+
+    .megaligaScores {
+        flex-direction: column !important;
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .megaligaScoresTable.scheduleTable {
+        margin-bottom: 1em;
+    }
+
+    .scoreTtitleContainer {
+        margin: 1em 0 1em 1em !important;
+    }
+
+    .scoreBoardContainer {
+        overflow-x: auto;
+        width: 95%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .scheduleTable.playoffs {
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
 }
 
 .displayFlex {
@@ -328,6 +356,15 @@ body::-webkit-scrollbar-thumb {
 /*schedule table in megaliga-> kolejka n sub page*/
 .scheduleContainer {
     display: flex;
+}
+
+.scoreTtitleContainer {
+    margin: 4em 0 1em 0;
+}
+
+.megaligaScores {
+    flex-direction: row;
+    width: 100%;
 }
 
 .standingsTableContainer {

@@ -182,7 +182,7 @@ do_action('hestia_before_single_page_wrapper');
                                 $margin = $side == 'left' ? 'marginRight40' : '';
                                 echo '<table class="scheduleTable playoffs ' . $margin . '" border="0">';
                                 echo '  <tr>
-                            <th colspan="3" class="scheduleHeader textLeft">playoff</th>
+                            <th colspan="3" class="scheduleHeader textLeft">playoffs</th>
                             <th colspan="3" class="scheduleHeader textRight">' . $round_number . '. kolejka</th>
                         </tr>';
                                 $i = 0;
@@ -237,9 +237,12 @@ do_action('hestia_before_single_page_wrapper');
                                 $playerNoTeam1 = 0;
                                 $playerNoTeam2 = 0;
 
+                                echo '<div class="scoreBoardContainer">';
+
                                 if ($isForm) {
                                     echo '<form action="" method="post">';
                                 }
+
                                 echo '<table class="scoreBoardTable" border="0">';
                                 echo '  <tr><td colspan="11" class="teamOverviewContent textLeft">' . $scoreBoardData['team1Data']->team_name . ' : ' . $scoreBoardData['team2Data']->team_name . '</td></tr>';
                                 echo '  <tr><td colspan="6" class="textLeft"><span class="setplayTitle">Zagrywki: </span><span class="setplayName">' . $scoreBoardData['team1Data']->team_name . ' - ' . $setplayTeam1 . '</span></td><td colspan="5" class="setplayName textLeft">' . $scoreBoardData['team2Data']->team_name . ' - ' . $setplayTeam2 . '</td></tr>';
@@ -855,6 +858,7 @@ do_action('hestia_before_single_page_wrapper');
 
                                     echo '</form>';
                                 }
+                                echo '</div>';
                             }
 
                             function getAllGameData($query, $round_number)
@@ -935,7 +939,7 @@ do_action('hestia_before_single_page_wrapper');
 
                             echo '</div>';
                             echo '<div>';
-                            echo '  <div class="marginTop4em marginBottom1em">';
+                            echo '  <div class="scoreTtitleContainer">';
                             echo '      <span class="scoreTableName">Wyniki</span>';
                             echo '  </div>';
                             foreach ($scoreBoradPlayoffData as $gameData) {
