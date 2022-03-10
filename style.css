@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.215
+Version: 0.226
 */
 
 :root {
@@ -241,6 +241,15 @@ body::-webkit-scrollbar-thumb {
         padding: 0.4em !important;
     }
 
+    .teamRosterTeamPageContainer {
+        width: 100% !important;
+        padding: 0.4em !important;
+    }
+
+    .teamOverviewTeamPageContainer {
+        width: 100% !important;
+    }
+
     .teamOverviewContainerForm {
         width: 100% !important;
     }
@@ -452,16 +461,12 @@ td.scoreSeparator {
     margin-top: 20px;
 }
 
-.marginTop100 {
-    margin-top: 100px;
-}
-
 .marginLeft10 {
     margin-left: 10px;
 }
 
 .marginY20 {
-    margin-bottom: 20px;
+    margin-bottom: 1em;
 }
 
 .floatLeft {
@@ -476,10 +481,6 @@ td.scoreSeparator {
 
 .left {
     align-self: flex-start;
-}
-
-.right {
-    align-self: flex-end;
 }
 
 .center {
@@ -522,26 +523,6 @@ td.scoreSeparator {
     margin-top: 20px !important;
 }
 
-.marginTop40 {
-    margin-top: 40px !important;
-}
-
-.marginRight20 {
-    margin-right: 20px;
-}
-
-.marginRight5 {
-    margin-right: 5px;
-}
-
-.marginRight45 {
-    margin-right: 45px;
-}
-
-.marginRight50 {
-    margin-right: 50px;
-}
-
 .marginLeft1em {
     margin-left: 1em;
 }
@@ -554,12 +535,8 @@ td.scoreSeparator {
     list-style-type: none;
 }
 
-.marginTop4em {
-    margin-top: 4em;
-}
-
-.marginBottom1em {
-    margin-bottom: 1em;
+.overflowXhidden {
+    overflow-x: hidden !important;
 }
 
 /*team page*/
@@ -567,9 +544,11 @@ td.scoreSeparator {
 .teamContainer {
     display: flex;
     flex-direction: row;
-    background-color: #b3b3b3;
-    margin-bottom: 20px;
-    padding: 10px;
+    box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.5);
+    border: solid 1px rgb(200 200 200 / 50%);
+    margin: 0em auto 2em auto;
+    padding: 1em;
+    overflow-x: auto;
 }
 
 .rosterContainer {
@@ -596,12 +575,23 @@ td.scoreSeparator {
     width: 75%;
 }
 
+.teamOverviewTeamPageContainer {
+    width: 40%;
+}
+
 .teamOverviewContainerForm {
     width: 50%;
 }
 
 .teamRosterContainer {
     width: 25%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+}
+
+.teamRosterTeamPageContainer {
+    width: 60%;
     display: flex;
     flex-direction: column;
     padding: 1em;
