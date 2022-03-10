@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.241
+Version: 0.242
 */
 
 :root {
@@ -348,6 +348,10 @@ body::-webkit-scrollbar-thumb {
         margin-left: auto !important;
         margin-right: auto !important;
         overflow-x: auto;
+    }
+
+    .width_100 {
+        width: 95% !important;
     }
 }
 
