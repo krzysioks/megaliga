@@ -43,7 +43,7 @@ do_action('hestia_before_single_page_wrapper');
                             $current_user = wp_get_current_user();
                             $userId = $current_user->ID;
                             // $userId = 20; //46; //14;
-                            $userId = 26;
+                            // $userId = 26;
                             //check if draft window is open
                             $getDraftWindowState = $wpdb->get_results('SELECT draft_window_open, draft_credit_enabled, draft_round1_order_lottery_open FROM megaliga_draft_data');
 
