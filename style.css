@@ -5,13 +5,13 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.226
+Version: 0.241
 */
 
 :root {
     --megaliga-primary-color: #2268bf;
     --megaliga-bg-color: #5380b8;
-    --megaliga-bg-color-light: #bddbff;
+    --megaliga-bg-color-light: #f3f8ff;
     --megaliga--disabled-color: #d1d1d1;
 }
 
@@ -222,10 +222,7 @@ body::-webkit-scrollbar-thumb {
 
     .draftFormContainer {
         flex-direction: column !important;
-    }
-
-    .draftPlayer {
-        width: 100% !important;
+        margin-left: 1em !important;
     }
 
     .teamContainerRow1 {
@@ -276,9 +273,6 @@ body::-webkit-scrollbar-thumb {
     }
     .draftFormContainer {
         flex-direction: column !important;
-    }
-    .draftPlayer {
-        width: 100% !important;
     }
 
     .standingsTableContainer {
@@ -347,6 +341,13 @@ body::-webkit-scrollbar-thumb {
         width: 95% !important;
         margin-left: auto !important;
         margin-right: auto !important;
+    }
+
+    .jsgrid {
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        overflow-x: auto;
     }
 }
 
@@ -870,10 +871,15 @@ img.winner {
 /*draft page*/
 .draftPlayer {
     font-size: 15px !important;
-    height: 30px !important;
+    height: 40px !important;
     width: 75%;
     margin-top: 5px;
     cursor: pointer;
+}
+.teamOverviewContent.marginBottom5.draft {
+    margin-top: 3px;
+    margin-left: 1em;
+    color: inherit;
 }
 
 .submitDrawPositionOrder {
@@ -1044,4 +1050,28 @@ footer.footer.footer-black {
 .comment-form-email,
 .comment-notes {
     display: none;
+}
+
+/*overrides for jsgrid*/
+.jsgrid {
+    position: relative;
+    overflow: hidden;
+    font-size: 1em;
+    box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.5);
+    border: solid 1px rgb(200 200 200 / 50%);
+    margin-bottom: 2em;
+    overflow-x: auto;
+}
+
+.jsgrid-header-cell {
+    color: var(--megaliga-primary-color);
+    background: #fff !important;
+}
+
+.jsgrid-alt-row {
+    background: var(--megaliga-bg-color-light) !important;
+}
+
+.jsgrid .jsgrid-alt-row > .jsgrid-cell {
+    background: transparent !important;
 }
