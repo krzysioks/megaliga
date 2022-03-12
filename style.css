@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.242
+Version: 0.252
 */
 
 :root {
@@ -353,6 +353,14 @@ body::-webkit-scrollbar-thumb {
     .width_100 {
         width: 95% !important;
     }
+
+    .historyTableContainer {
+        width: 95% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        flex-direction: column;
+        overflow-x: auto;
+    }
 }
 
 .displayFlex {
@@ -530,6 +538,10 @@ td.scoreSeparator {
 
 .marginLeft1em {
     margin-left: 1em;
+}
+
+.marginBottom2em {
+    margin-bottom: 2em;
 }
 
 .fontSize12 {
@@ -1078,4 +1090,46 @@ footer.footer.footer-black {
 
 .jsgrid .jsgrid-alt-row > .jsgrid-cell {
     background: transparent !important;
+}
+
+.medal {
+    display: flex;
+}
+
+.medal-icon {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 24px;
+    width: 24px;
+    border-radius: 100%;
+    border: 2px solid transparent;
+    border-color: currentColor;
+    text-align: center;
+    font-size: 16px;
+    margin-right: 4px;
+    color: #fff;
+}
+.medal-icon:before {
+    content: '';
+    z-index: -1;
+    position: absolute;
+    width: 50%;
+    background-color: #b22b32;
+    height: 1em;
+    top: -0.4em;
+}
+
+.medal-icon[data-medal='1'] {
+    border-color: #fec223;
+    background: linear-gradient(135deg, #e7b120 0%, #e7b120 50%, #fec223 50%, #fec223 100%);
+}
+.medal-icon[data-medal='2'] {
+    border-color: #9fa6ac;
+    background: linear-gradient(135deg, #91979d 0%, #91979d 50%, #9fa6ac 50%, #9fa6ac 100%);
+}
+.medal-icon[data-medal='3'] {
+    border-color: #ba765f;
+    background: linear-gradient(135deg, #c0826d 0%, #c0826d 50%, #ba765f 50%, #ba765f 100%);
 }
