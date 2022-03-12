@@ -46,14 +46,14 @@ do_action('hestia_before_single_page_wrapper');
                             $userId = 56;
 
                             //get conditions to show group lottery form
-                            $isGroupLotteryOpenQuery = $wpdb->get_results('SELECT group_lottery_open FROM megaliga_draft_data');
+                            $getGroupLotteryDataQuery = $wpdb->get_results('SELECT group_lottery_open, countRookies FROM megaliga_draft_data');
 
                             //form submission
                             if ($_POST['submitLottery']) {
                                 //check if system tries to subimt same data again and group lottery is open
                                 $getCheckIfUserTeamAlreadyAssignedToGroup = $wpdb->get_results('SELECT ligue_groups_id FROM megaliga_user_data WHERE ID = ' . $userId);
 
-                                if ($getCheckIfUserTeamAlreadyAssignedToGroup[0]->ligue_groups_id == 4 && $isGroupLotteryOpenQuery[0]->group_lottery_open == 1) {
+                                if ($getCheckIfUserTeamAlreadyAssignedToGroup[0]->ligue_groups_id == 4 && $getGroupLotteryDataQuery[0]->group_lottery_open == 1) {
                                     function assignTeam($getDolceTeamNumber, $getGabbanaTeamNumber, $limit, $userId)
                                     {
                                         global $wpdb;
@@ -72,24 +72,35 @@ do_action('hestia_before_single_page_wrapper');
                                         $wpdb->update('megaliga_user_data', $updateUserGroupAssigmentData, $whereUpdateUserGroupAssigment);
                                     }
 
-                                    //check if user is rookie (this influence from which bucket will be draw)
-                                    $getIsRookie = $wpdb->get_results('SELECT is_rookie FROM megaliga_user_data WHERE ID = ' . $userId);
+                                    //check if in given season there are any rookies
+                                    if ($getGroupLotteryDataQuery[0]->countRookies) {
+                                        //check if user is rookie (this influence from which bucket will be draw)
+                                        $getIsRookie = $wpdb->get_results('SELECT is_rookie FROM megaliga_user_data WHERE ID = ' . $userId);
 
-                                    //get number of already assigned teams from 1st bucket for dolce
-                                    $getDolceFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 0');
-                                    //get number of already assigned teams from 2nd bucket for dolce
-                                    $getDolceSecondBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 1');
+                                        //get number of already assigned teams from 1st bucket for dolce
+                                        $getDolceFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 0');
+                                        //get number of already assigned teams from 2nd bucket for dolce
+                                        $getDolceSecondBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 1');
 
-                                    //get number of already assigned teams from 1st bucket for dolce
-                                    $getGabbanaFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 0');
-                                    //get number of already assigned teams from 2nd bucket for dolce
-                                    $getGabbanaSecondBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 1');
+                                        //get number of already assigned teams from 1st bucket for dolce
+                                        $getGabbanaFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 0');
+                                        //get number of already assigned teams from 2nd bucket for dolce
+                                        $getGabbanaSecondBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 1');
 
-                                    //if user is rookie -> there cannot be more than 2 rookie teams in the group
-                                    if ($getIsRookie[0]->is_rookie) {
-                                        assignTeam($getDolceSecondBucketTeamNumber,  $getGabbanaSecondBucketTeamNumber, 2, $userId);
+                                        //if user is rookie -> there cannot be more than 2 rookie teams in the group
+                                        if ($getIsRookie[0]->is_rookie) {
+                                            assignTeam($getDolceSecondBucketTeamNumber,  $getGabbanaSecondBucketTeamNumber, 2, $userId);
+                                        } else {
+                                            assignTeam($getDolceFirstBucketTeamNumber,  $getGabbanaFirstBucketTeamNumber, 4, $userId);
+                                        }
                                     } else {
-                                        assignTeam($getDolceFirstBucketTeamNumber,  $getGabbanaFirstBucketTeamNumber, 4, $userId);
+                                        //get number of already assigned teams from 1st bucket for dolce
+                                        $getDolceFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "dolce" FROM megaliga_user_data WHERE ligue_groups_id = 1 AND is_rookie = 0');
+
+                                        //get number of already assigned teams from 1st bucket for dolce
+                                        $getGabbanaFirstBucketTeamNumber = $wpdb->get_results('SELECT COUNT(*) as "gabbana" FROM megaliga_user_data WHERE ligue_groups_id = 2 AND is_rookie = 0');
+
+                                        assignTeam($getDolceFirstBucketTeamNumber,  $getGabbanaFirstBucketTeamNumber, 6, $userId);
                                     }
                                 }
                             }
@@ -163,7 +174,7 @@ do_action('hestia_before_single_page_wrapper');
                                     if ($megaligaUserDataQuery[0]->ligue_groups_id == 4) {
                                         echo '<form action="" method="post">';
                                         echo '  <div class="displayFlex flexDirectionColumn marginLeft1em">';
-                                        echo '    <div class="displayFlex flexDirectionRow">';
+                                        echo '    <div class="displayFlex flexDirectionRow alignItemsBaseline">';
                                         echo '      <span class="teamOverviewContent">' . $getUserName[0]->user_login . '</span><span>, wylosouj przydział do grupy</span>';
                                         echo '    </div>';
                                         echo '    <input class="submitDraftPlayer" type="submit" name="submitLottery" value="Wylosuj">';
@@ -174,7 +185,7 @@ do_action('hestia_before_single_page_wrapper');
                                         $getGroupName = $wpdb->get_results('SELECT name FROM megaliga_ligue_groups WHERE ligue_groups_id = ' . $megaligaUserDataQuery[0]->ligue_groups_id);
 
                                         echo '<div class="displayFlex flexDirectionColumn marginY20 marginLeft1em">';
-                                        echo '  <div class="displayFlex flexDirectionRow">';
+                                        echo '  <div class="displayFlex flexDirectionRow alignItemsBaseline">';
                                         echo '    <span class="teamOverviewContent">' . $getUserName[0]->user_login . '</span><span>, Twoja drużyna została przydzielona do grupy:</span>';
                                         echo '  </div>';
                                         echo '  <div class="marginTop10">';
