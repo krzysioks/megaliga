@@ -133,14 +133,30 @@ do_action('hestia_before_single_page_wrapper');
 
                             //handle submission (user decide to leave his turn)
                             if ($_POST['passDraft']) {
+                                //get number of draft round for given user
+                                $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number_playoff FROM megaliga_user_data WHERE ID = ' . $userId);
+                                //increment number with which player in next round will be drafted will be drafted
+                                $player_next_draft_number_playoff = $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number_playoff + 1;
+                                //update number with which player in next round will be drafted for given user
+                                $data = array(
+                                    'player_draft_number_playoff' => $player_next_draft_number_playoff
+                                );
+                                $where = array('ID' => $userId);
+                                $wpdb->update('megaliga_user_data', $data, $where);
+
                                 setNextDraftRound($userId);
                             }
 
                             function drawDraftForm($draftWindowState, $getCheckIfUserReachedPlayoff, $getDraftTurnUserId, $userId)
                             {
                                 global $wpdb;
-                                //draft form will be shown if user taking part in game is logged in and draft window is open and user reached playoff stage and it is his turn to draft player
-                                if (is_user_logged_in() && $draftWindowState[0]->playoff_draft_window_open && $getCheckIfUserReachedPlayoff[0]->reached_playoff && $getDraftTurnUserId[0]->ID == $userId) {
+
+                                //check in which draft round given user is now
+                                $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number FROM megaliga_user_data WHERE ID = ' . $userId);
+
+
+                                //draft form will be shown if user taking part in game is logged in and draft window is open and user reached playoff stage and it is his turn to draft player and is not above number of rounds lmit
+                                if (is_user_logged_in() && $draftWindowState[0]->playoff_draft_window_open && $getCheckIfUserReachedPlayoff[0]->reached_playoff && $getDraftTurnUserId[0]->ID == $userId && $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number_playoff < 8) {
                                     //$draftWindowState[0]->playoff_draft_credit_enabled - flag indicates if draftCredit mode is on (players in draft has value and user cannot draft player he cannot afford)
 
                                     $getUserData = $wpdb->get_results('SELECT megaliga_user_data.credit_balance_playoff, megaliga_team_names.name, wp_users.user_login FROM megaliga_user_data, megaliga_team_names, wp_users WHERE megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId);

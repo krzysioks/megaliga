@@ -128,6 +128,17 @@ do_action('hestia_before_single_page_wrapper');
 
                             //handle submission (user decide to leave his turn)
                             if ($_POST['passDraft']) {
+                                //get number of draft round for given user
+                                $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number FROM megaliga_user_data WHERE ID = ' . $userId);
+                                //increment number with which player in next round will be drafted will be drafted
+                                $player_next_draft_number = $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number + 1;
+                                //update number with which player in next round will be drafted for given user
+                                $data = array(
+                                    'player_draft_number' => $player_next_draft_number
+                                );
+                                $where = array('ID' => $userId);
+                                $wpdb->update('megaliga_user_data', $data, $where);
+
                                 setNextDraftRound($userId);
                             }
 
@@ -224,8 +235,11 @@ do_action('hestia_before_single_page_wrapper');
 
                                     $getDraftTurnUserId = $wpdb->get_results('SELECT ID FROM megaliga_season_draft_order_' . $getGroupName[0]->name . ' WHERE draft_order = ' . $getDraftCurrentRound[0]->draft_current_round);
 
-                                    //...and it is his turn to draft player
-                                    if ($getDraftTurnUserId[0]->ID == $userId) {
+                                    //check in which draft round given user is now
+                                    $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number FROM megaliga_user_data WHERE ID = ' . $userId);
+
+                                    //...and it is his turn to draft player and he has not passedmore than 7 draft rounds
+                                    if ($getDraftTurnUserId[0]->ID == $userId && $getNumberWithWhichPlayerIsDrafted[0]->player_draft_number < 8) {
                                         //$draftWindowState[0]->draft_credit_enabled - flag indicates if draftCredit mode is on (players in draft has value and user cannot draft player he cannot afford)
                                         $getUserData = $wpdb->get_results('SELECT megaliga_user_data.credit_balance, megaliga_team_names.name, wp_users.user_login FROM megaliga_user_data, megaliga_team_names, wp_users WHERE megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_user_data.ID = wp_users.ID AND megaliga_user_data.ID = ' . $userId);
 
@@ -334,9 +348,10 @@ do_action('hestia_before_single_page_wrapper');
                                 }
                             }
 
+                            //content of the draft page 
                             drawDraftLotteryRound1Form($getDraftWindowState, $userId);
-                            //content of the draft page
                             drawDraftForm($getDraftWindowState, $userId);
+
                             the_content();
                             //custom code ends here
 
