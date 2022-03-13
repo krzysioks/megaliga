@@ -49,8 +49,8 @@ do_action('hestia_before_single_page_wrapper');
                                 $returnData = array('team1Name' => '', 'team2Name' => '', 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalTeam1' => null, 'totalTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'noone');
 
                                 //get team names of both users
-                                $getTeam1Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name" FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $stage->id_user_team1);
-                                $getTeam2Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name" FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $stage->id_user_team2);
+                                $getTeam1Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $stage->id_user_team1);
+                                $getTeam2Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url  FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $stage->id_user_team2);
 
                                 $returnData['team1Name'] = $getTeam1Name[0]->team_name;
                                 $returnData['team2Name'] = $getTeam2Name[0]->team_name;
@@ -91,9 +91,9 @@ do_action('hestia_before_single_page_wrapper');
                                         $checkIfRecordExist = $wpdb->get_results('SELECT COUNT(*) as "champion" FROM megaliga_champion');
 
                                         // prepare data for submission
-                                        $userId = $returnData['winner'] == 'team1' ? $stage->id_user_team1 : $stage->id_user_team2;
                                         $submitDataArray = array();
-                                        $submitDataArray['ID'] = $userId;
+                                        $submitDataArray['team_name'] = $returnData['winner'] == 'team1' ? $getTeam1Name[0]->team_name : $getTeam2Name[0]->team_name;
+                                        $submitDataArray['logo_url'] = $returnData['winner'] == 'team1' ? $getTeam1Name[0]->logo_url : $getTeam2Name[0]->logo_url;
 
                                         if ($checkIfRecordExist[0]->champion == 1) {
                                             //update record
