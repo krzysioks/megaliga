@@ -42,7 +42,7 @@ do_action('hestia_before_single_page_wrapper');
                             //custom code starts here
                             global $wpdb;
 
-                            function getStageData($stage)
+                            function getStageData($stage, $type)
                             {
                                 global $wpdb;
 
@@ -83,6 +83,26 @@ do_action('hestia_before_single_page_wrapper');
                                     } else {
                                         //if totalScore of team1 and 2 equals -> team with highier seed wins
                                         $returnData['winner'] = ($returnData['seedNumberTeam1'] > $returnData['seedNumberTeam2']) ? 'team2' : 'team1';
+                                    }
+
+                                    //if winner is defined -> save his ID to megaliga_champion to be able to show current champion on dashboard if data is of type "final"
+                                    if ($type == 'final') {
+                                        //define if insert od update record of megaliga_champion
+                                        $checkIfRecordExist = $wpdb->get_results('SELECT COUNT(*) as "champion" FROM megaliga_champion');
+
+                                        // prepare data for submission
+                                        $userId = $returnData['winner'] == 'team1' ? $stage->id_user_team1 : $stage->id_user_team2;
+                                        $submitDataArray = array();
+                                        $submitDataArray['ID'] = $userId;
+
+                                        if ($checkIfRecordExist[0]->champion == 1) {
+                                            //update record
+                                            $where = array('id_champion' => '1');
+                                            $wpdb->update('megaliga_champion', $submitDataArray, $where);
+                                        } else {
+                                            //insert record
+                                            $wpdb->insert('megaliga_champion', $submitDataArray);
+                                        }
                                     }
                                 }
 
@@ -184,7 +204,7 @@ do_action('hestia_before_single_page_wrapper');
 
                                 $i = 0;
                                 foreach ($getSemifinalStage as $stage) {
-                                    $semifinalData[$i] = getStageData($stage);
+                                    $semifinalData[$i] = getStageData($stage, 'semifinals');
                                     $i++;
                                 }
 
@@ -203,8 +223,8 @@ do_action('hestia_before_single_page_wrapper');
 
                                 $getThirdPlaceStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2, seed_number_team1, seed_number_team2 FROM megaliga_playoff_ladder WHERE stage = "3rdplace"');
 
-                                $finalData = getStageData($getfinalStage[0]);
-                                $thridPlaceData = getStageData($getThirdPlaceStage[0]);
+                                $finalData = getStageData($getfinalStage[0], 'final');
+                                $thridPlaceData = getStageData($getThirdPlaceStage[0], '3rdpalce');
 
                                 //draw 2nd stage
                                 echo '<div class="phaseContainer order-3">';
