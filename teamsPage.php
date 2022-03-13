@@ -43,7 +43,7 @@ do_action('hestia_before_single_page_wrapper');
 
                             $current_user = wp_get_current_user();
                             $userId = $current_user->ID;
-                            // $userId = 56;
+                            // $userId = 47;
 
                             //get conditions to show group lottery form
                             $getGroupLotteryDataQuery = $wpdb->get_results('SELECT group_lottery_open, countRookies FROM megaliga_draft_data');
@@ -202,7 +202,7 @@ do_action('hestia_before_single_page_wrapper');
 
                             //content of the team page
                             echo '<div>';
-                            drawGroupLotteryForm($isGroupLotteryOpenQuery, $userId);
+                            drawGroupLotteryForm($getGroupLotteryDataQuery, $userId);
                             drawTeam($getUserData);
                             echo '</div>';
                             //custom code ends here
