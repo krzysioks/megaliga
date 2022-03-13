@@ -157,4 +157,6 @@ Tests:
 4. set 1st round draft lottery order gabbana teams
    UPDATE `megaliga_1round_draft_order_lottery_outcome` SET `one`= 26,`two`= 20,`three`= 51, `four`= 55, `five`= 56, `six`= 47 WHERE id_draft_order_lottery_outcome = 2
 
-Przepraszamy, megaliga jest chwilowo niedostępna. Trwają prace przygotowawcze do nowego sezonu 2021
+5. reset megaliga_players table
+   UPDATE `megaliga_players` SET `id_user_playoff`= NULL, drafted_with_number_dolce= NULL, `drafted_with_number_playoff`=NULL
+   Przepraszamy, megaliga jest chwilowo niedostępna. Trwają prace przygotowawcze do nowego sezonu 2021

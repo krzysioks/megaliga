@@ -43,7 +43,7 @@ do_action('hestia_before_single_page_wrapper');
                             global $wpdb;
                             $current_user = wp_get_current_user();
                             $userId = $current_user->ID;
-                            // $userId = 27; //46 //14;
+                            // $userId = 46; //46 //14;
 
                             //check if draft window is open
                             $getDraftWindowState = $wpdb->get_results('SELECT playoff_draft_window_open, playoff_draft_credit_enabled FROM megaliga_draft_data');
@@ -152,7 +152,7 @@ do_action('hestia_before_single_page_wrapper');
                                 global $wpdb;
 
                                 //check in which draft round given user is now
-                                $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number FROM megaliga_user_data WHERE ID = ' . $userId);
+                                $getNumberWithWhichPlayerIsDrafted = $wpdb->get_results('SELECT player_draft_number_playoff FROM megaliga_user_data WHERE ID = ' . $userId);
 
 
                                 //draft form will be shown if user taking part in game is logged in and draft window is open and user reached playoff stage and it is his turn to draft player and is not above number of rounds lmit
