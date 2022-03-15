@@ -50,7 +50,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '<table class="scheduleTable marginTop10 ' . $margin . '" border="0">';
 
                                 if ($groupName != '') {
-                                    echo '  <tr><td colspan="8" class="scheduleTableName textLeft">Grupa ' . ucfirst($groupName) . '</td></tr>';
+                                    echo '  <tr><td colspan="9" class="scheduleTableName textLeft">Grupa ' . ucfirst($groupName) . '</td></tr>';
                                 }
 
                                 echo '  <tr>

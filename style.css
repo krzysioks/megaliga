@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.274
+Version: 0.275
 */
 
 :root {
@@ -965,7 +965,7 @@ img.winner {
 .draftPositionPresentation {
     font-size: 30px;
     font-weight: bold;
-    color: #c40000;
+    color: var(--megaliga-primary-color);
     position: relative;
     top: 30px;
 }
