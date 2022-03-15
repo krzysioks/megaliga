@@ -31,11 +31,11 @@ function hestia_child_get_parent_options()
 }
 add_action('after_switch_theme', 'hestia_child_get_parent_options');
 
-add_action('login_head', 'hide_login_nav');
-function hide_login_nav()
-{
-    echo '<style>#nav{display:none}</style>';
-}
+// add_action('login_head', 'hide_login_nav');
+// function hide_login_nav()
+// {
+//     echo '<style>#nav{display:none}</style>';
+// }
 
 function custom_paginate_comments_links($args = array())
 {

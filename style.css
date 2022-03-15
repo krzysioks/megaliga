@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.275
+Version: 0.276
 */
 
 :root {
@@ -981,7 +981,7 @@ img.winner {
 }
 
 .individualCommentsContainer {
-    height: 400px;
+    max-height: 400px;
     overflow-y: auto;
     margin: 1em;
 }
