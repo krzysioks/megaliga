@@ -345,7 +345,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</div>';
                             }
 
-                            if ($userId == 14 || $userId == 48) {
+                            if ($userId == 14 || $userId == 58) {
                                 drawToggleFormStatusButton($isFormEnabled);
                                 //draw emergencyTeamSelection form if user is admin and team has not already been chosen
                                 if (!isset($_POST['submitEmergencyTeamSelection'])) {

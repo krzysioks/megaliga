@@ -43,14 +43,14 @@ do_action('hestia_before_single_page_wrapper');
                                 global $wpdb;
                                 $title = the_title('', '', false);
                                 $current_user = wp_get_current_user();
-                                //show form only for user with ID == 14 (mbaginski) || 48 (Gabbana)
-                                // $isForm = $userId == 14 || $userId == 48;
+                                //show form only for user with ID == 14 (mbaginski) || 58 (lukaszenko2)
+                                // $isForm = $userId == 14 || $userId == 58;
                                 //8 - length of "kolejka" string which is in every title of składy subpage
                                 // $round_number = substr($title, 0, strlen($title) - 8);
                                 $userId = $current_user->ID;
-                                // $userId = 48; //14;
+                                // $userId = 58; //14;
 
-                                if (is_user_logged_in() && ($userId == 14 || $userId == 48 || $userId == 1)) {
+                                if (is_user_logged_in() && ($userId == 14 || $userId == 58 || $userId == 1)) {
                                     //content of export page
                                     echo '<div>';
                                     echo '  <form action="' . esc_attr(admin_url('admin-post.php')) . '" method="post">';

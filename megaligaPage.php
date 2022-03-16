@@ -45,7 +45,7 @@ do_action('hestia_before_single_page_wrapper');
                             //8 - length of "kolejka" string which is in every title of składy subpage
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
-                            // $userId = 48; //14;
+                            // $userId = 58; //14;
 
                             //handle submission
                             if ($_POST['submitScore']) {
@@ -228,8 +228,8 @@ do_action('hestia_before_single_page_wrapper');
                             function drawScoreBoard($scoreBoardData, $userId)
                             {
                                 global $wpdb;
-                                //show form only for user with ID == 14 (mbaginski) || 48 (Gabbana)
-                                $isForm = $userId == 14 || $userId == 48;
+                                //show form only for user with ID == 14 (mbaginski) || 58 (lukaszenko2)
+                                $isForm = $userId == 14 || $userId == 58;
                                 $setplayTeam1 = ($scoreBoardData['team1StartingLineup']->setplays != '') ? $scoreBoardData['team1StartingLineup']->setplays : 'nie wybrano';
                                 $setplayTeam2 = ($scoreBoardData['team2StartingLineup']->setplays != '') ? $scoreBoardData['team2StartingLineup']->setplays : 'nie wybrano';
                                 $playerNoTeam1 = 0;
