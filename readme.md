@@ -3,12 +3,14 @@ megaliga – instrukcja obsługi v.4.0
 1. Wprowadź wszystkich graczy do tabeli megaliga_user_data
 
 2. Ustaw następujące wartości w kolumnach megaliga_user_data:
-   reached_playoff = 0
-   player_draft_number = 1
-   player_draft_number_playoff = 1
-   (jeżeli wykorzystywane) w kolumnie credit_balance i credit_balance_playoff wstaw wartość kredytu przyznawanego dla każdego gracza
-   ligue_groups_id = 4 – reset przydziału do grupy
-   is_rookie - 1 - jeżeli jest to pierwszy sezon drużyny; 0 - drużyna obecna w lidze co najmniej 2 sezony
+
+    - reached_playoff = 0
+    - player_draft_number = 1
+    - player_draft_number_playoff = 1
+    - (jeżeli wykorzystywane) w kolumnie credit_balance i credit_balance_playoff wstaw wartość kredytu przyznawanego dla każdego gracza
+    - ligue_groups_id = 4 – reset przydziału do grupy
+    - is_rookie - 1 - jeżeli jest to pierwszy sezon drużyny; 0 - drużyna obecna w lidze co najmniej 2 sezony,
+    - is_draw_round1_draft_order = 0 - reset formularza wyboru kolejności w drafcie
 
 3. W tabeli megaliga_draft_data wstaw:
 
