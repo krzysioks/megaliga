@@ -102,23 +102,43 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</table>';
                             }
 
-                            $getRound = $wpdb->get_results('SELECT current_round FROM megaliga_current_round WHERE id_current_round = 1');
+                            $getRoundsCalendar = $wpdb->get_results('SELECT round_number, round_date FROM megaliga_round_calendar');
+                            $currentDate = getdate();
 
-                            //get teams for Dolce ligue
-                            $getSchedule4DolceTeam1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $getRound[0]->current_round);
+                            $currentDateTimestamp = strtotime($currentDate['year'] . '-' . $currentDate['mon'] . '-' . $currentDate['mday']);
 
-                            $getSchedule4DolceTeam2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $getRound[0]->current_round);
+                            // $currentDateTimestamp = strtotime('2023-05-25');
 
-                            //get teams for Gabbama ligue
-                            $getSchedule4GabbanaTeam1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $getRound[0]->current_round);
+                            //find last round
+                            $playedRounds = array();
+                            foreach ($getRoundsCalendar as $roundCalendar) {
+                                $roundDateTimestamp = strtotime($roundCalendar->round_date);
+                                if ($currentDateTimestamp > $roundDateTimestamp) {
+                                    array_push($playedRounds, $roundCalendar->round_number);
+                                }
+                            }
 
-                            $getSchedule4GabbanaTeam2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $getRound[0]->current_round);
+                            //last played round is the highiest round from those which have been played
+                            $lastPlayedRound = count($playedRounds) > 0 ? max($playedRounds) : 0;
 
-                            //get all games for Dolce for given round
-                            $getGames4Dolce = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 1 AND round_number = ' . $getRound[0]->current_round);
+                            if ($lastPlayedRound > 0) {
+                                //get teams for Dolce ligue
+                                $getSchedule4DolceTeam1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $lastPlayedRound);
 
-                            //get all games for Gabbana for given round
-                            $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $getRound[0]->current_round);
+                                $getSchedule4DolceTeam2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $lastPlayedRound);
+
+                                //get teams for Gabbama ligue
+                                $getSchedule4GabbanaTeam1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $lastPlayedRound);
+
+                                $getSchedule4GabbanaTeam2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $lastPlayedRound);
+
+                                //get all games for Dolce for given round
+                                $getGames4Dolce = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 1 AND round_number = ' . $lastPlayedRound);
+
+                                //get all games for Gabbana for given round
+                                $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $lastPlayedRound);
+                            }
+
 
                             //get data for current champion
                             $getChampionData = $wpdb->get_results('SELECT team_name, logo_url FROM megaliga_champion');
@@ -153,13 +173,17 @@ do_action('hestia_before_single_page_wrapper');
                                 drawChampion($champion, $title);
                                 echo '  </div>';
                             }
-                            echo '      <div class="individualCommentsTitle">Wyniki ostatniej kolejki</div>';
-                            echo '      <div class="scoreTableDolce">';
-                            drawCurrentRoundScore($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'right', $getRound[0]->current_round);
-                            echo '      </div>';
-                            echo '      <div class="scoreTableGabbana">';
-                            drawCurrentRoundScore($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $getRound[0]->current_round);
-                            echo '      </div>';
+
+                            if ($lastPlayedRound > 0) {
+                                echo '      <div class="individualCommentsTitle">Wyniki ostatniej kolejki</div>';
+                                echo '      <div class="scoreTableDolce">';
+                                drawCurrentRoundScore($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'right', $lastPlayedRound);
+                                echo '      </div>';
+                                echo '      <div class="scoreTableGabbana">';
+                                drawCurrentRoundScore($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $lastPlayedRound);
+                                echo '      </div>';
+                            }
+
                             echo '  </div>';
 
                             echo '</div>';

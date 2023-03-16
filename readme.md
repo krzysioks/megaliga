@@ -19,10 +19,6 @@ megaliga – instrukcja obsługi v.4.0
 -   1 w kolumnie playoff_draft_current_round
 -   countRookies = 1 - jeżeli losowanie przydziału do grupy ma uwzględniać podział zespołów na koszyki; 0 - brak podziału
 
-3a) W tabeli megaliga_current_round wstaw:
-
--   1 w pole current_round
-
 4. W tabeli megaliga_1round_draft_order_lottery_outcome wstaw wartość NULL w kolumnach one, two, three, four, five, six dla obu wierszy reprezentujących grupę dolce i gabbana. W kolumnach one, two, three, four, five, six zapisane są ID graczy.
 
 5. W tabeli megaliga_draft_order:
@@ -68,7 +64,9 @@ megaliga – instrukcja obsługi v.4.0
 -   megaliga_season_draft_order_gabbana
 -   megaliga_playoff_draft_order
 
-11. Dokonaj aktualizacji tabeli megaliga_players
+11. Wpisz aktualne daty kolejek w tabeli megaliga_round_calendar
+
+12. Dokonaj aktualizacji tabeli megaliga_players
 
 -   usuń zawodników nie istniejących
 -   dodaj nowych zawodników
@@ -76,7 +74,7 @@ megaliga – instrukcja obsługi v.4.0
 -   usuń przypisanie do graczy w rundzie zasadniczej i w fazie playoff
 -   usuń numer w drafcie, do sezonu zasadniczego i playoff, z którym zostali wybrani do zespołu
 
-12. Uruchom losowanie przydziału do grup w widoku "Drużyny" poprzez ustawienie w kolumnie megaliga_draft_data.group_lottery_open = 1
+13. Uruchom losowanie przydziału do grup w widoku "Drużyny" poprzez ustawienie w kolumnie megaliga_draft_data.group_lottery_open = 1
     I. meliga_draft_data.countRookies = 1 - jeżeli w sezonie są drużyny "beniaminki":
 
 -   losowanie odbywa się z podziałem na koszyki
@@ -86,15 +84,15 @@ megaliga – instrukcja obsługi v.4.0
 
 II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "beniaminków"
 
-13. Uruchom losowanie kolejności wyboru w pierwszej rundzie draftu:
+14. Uruchom losowanie kolejności wyboru w pierwszej rundzie draftu:
 
 -   megaliga_draft_data.draft_round1_order_lottery_open = 1
 
-14. Kolejność wyboru w drafcie w fazie playoff generuje się automatycznie
+15. Kolejność wyboru w drafcie w fazie playoff generuje się automatycznie
 
-15. Jeżeli w danym sezonie megaliga dodane są nowe grupy to dodaj je do tabeli megaliga_ligue_groups (to ma wpływ na użyte szablony stron; zmiany grup wymagaja implementacji zmian w kodzie)
+16. Jeżeli w danym sezonie megaliga dodane są nowe grupy to dodaj je do tabeli megaliga_ligue_groups (to ma wpływ na użyte szablony stron; zmiany grup wymagaja implementacji zmian w kodzie)
 
-16. Draft do rundy zasadniczej
+17. Draft do rundy zasadniczej
 
 -   dokonaj konfiguracji draftu w tabeli megaliga_draft_data
     a) draft_window_open = 1 – udostepnij formularz do draftowania zawodnikow; 0 – ukryj formularz draftu
@@ -105,7 +103,7 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
 
-17. Wprowadź rozpiskę meczy dla każdej z 10 kolejek rundy zasadniczej do tabeli megaliga_schedule
+18. Wprowadź rozpiskę meczy dla każdej z 10 kolejek rundy zasadniczej do tabeli megaliga_schedule
 
 -   po 5 kolejkach rozpoczyna się runda rewanżowa, gdzie zwycięzca dwumeczu otrzymuje dodatkowy punkt
 -   jeżeli drużyny grają ze sobą 2 razy:
@@ -114,7 +112,7 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
     -   w tabeli megaliga_schedule dla reokrdu opisującego 3 spotkanie w kolumnie id_rematch_schedule podaj id_schedule pierwszego spotkania, w kolumnie id_rematch_schedule2 podaj id_schedule drugiego spotkania
 -   każda drużyna rozgrywa mecz i rewanż z każdą z pozostałych 5 drużyn. Zwycięzca każdego z pojedynków ( liczy się suma małych punktów) otrzymuję w dodatkowy punkt po rozegranym meczu rundy rewanżowej
 
-18. Przygotowanie fazy playoff
+19. Przygotowanie fazy playoff
 
 -   w tabeli megaliga_user_data oznacz drużyny, które awansowały do fazy playoff poprzez ustawienie wartości 1 w polu „reached_playoff”
 -   dokonaj konfiguracji draftu w tabeli megaliga_draft_data
@@ -125,7 +123,7 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
 
-19. Wprowadź rozpiskę meczy dla fazy playoff w tabeli megaliga_schedule_playoff
+20. Wprowadź rozpiskę meczy dla fazy playoff w tabeli megaliga_schedule_playoff
 
 -   należy pamiętać, że id gracza zapisane w polu np.: id_user_team1 dla rundy 1 musi być również zapisane w tym samym polu dla rundy 2.
 -   tabele uzupełnia się na bierząco. Najpierw dla fazy półfinałowej mecze 1 i 2 rundy, potem, gdy znane będą pary finałowe i meczu o 3 miejsce, wprowadzamy kolejne mecze.
@@ -135,7 +133,7 @@ id_schedule id_user_team1 id_user_team2 round_number team1_score team2_score
 1, 10, 12, 1, NULL, NULL
 2, 10, 12, 2, NULL, NULL
 
-20. Uzupełnij tabele megaliga_playoff_ladder w celu wyświeltenia danych w zakładce tabela->play-off
+21. Uzupełnij tabele megaliga_playoff_ladder w celu wyświeltenia danych w zakładce tabela->play-off
 
 -   każdy rekord tej tabeli opisuje pare drużyn grających ze sobą w danej fazie playoff:
     a) półfinał (semifinal)
@@ -146,7 +144,7 @@ id_schedule id_user_team1 id_user_team2 round_number team1_score team2_score
 -   w fazie półfinałowej pary tworzy się na podstawie miejsca zajętego przez drużyny w sezonie zasadniczym:
     a) 1 z 4 i 2 z 3
 
-21. Przykład uzupełnienia tabeli megaliga_playoff_ladder
+22. Przykład uzupełnienia tabeli megaliga_playoff_ladder
     id_playoff_ladder id_user_team1 id_user_team2 stage id_schedule_round1 id_schedule_round2 seed_number_team1 seed_number_team2
     1, 10, 12, semifinal, 1, 2, 1, 4
 

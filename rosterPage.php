@@ -55,14 +55,6 @@ do_action('hestia_before_single_page_wrapper');
                                 $submitDataArray['is_open'] = $_POST['is_open'];
                                 $where = array('round_number' => $round_number, 'season_stage' => 'regular');
                                 $wpdb->update('megaliga_starting_lineup_status', $submitDataArray, $where);
-
-                                //when selecting roster for given round is closed -> set this round as current one to show scores in dashboard
-                                if (!$_POST['is_open']) {
-                                    $submitDataArray = array();
-                                    $submitDataArray['current_round'] = $round_number;
-                                    $where = array('id_current_round' => 1);
-                                    $wpdb->update('megaliga_current_round', $submitDataArray, $where);
-                                }
                             }
 
                             //defining if roster submission form should be
