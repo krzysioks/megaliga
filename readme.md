@@ -1,8 +1,10 @@
-megaliga – instrukcja obsługi v.4.0
+megaliga – instrukcja obsługi v.5.0
 
-1. Wprowadź wszystkich graczy do tabeli megaliga_user_data
+1. Wpisz wyniki z tabel z rundy zasadniczej i playoff do tabeli megaliga_history
 
-2. Ustaw następujące wartości w kolumnach megaliga_user_data:
+2. Wprowadź wszystkich graczy do tabeli megaliga_user_data
+
+3. Ustaw następujące wartości w kolumnach megaliga_user_data:
 
     - reached_playoff = 0
     - player_draft_number = 1
@@ -12,16 +14,16 @@ megaliga – instrukcja obsługi v.4.0
     - is_rookie - 1 - jeżeli jest to pierwszy sezon drużyny; 0 - drużyna obecna w lidze co najmniej 2 sezony,
     - is_draw_round1_draft_order = 0 - reset formularza wyboru kolejności w drafcie
 
-3. W tabeli megaliga_draft_data wstaw:
+4. W tabeli megaliga_draft_data wstaw:
 
 -   1 w kolumnie draft_current_round_dolce
 -   1 w kolumnie draft_current_round_gabbana
 -   1 w kolumnie playoff_draft_current_round
 -   countRookies = 1 - jeżeli losowanie przydziału do grupy ma uwzględniać podział zespołów na koszyki; 0 - brak podziału
 
-4. W tabeli megaliga_1round_draft_order_lottery_outcome wstaw wartość NULL w kolumnach one, two, three, four, five, six dla obu wierszy reprezentujących grupę dolce i gabbana. W kolumnach one, two, three, four, five, six zapisane są ID graczy.
+5. W tabeli megaliga_1round_draft_order_lottery_outcome wstaw wartość NULL w kolumnach one, two, three, four, five, six dla obu wierszy reprezentujących grupę dolce i gabbana. W kolumnach one, two, three, four, five, six zapisane są ID graczy.
 
-5. W tabeli megaliga_draft_order:
+6. W tabeli megaliga_draft_order:
    a) dodaj po 6 rekordów dla każdej z grup:
 
     - position_name = 1..6
@@ -32,16 +34,14 @@ megaliga – instrukcja obsługi v.4.0
 
     - is_selected = 0
 
-6. W tabeli megaliga_starting_lineup_status w polu "is_open" wstaw wartość 1 dla wszystkich rekordów.
+7. W tabeli megaliga_starting_lineup_status w polu "is_open" wstaw wartość 1 dla wszystkich rekordów.
    Pole to odpowiada za blokowanie formularza wyboru składu dla danej kolejki w sezonie zasadniczym i w playoff
 
-7. Dodaj nowy sezon megaligi do tabeli megaliga_season
+8. Dodaj nowy sezon megaligi do tabeli megaliga_season
 
 -   w polu „season_name” wprowadź rok, w którym odbywa się dana edycja megaligi
 -   w polu „number_of_groups” podaj liczbę grup w danym sezonie megaligi
 -   w polu „current” wpisz jeden dla obecnie rozgrywanego sezonu. Jednocześnie dla wszystkich pozostałych wpisów odpowiadającym poprzednim sezonom w pole „current” wpisz wartość = 0
-
-8. Wpisz wyniki z tabel z rundy zasadniczej i playoff do tabeli megaliga_history
 
 9. Wpisz do megaliga_history_champion mistrza z kończącego się sezonu:
 
