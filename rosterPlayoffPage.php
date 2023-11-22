@@ -52,7 +52,7 @@ do_action('hestia_before_single_page_wrapper');
                             //values for test
                             //$round_number = 1;
                             // $userId = 20;
-                            // $userId = 46;
+                            // $userId = 44;
                             // $userId = 14;
 
                             //handling submision of form's status
@@ -158,7 +158,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '      <div class="teamRosterContainerForm">';
                                 echo '          <span class="teamOverviewRosterLabel">wybierz skład (dokładnie 5 zawodników):</span>';
                                 echo '              <ul>';
-                                echo '                  <li>';
+                                echo '                  <li class="liNoStyle">';
                                 echo '                      <span class="teamOverviewRosterTeamName">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nr startowy&nbsp;&nbsp; zawodnik</span>';
                                 echo '                  </li>';
                             ?>
@@ -345,7 +345,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</div>';
                             }
 
-                            if ($userId == 14 || $userId == 58) {
+                            if ($userId == 14) {
                                 drawToggleFormStatusButton($isFormEnabled);
                                 //draw emergencyTeamSelection form if user is admin and team has not already been chosen
                                 if (!isset($_POST['submitEmergencyTeamSelection'])) {

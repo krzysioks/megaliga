@@ -48,6 +48,7 @@ do_action('hestia_before_single_page_wrapper');
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
                             // $userId = 14;
+                            // $userId = 20;
 
                             //handling submision of form's status
                             if ($_POST['submitFormStatus']) {
@@ -90,7 +91,7 @@ do_action('hestia_before_single_page_wrapper');
                                     }
                                 }
 
-                                //check if to insert new record or update already existing
+                                //check wether to insert new record or update already existing
                                 $checkIfRecordExist = $wpdb->get_results('SELECT id_starting_lineup, player1, player2, player3, player4, player5 FROM megaliga_starting_lineup WHERE round_number = ' . $round_number . ' AND ID = ' . $_POST['userId']);
 
                                 $submitDataArray['round_number'] = $round_number;
@@ -282,7 +283,7 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <div class="teamRosterContainer">';
                                     echo '          <span class="teamOverviewRosterLabel">skład:</span>';
                                     echo '              <ul>';
-                                    echo '                  <li>';
+                                    echo '                  <li class="liNoStyle">';
                                     echo '                      <span class="teamOverviewRosterTeamName">nr startowy&nbsp;&nbsp; zawodnik</span>';
                                     echo '                  </li>';
 
@@ -341,7 +342,7 @@ do_action('hestia_before_single_page_wrapper');
                             }
 
                             //draw emergencyTeamSelection form if user is admin and team has not already been chosen
-                            if ($userId == 14 || $userId == 58) {
+                            if ($userId == 14) {
                                 drawToggleFormStatusButton($isFormEnabled);
                                 //draw emergencyTeamSelection form if user is admin and team has not already been chosen
                                 if (!isset($_POST['submitEmergencyTeamSelection'])) {

@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.276
+Version: 0.277
 */
 
 :root {
@@ -581,6 +581,10 @@ td.scoreSeparator {
 
 .alignItemsBaseline {
     align-items: baseline;
+}
+
+.liNoStyle {
+    list-style-type: none;
 }
 
 /*team page*/

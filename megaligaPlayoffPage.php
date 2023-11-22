@@ -230,8 +230,8 @@ do_action('hestia_before_single_page_wrapper');
                             function drawScoreBoard($scoreBoardData, $userId)
                             {
                                 global $wpdb;
-                                //show form only for user with ID == 14 (mbaginski) || 58 (lukaszenko2)
-                                $isForm = $userId == 14 || $userId == 58;
+                                //show form only for user with ID == 14 (mbaginski)
+                                $isForm = $userId == 14;
                                 $setplayTeam1 = ($scoreBoardData['team1StartingLineup']->setplays != '') ? $scoreBoardData['team1StartingLineup']->setplays : 'nie wybrano';
                                 $setplayTeam2 = ($scoreBoardData['team2StartingLineup']->setplays != '') ? $scoreBoardData['team2StartingLineup']->setplays : 'nie wybrano';
                                 $playerNoTeam1 = 0;

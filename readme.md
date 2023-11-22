@@ -35,7 +35,7 @@ megaliga – instrukcja obsługi v.5.0
     - is_selected = 0
 
 7. W tabeli megaliga_starting_lineup_status w polu "is_open" wstaw wartość 1 dla wszystkich rekordów.
-   Pole to odpowiada za blokowanie formularza wyboru składu dla danej kolejki w sezonie zasadniczym i w playoff
+   Pole to odpowiada za blokowanie formularza wyboru składu dla danej kolejki w sezonie zasadniczym, playin i playoff
 
 8. Dodaj nowy sezon megaligi do tabeli megaliga_season
 
