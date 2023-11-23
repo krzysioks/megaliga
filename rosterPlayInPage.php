@@ -1,8 +1,8 @@
 <?php
 /*
-Template Name: Roster Playoff
-Description: Shows playoff roster for the teams for two groups in the ligue.
-To mark team as reached playoff stage -> set value of megaliga_user_data.rached_playoff = 1 for desired team
+Template Name: Roster Playin
+Description: Shows playin roster for the teams for one group in the ligue.
+To mark team as reached playin stage -> set value of megaliga_user_data.reached_playin = 1 for desired team
  */
 
 get_header();
