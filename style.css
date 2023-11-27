@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.277
+Version: 0.278
 */
 
 :root {
@@ -321,6 +321,10 @@ body::-webkit-scrollbar-thumb {
     /*playoff standings page*/
     .playoffLadderflexDirection {
         flex-direction: column !important;
+    }
+
+    .generatePlayInScheduleWrapper {
+        margin-left: 10px;
     }
 }
 

@@ -45,7 +45,7 @@ do_action('hestia_before_single_page_wrapper');
                             //8 - length of "kolejka" string which is in every title of składy subpage
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
-                            // $userId = 58; //14;
+                            // $userId = 14;
 
                             //handle submission
                             if ($_POST['submitScore']) {
@@ -174,6 +174,137 @@ do_action('hestia_before_single_page_wrapper');
                                 $wpdb->update('megaliga_schedule', array('team2_score' => $team2Outcome), $where);
                             }
 
+                            // handle playin schedule generation
+                            if ($_POST['submitPlayInSchedule']) {
+                                function compareTeams($a, $b)
+                                {
+                                    // sort by points
+                                    $retval = strnatcmp($b['points'], $a['points']);
+                                    // if points are identical, sort balance
+                                    if (!$retval) {
+                                        $retval = (int)$b['balance'] - (int)$a['balance'];
+                                        //$retval = strnatcmp((integer)$b['balance'], (integer)$a['balance']);
+                                    }
+
+                                    //if balance identical -> sort by totalScore
+                                    if (!$retval) {
+                                        $retval = (int)$b['totalScore'] - (int)$a['totalScore'];
+                                        //$retval = strnatcmp((integer)$b['balance'], (integer)$a['balance']);
+                                    }
+
+                                    return $retval;
+                                }
+
+                                // get current megaliga standings
+                                $getDolceUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1');
+                                $getGabbanaUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 2');
+
+                                $getDolceSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 1');
+                                $getGabbanaSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 2');
+
+                                function calculateStandingsData($scheduleQuery, $userIDquery)
+                                {
+                                    global $wpdb;
+                                    $standingsData = array();
+                                    foreach ($userIDquery as $user) {
+                                        $standingsData[$user->ID] = array('gamesPlayed' => 0, 'wins' => 0, 'looses' => 0, 'draws' => 0, 'balance' => 0, 'points' => 0, 'ID' => $user->ID, 'totalScore' => 0);
+                                    }
+
+                                    foreach ($scheduleQuery as $game) {
+                                        if ($game->team1_score != null) {
+                                            $standingsData[$game->id_user_team1]['totalScore'] = $standingsData[$game->id_user_team1]['totalScore'] + $game->team1_score;
+                                            $standingsData[$game->id_user_team2]['totalScore'] = $standingsData[$game->id_user_team2]['totalScore'] + $game->team2_score;
+
+                                            //when team1 wins
+                                            if ($game->team1_score > $game->team2_score) {
+                                                $standingsData[$game->id_user_team1]['gamesPlayed'] = $standingsData[$game->id_user_team1]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team1]['wins'] = $standingsData[$game->id_user_team1]['wins'] + 1;
+                                                $standingsData[$game->id_user_team1]['balance'] = $standingsData[$game->id_user_team1]['balance'] + $game->team1_score - $game->team2_score;
+                                                $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 2;
+
+                                                $standingsData[$game->id_user_team2]['gamesPlayed'] = $standingsData[$game->id_user_team2]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team2]['looses'] = $standingsData[$game->id_user_team2]['looses'] + 1;
+                                                $standingsData[$game->id_user_team2]['balance'] = $standingsData[$game->id_user_team2]['balance'] + $game->team2_score - $game->team1_score;
+                                            }
+
+                                            //when team2 wins
+                                            if ($game->team1_score < $game->team2_score) {
+                                                $standingsData[$game->id_user_team2]['gamesPlayed'] = $standingsData[$game->id_user_team2]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team2]['wins'] = $standingsData[$game->id_user_team2]['wins'] + 1;
+                                                $standingsData[$game->id_user_team2]['balance'] = $standingsData[$game->id_user_team2]['balance'] + $game->team2_score - $game->team1_score;
+                                                $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 2;
+
+                                                $standingsData[$game->id_user_team1]['gamesPlayed'] = $standingsData[$game->id_user_team1]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team1]['looses'] = $standingsData[$game->id_user_team1]['looses'] + 1;
+                                                $standingsData[$game->id_user_team1]['balance'] = $standingsData[$game->id_user_team1]['balance'] + $game->team1_score - $game->team2_score;
+                                            }
+
+                                            //when team1 draws with team2
+                                            if ($game->team1_score == $game->team2_score) {
+                                                $standingsData[$game->id_user_team1]['gamesPlayed'] = $standingsData[$game->id_user_team1]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team1]['draws'] = $standingsData[$game->id_user_team1]['draws'] + 1;
+                                                $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 1;
+
+                                                $standingsData[$game->id_user_team2]['gamesPlayed'] = $standingsData[$game->id_user_team2]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team2]['draws'] = $standingsData[$game->id_user_team2]['draws'] + 1;
+                                                $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
+                                            }
+
+                                            //if $game is played during rematch round -> add bonus point for team that has better balance after 2 matches
+                                            if ($game->id_rematch_schedule !== null) {
+                                                $getRematchSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule);
+
+                                                //count total points scored by each team during both rounds (1st and rematch)
+                                                $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule[0]->id_user_team1 ? $game->team1_score + $getRematchSchedule[0]->team1_score : $game->team1_score + $getRematchSchedule[0]->team2_score;
+                                                $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule[0]->id_user_team2 ? $game->team2_score + $getRematchSchedule[0]->team2_score : $game->team2_score + $getRematchSchedule[0]->team1_score;
+
+                                                //if given teams play more than 2 times witch each other -> take into account also third match
+                                                if ($game->id_rematch_schedule2 !== null) {
+                                                    $getRematchSchedule2 = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule2);
+
+                                                    $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule2[0]->id_user_team1 ? $team1MatchupScore + $getRematchSchedule2[0]->team1_score : $team1MatchupScore + $getRematchSchedule2[0]->team2_score;
+                                                    $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule2[0]->id_user_team2 ? $team2MatchupScore + $getRematchSchedule2[0]->team2_score : $team2MatchupScore + $getRematchSchedule2[0]->team1_score;
+                                                }
+
+                                                //when team 1 wins the matchup
+                                                if ($team1MatchupScore > $team2MatchupScore) {
+                                                    $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 1;
+                                                } else if ($team1MatchupScore < $team2MatchupScore) {
+                                                    //when team 2 wins the matchup
+                                                    $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    uasort($standingsData, 'compareTeams');
+                                    return $standingsData;
+                                }
+
+                                $standingsDolce = calculateStandingsData($getDolceSchedule, $getDolceUserID);
+                                $standingsGabbana = calculateStandingsData($getGabbanaSchedule, $getGabbanaUserID);
+
+                                // get first 3 teams from dolce and gabbana groups
+                                $i = 0;
+                                $top3teamsDolce = array();
+                                foreach ($standingsDolce as $team) {
+                                    if ($i < 3) {
+                                        array_push($top3teamsDolce, $team['ID']);
+                                    }
+                                    $i++;
+                                }
+
+                                $i = 0;
+                                $top3teamsGabbana = array();
+                                foreach ($standingsGabbana as $team) {
+                                    if ($i < 3) {
+                                        array_push($top3teamsGabbana, $team['ID']);
+                                    }
+                                    $i++;
+                                }
+                                // TODO KP Add verification to know if to insert new records or update existing ones
+                            }
+
                             function drawSchedule($queryTeam1Result, $queryTeam2Result, $gameIdentificationData, $groupName, $side, $round_number)
                             {
                                 $margin = $side == 'left' ? 'marginRight40' : '';
@@ -228,7 +359,7 @@ do_action('hestia_before_single_page_wrapper');
                             function drawScoreBoard($scoreBoardData, $userId)
                             {
                                 global $wpdb;
-                                //show form only for user with ID == 14 (mbaginski) || 58 (lukaszenko2)
+                                //show form only for user with ID == 14 (mbaginski)
                                 $isForm = $userId == 14;
                                 $setplayTeam1 = ($scoreBoardData['team1StartingLineup']->setplays != '') ? $scoreBoardData['team1StartingLineup']->setplays : 'nie wybrano';
                                 $setplayTeam2 = ($scoreBoardData['team2StartingLineup']->setplays != '') ? $scoreBoardData['team2StartingLineup']->setplays : 'nie wybrano';
@@ -942,6 +1073,17 @@ do_action('hestia_before_single_page_wrapper');
 
                             //content of the megaliga page
                             the_content();
+
+                            //show button to generate schedule for playin only if user with ID == 14 (mbaginski) and round_number = 14
+                            // TODO KP add validation to not show button if at least one record in megaliga_schedule_playin has score
+                            if ($userId == 14 && $round_number == 14) {
+                                echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
+                                echo '  <form action="" method="post">';
+                                echo '      <input type="submit" name="submitPlayInSchedule" value="Generuj terminarz dla fazy play in">';
+                                echo '  </form>';
+                                echo '</div>';
+                            }
+
                             echo '<div class="megaligaScores scheduleContainer">';
                             drawSchedule($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'left', $round_number);
                             drawSchedule($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $round_number);
