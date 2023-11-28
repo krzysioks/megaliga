@@ -183,13 +183,11 @@ do_action('hestia_before_single_page_wrapper');
                                     // if points are identical, sort balance
                                     if (!$retval) {
                                         $retval = (int)$b['balance'] - (int)$a['balance'];
-                                        //$retval = strnatcmp((integer)$b['balance'], (integer)$a['balance']);
                                     }
 
                                     //if balance identical -> sort by totalScore
                                     if (!$retval) {
                                         $retval = (int)$b['totalScore'] - (int)$a['totalScore'];
-                                        //$retval = strnatcmp((integer)$b['balance'], (integer)$a['balance']);
                                     }
 
                                     return $retval;
@@ -302,7 +300,49 @@ do_action('hestia_before_single_page_wrapper');
                                     }
                                     $i++;
                                 }
-                                // TODO KP Add verification to know if to insert new records or update existing ones
+
+                                $checkIfRecordsExists = $wpdb->get_results('SELECT id_schedule, round_number FROM megaliga_schedule_playin');
+                                if (count($checkIfRecordsExists) > 0) {
+                                    $i = 1;
+                                    $dolceIterator = 0;
+                                    $gabbnaIterator = 2;
+                                    foreach ($checkIfRecordsExists as $record) {
+                                        $submitDataArray = array();
+                                        $submitDataArray['id_user_team1'] = $top3teamsDolce[$dolceIterator];
+                                        $submitDataArray['id_user_team2'] = $top3teamsGabbana[$gabbanaIterator];
+                                        $submitDataArray['round_number'] = $record->round_number;
+                                        $submitDataArray['team1_score'] = null;
+                                        $submitDataArray['team2_score'] = null;
+
+                                        $where = array('id_schedule' => $record->id_schedule);
+                                        $wpdb->update('megaliga_schedule_playin', $submitDataArray, $where);
+
+                                        if ($i % 2 == 0) {
+                                            $dolceIterator++;
+                                            $gabbanaIterator--;
+                                        }
+
+                                        $i++;
+                                    }
+                                } else {
+                                    $gabbnaIterator = 2;
+                                    for ($dolceIterator = 0; $dolceIterator < 3; $dolceIterator++) {
+                                        $submitDataArray = array();
+                                        $submitDataArray['id_user_team1'] = $top3teamsDolce[$dolceIterator];
+                                        $submitDataArray['id_user_team2'] = $top3teamsGabbana[$gabbanaIterator];
+                                        $submitDataArray['round_number'] = 1;
+                                        $submitDataArray['team1_score'] = null;
+                                        $submitDataArray['team2_score'] = null;
+
+                                        $wpdb->insert('megaliga_starting_lineup_playin', $submitDataArray);
+
+                                        $submitDataArray['round_number'] = 2;
+                                        $wpdb->insert('megaliga_starting_lineup_playin', $submitDataArray);
+
+                                        $dolceIterator++;
+                                        $gabbanaIterator--;
+                                    }
+                                }
                             }
 
                             function drawSchedule($queryTeam1Result, $queryTeam2Result, $gameIdentificationData, $groupName, $side, $round_number)
@@ -1071,17 +1111,31 @@ do_action('hestia_before_single_page_wrapper');
                             $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $round_number);
                             $scoreBoradGabbanaData = getAllGameData($getGames4Gabbana, $round_number);
 
+
+
                             //content of the megaliga page
                             the_content();
 
                             //show button to generate schedule for playin only if user with ID == 14 (mbaginski) and round_number = 14
-                            // TODO KP add validation to not show button if at least one record in megaliga_schedule_playin has score
                             if ($userId == 14 && $round_number == 14) {
-                                echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
-                                echo '  <form action="" method="post">';
-                                echo '      <input type="submit" name="submitPlayInSchedule" value="Generuj terminarz dla fazy play in">';
-                                echo '  </form>';
-                                echo '</div>';
+                                // get all records from megaliga_schedule_playin to check if any score has already been added
+                                $getPlayInScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playin ');
+
+                                $scoresAdded = false;
+                                foreach ($getPlayInScores as $record) {
+                                    if ($record->team1_score > 0 || $record->team2_score > 0) {
+                                        $scoresAdded = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!$scoresAdded) {
+                                    echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
+                                    echo '  <form action="" method="post">';
+                                    echo '      <input type="submit" name="submitPlayInSchedule" value="Generuj terminarz dla fazy play in">';
+                                    echo '  </form>';
+                                    echo '</div>';
+                                }
                             }
 
                             echo '<div class="megaligaScores scheduleContainer">';
