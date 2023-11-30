@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.278
+Version: 0.283
 */
 
 :root {
@@ -13,6 +13,8 @@ Version: 0.278
     --megaliga-bg-color: #5380b8;
     --megaliga-bg-color-light: #f3f8ff;
     --megaliga--disabled-color: #d1d1d1;
+    --megaliga--success: #66c847;
+
 }
 
 @media all and (max-width: 1440px) {
@@ -214,6 +216,15 @@ body::-webkit-scrollbar-thumb {
 
     .order-5 {
         order: 5;
+    }
+
+    .schedulePlayinGeneratorSuccess {
+        font-weight: bold;
+        background-color: var(--megaliga--success);
+        justify-content: center;
+        padding: 20px;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 }
 
@@ -1033,6 +1044,13 @@ div.individualCommentsContainer > p {
 .scoreTableDolce,
 .scoreTableGabbana {
     margin: 1em;
+}
+
+.schedulePlayinGeneratorSuccess {
+    font-weight: bold;
+    background-color: var(--megaliga--success);
+    justify-content: center;
+    padding: 20px;
 }
 
 /* Overrides of parent theme rules */

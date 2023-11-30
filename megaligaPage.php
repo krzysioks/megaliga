@@ -305,7 +305,7 @@ do_action('hestia_before_single_page_wrapper');
                                 if (count($checkIfRecordsExists) > 0) {
                                     $i = 1;
                                     $dolceIterator = 0;
-                                    $gabbnaIterator = 2;
+                                    $gabbanaIterator = 2;
                                     foreach ($checkIfRecordsExists as $record) {
                                         $submitDataArray = array();
                                         $submitDataArray['id_user_team1'] = $top3teamsDolce[$dolceIterator];
@@ -325,7 +325,7 @@ do_action('hestia_before_single_page_wrapper');
                                         $i++;
                                     }
                                 } else {
-                                    $gabbnaIterator = 2;
+                                    $gabbanaIterator = 2;
                                     for ($dolceIterator = 0; $dolceIterator < 3; $dolceIterator++) {
                                         $submitDataArray = array();
                                         $submitDataArray['id_user_team1'] = $top3teamsDolce[$dolceIterator];
@@ -333,16 +333,39 @@ do_action('hestia_before_single_page_wrapper');
                                         $submitDataArray['round_number'] = 1;
                                         $submitDataArray['team1_score'] = null;
                                         $submitDataArray['team2_score'] = null;
-
-                                        $wpdb->insert('megaliga_starting_lineup_playin', $submitDataArray);
+                                        $wpdb->insert('megaliga_schedule_playin', $submitDataArray);
 
                                         $submitDataArray['round_number'] = 2;
-                                        $wpdb->insert('megaliga_starting_lineup_playin', $submitDataArray);
+                                        $wpdb->insert('megaliga_schedule_playin', $submitDataArray);
 
-                                        $dolceIterator++;
                                         $gabbanaIterator--;
                                     }
                                 }
+
+                                // set megaliga_user_data.reached_playin = 1 for teams that have reached playins
+                                $getAllUsers = $wpdb->get_results('SELECT ID FROM megaliga_user_data');
+
+                                //clear reached_playin to 0 for all users
+                                foreach ($getAllUsers as $record) {
+                                    $submitDataArray = array();
+                                    $submitDataArray['reached_playin'] = 0;
+                                    $where = array('ID' => $record->ID);
+                                    $wpdb->update('megaliga_user_data', $submitDataArray, $where);
+                                }
+
+                                // set reached_playin for those users, who reach playin
+                                for ($i = 0; $i < 3; $i++) {
+                                    $submitDataArray = array();
+                                    $submitDataArray['reached_playin'] = 1;
+                                    $whereDolce = array('ID' => $top3teamsDolce[$i]);
+                                    $whereGabbana = array('ID' => $top3teamsGabbana[$i]);
+                                    $wpdb->update('megaliga_user_data', $submitDataArray, $whereDolce);
+                                    $wpdb->update('megaliga_user_data', $submitDataArray, $whereGabbana);
+                                }
+
+                                echo "<div class='displayFlex marginTop20 marginBottom20 schedulePlayinGeneratorSuccess'>";
+                                echo "  Terminarz dla fazy play in wygenerowany poprawnie";
+                                echo "</div>";
                             }
 
                             function drawSchedule($queryTeam1Result, $queryTeam2Result, $gameIdentificationData, $groupName, $side, $round_number)
