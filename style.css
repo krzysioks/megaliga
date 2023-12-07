@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.283
+Version: 0.285
 */
 
 :root {
@@ -411,6 +411,10 @@ body::-webkit-scrollbar-thumb {
 
 .flexDirectionColumn {
     flex-direction: column;
+}
+
+.justifyContentEvenly {
+    justify-content: space-evenly;
 }
 
 /*schedule table in megaliga-> kolejka n sub page*/

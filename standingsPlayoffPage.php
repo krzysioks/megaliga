@@ -1,7 +1,7 @@
 <?php
 /*
 Template Name: Standings Playoff
-Description: Shows standings of the playoff phase for one group in the ligue. Shows the playoff ladder, which consists of 4 phases. Phase 1-3 (relative to 1, 2, 3 kolejka) are the rounds where each team plays 1 game with all teams. Phase 4 - final  (first and second team) and game for 3rd place (third and fourth team)
+Description: Shows standings of the playoff phase for two groups in the ligue. Shows the playoff ladder, which consists of 2 phases: Semifinal (relative to round 1 and 2) where the winner is team which scores more points; final and 3rd place game (relative to round 3 and 4) where the winner is team which scores more points
  */
 
 get_header();

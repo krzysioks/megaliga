@@ -313,6 +313,9 @@ do_action('hestia_before_single_page_wrapper');
                                         $submitDataArray['round_number'] = $record->round_number;
                                         $submitDataArray['team1_score'] = null;
                                         $submitDataArray['team2_score'] = null;
+                                        $submitDataArray['team1_seed'] = $dolceIterator + 1;
+                                        $submitDataArray['team2_seed'] = $gabbanaIterator + 1;
+
 
                                         $where = array('id_schedule' => $record->id_schedule);
                                         $wpdb->update('megaliga_schedule_playin', $submitDataArray, $where);
@@ -333,6 +336,8 @@ do_action('hestia_before_single_page_wrapper');
                                         $submitDataArray['round_number'] = 1;
                                         $submitDataArray['team1_score'] = null;
                                         $submitDataArray['team2_score'] = null;
+                                        $submitDataArray['team1_seed'] = $dolceIterator + 1;
+                                        $submitDataArray['team2_seed'] = $gabbanaIterator + 1;
                                         $wpdb->insert('megaliga_schedule_playin', $submitDataArray);
 
                                         $submitDataArray['round_number'] = 2;
@@ -353,7 +358,7 @@ do_action('hestia_before_single_page_wrapper');
                                     $wpdb->update('megaliga_user_data', $submitDataArray, $where);
                                 }
 
-                                // set reached_playin for those users, who reach playin
+                                // set reached_playin for those users, who reached playin
                                 for ($i = 0; $i < 3; $i++) {
                                     $submitDataArray = array();
                                     $submitDataArray['reached_playin'] = 1;
