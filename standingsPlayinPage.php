@@ -159,7 +159,7 @@ do_action('hestia_before_single_page_wrapper');
                                 $standingsGabbana = calculateStandingsData($getGabbanaSchedule, $getGabbanaUserID);
 
                                 for ($i = 0; $i < 5; $i++) {
-                                    $matchupData = array('team1Name' => '', 'team2Name' => '', 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalTeam1' => null, 'totalTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'none', 'winnerTotalWinsNumber' => 0, 'winnerTotalScore' => 0);
+                                    $matchupData = array('team1Name' => '', 'team2Name' => '', 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalScoreTeam1' => null, 'totalScoreTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'none', 'winnerTotalWinsNumber' => 0, 'winnerTotalScore' => 0);
 
                                     //get team names of both users
                                     $getTeam1Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name" FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id  AND megaliga_user_data.ID = ' . $getSchedulePlayin[$i]->id_user_team1);
@@ -312,9 +312,69 @@ do_action('hestia_before_single_page_wrapper');
                                 return $isPlayinPhaseFinished[0] * $isPlayinPhaseFinished[1] * $isPlayinPhaseFinished[2];
                             }
 
+                            function drawPlayOffSeed($matchupData)
+                            {
+                                function compareWinners($a, $b)
+                                {
+                                    // sort by total wins
+                                    $retval = strnatcmp($b['winnerTotalWinsNumber'], $a['winnerTotalWinsNumber']);
+                                    // if total wins are identical, sort by total score
+                                    if (!$retval) {
+                                        $retval = (int)$b['winnerTotalScore'] - (int)$a['winnerTotalScore'];
+                                    }
+
+                                    return $retval;
+                                }
+
+                                function compareLoosers($a, $b)
+                                {
+                                    // sort by score gap to winner
+                                    $retval = strnatcmp($b['scoreGapToWinner'], $a['scoreGapToWinner']);
+
+                                    return -$retval;
+                                }
+
+                                $luckyLooserData = array();
+                                $winnersData = array();
+
+                                foreach ($matchupData as $matchup) {
+                                    if ($matchup['winner'] == 'team1') {
+                                        array_push($winnersData, array('teamName' => $matchup['team1Name'], 'winnerTotalWinsNumber' => $matchup['winnerTotalWinsNumber'], 'winnerTotalScore' => $matchup['winnerTotalScore']));
+
+                                        array_push($luckyLooserData,  array('teamName' => $matchup['team2Name'], 'scoreGapToWinner' => $matchup['totalScoreTeam1'] - $matchup['totalScoreTeam2']));
+                                    } else if ($matchup['winner'] == 'team2') {
+                                        array_push($winnersData, array('teamName' => $matchup['team2Name'], 'winnerTotalWinsNumber' => $matchup['winnerTotalWinsNumber'], 'winnerTotalScore' => $matchup['winnerTotalScore']));
+
+                                        array_push($luckyLooserData,  array('teamName' => $matchup['team1Name'], 'scoreGapToWinner' => $matchup['totalScoreTeam2'] - $matchup['totalScoreTeam1']));
+                                    }
+                                }
+
+                                uasort($winnersData, 'compareWinners');
+                                uasort($luckyLooserData, 'compareLoosers');
+
+                                array_push($winnersData, $luckyLooserData[array_key_first($luckyLooserData)]);
+
+                                echo '  <div class="advancedToPlayoffContainer flexDirectionColumn marginBottom20">';
+
+                                $i = 1;
+                                foreach ($winnersData as $team) {
+                                    echo '<div class="advancedToPlayoffRow displayFlex flexDirectionRow">';
+                                    echo '  <div class="advancedToPlayoffSeedNumber">';
+                                    echo $i . '.';
+                                    echo '  </div>';
+                                    echo '  <div class="advancedToPlayoffTeam">';
+                                    echo $team['teamName'];
+                                    echo '  </div>';
+                                    echo '</div>';
+
+                                    $i++;
+                                }
+
+                                echo '  </div>';
+                            }
+
                             //content of the playin standings page
                             $matchupData = getData();
-
 
                             echo '<div>';
                             echo '  <div class="playoffLadder displayFlex justifyContentEvenly playoffLadderflexDirection ">';
@@ -330,16 +390,13 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '          <div class="playoffPhaseTitlePosition marginTop20 marginBottom40">';
                                 echo '              <span class="playoffPhaseTitle">rozstawienie drużyn w fazie play off</span>';
                                 echo '          </div>';
-                                // TODO KP implement drawPlayOffSeed which will render the seed position of teams that reached playoff phase
-                                // drawPlayOffSeed($matchupData);
+                                drawPlayOffSeed($matchupData);
                                 echo '      </div>';
                             }
 
                             echo '  </div>';
                             echo '</div>';
                             //custom code ends here
-
-                            echo 'isPlayinPhaseFinished: ' . $isPlayinPhaseFinished;
 
                             echo apply_filters('hestia_filter_blog_social_icons', '');
 
