@@ -358,7 +358,7 @@ do_action('hestia_before_single_page_wrapper');
 
                                 $i = 1;
                                 foreach ($winnersData as $team) {
-                                    $suffix = $i == 4 ? ' <span class="luckyLooser">( lucky looser )</span>' : '';
+                                    $suffix = $i == 4 ? ' <span class="luckyLooser">( lucky loser )</span>' : '';
                                     echo '<div class="advancedToPlayoffRow displayFlex flexDirectionRow">';
                                     echo '  <div class="advancedToPlayoffSeedNumber">';
                                     echo $i . '.';

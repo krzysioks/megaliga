@@ -93,7 +93,7 @@ do_action('hestia_before_single_page_wrapper');
                             //content of the history page
                             echo '<div>';
                             foreach ($getSeasonIdToShow as $season) {
-                                echo '<div class="marginBottom20">';
+                                echo '<div class="marginBottom20 marginTop20">';
                                 echo '  <div class="marginBottom20 marginLeft1em">';
                                 echo '      <span class="teamOverviewTeamName">sezon: ' . $season->season_name . '</span>';
                                 echo '  </div>';
@@ -117,6 +117,20 @@ do_action('hestia_before_single_page_wrapper');
                                 }
 
                                 echo '  </div>';
+
+                                //get playin data
+                                $playinStandings = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND table_type = "playin" ORDER BY place');
+
+                                //draw playin data
+                                if (count($playinStandings) != 0) {
+                                    echo '<div class="marginLeft1em">';
+                                    echo '  <span class="roundName">runda: playin</span>';
+                                    echo '</div>';
+                                    echo '  <div class="historyTableContainer">';
+                                    drawStandings($playinStandings, 'none', '', false);
+                                    echo '</div>';
+                                }
+                                echo '</div>';
 
                                 //get playoff data
                                 $playoffStandings = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND table_type = "playoff" ORDER BY place');
