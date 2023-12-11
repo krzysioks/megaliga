@@ -188,7 +188,7 @@ do_action('hestia_before_single_page_wrapper');
                                     if ($matchupData['scoreTeam1Round1'] != 0 && $matchupData['scoreTeam1Round2'] != 0 && $matchupData['scoreTeam2Round1'] != 0 && $matchupData['scoreTeam2Round2'] != 0) {
                                         if ($matchupData['totalScoreTeam1'] > $matchupData['totalScoreTeam2']) {
                                             $matchupData['winner'] = 'team1';
-                                        } else if ($matchupData['totalScoreTeam1'] < $returnData['totalScoreTeam2']) {
+                                        } else if ($matchupData['totalScoreTeam1'] < $matchupData['totalScoreTeam2']) {
                                             $matchupData['winner'] = 'team2';
                                         } else {
                                             //if totalScore of team1 and 2 equals -> team with highier seed wins
