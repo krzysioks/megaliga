@@ -1,11 +1,20 @@
 megaliga – instrukcja obsługi v.5.0
 
-1. Wpisz wyniki z tabel z rundy zasadniczej i playoff do tabeli megaliga_history
+1. Wpisz wyniki z tabel z rundy zasadniczej, playin i playoff do tabeli megaliga_history
+
+-   table_type:
+    -   regular - sezon zasadniczy
+    -   playin - faza play in
+    -   playoff - faza play off
+-   ligue_group:
+    -   `dolce` lub `gabbana` dla rundy zasadniczhe
+    -   `dolce&gabbana` dla fazy play in/off
 
 2. Wprowadź wszystkich graczy do tabeli megaliga_user_data
 
 3. Ustaw następujące wartości w kolumnach megaliga_user_data:
 
+    - reached_playin = 0
     - reached_playoff = 0
     - player_draft_number = 1
     - player_draft_number_playoff = 1
@@ -53,12 +62,16 @@ megaliga – instrukcja obsługi v.5.0
 
 -   megaliga_playoff_ladder
 -   megaliga_scores
+-   megaliga_scores_playin
 -   megaliga_scores_playoff
 -   megaliga_trainer_score
+-   megaliga_trainer_score_playin
 -   megaliga_trainer_score_playoff
 -   megaliga_schedule
+-   megaliga_schedule_playin
 -   megaliga_schedule_playoff
 -   megaliga_starting_lineup
+-   megaliga_starting_lineup_playin
 -   megaliga_starting_lineup_playoff
 -   megaliga_season_draft_order_dolce
 -   megaliga_season_draft_order_gabbana
@@ -112,7 +125,19 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
     -   w tabeli megaliga_schedule dla reokrdu opisującego 3 spotkanie w kolumnie id_rematch_schedule podaj id_schedule pierwszego spotkania, w kolumnie id_rematch_schedule2 podaj id_schedule drugiego spotkania
 -   każda drużyna rozgrywa mecz i rewanż z każdą z pozostałych 5 drużyn. Zwycięzca każdego z pojedynków ( liczy się suma małych punktów) otrzymuję w dodatkowy punkt po rozegranym meczu rundy rewanżowej
 
-19. Przygotowanie fazy playoff
+19. Przygotowanie fazy playin
+
+    Do fazy playin awansuje po trzy drużyny z każdej z grup. Mecze rozgrywają się według schematu (D - dolce; G - gabbana):
+
+    -   1D : 3G
+    -   2D : 2G
+    -   3D : 1G
+
+    Administrator ligi w zakładce `megaliga->kolejka 14` będzie miał dostępny guzik `Generuj terminarz dla fazy play in`, który automatycznie przygotuje terminarz dla tej fazy rozgrywek.
+
+    Guzik ten dostępny jest dopóki nie zostanie zapisany przynajmniej jeden wynik meczu jakiejkolwiek z trzech par.
+
+20. Przygotowanie fazy playoff
 
 -   w tabeli megaliga_user_data oznacz drużyny, które awansowały do fazy playoff poprzez ustawienie wartości 1 w polu „reached_playoff”
 -   dokonaj konfiguracji draftu w tabeli megaliga_draft_data
