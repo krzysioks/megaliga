@@ -1147,7 +1147,7 @@ do_action('hestia_before_single_page_wrapper');
                             //show button to generate schedule for playin only if user with ID == 14 (mbaginski) and round_number = 14
                             if ($userId == 14 && $round_number == 14) {
                                 // get all records from megaliga_schedule_playin to check if any score has already been added
-                                $getPlayInScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playin ');
+                                $getPlayInScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playin');
 
                                 $scoresAdded = false;
                                 foreach ($getPlayInScores as $record) {

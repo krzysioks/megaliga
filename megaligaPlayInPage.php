@@ -177,6 +177,358 @@ do_action('hestia_before_single_page_wrapper');
                                 $wpdb->update('megaliga_schedule_playin', array('team2_score' => $team2Outcome), $where);
                             }
 
+                            // handle playOff schedule generation
+                            if ($_POST['submitPlayOffSchedule']) {
+                                function compareTeams($a, $b)
+                                {
+                                    // sort by points
+                                    $retval = strnatcmp($b['points'], $a['points']);
+                                    // if points are identical, sort balance
+                                    if (!$retval) {
+                                        $retval = (int)$b['balance'] - (int)$a['balance'];
+                                    }
+
+                                    //if balance identical -> sort by totalScore
+                                    if (!$retval) {
+                                        $retval = (int)$b['totalScore'] - (int)$a['totalScore'];
+                                    }
+
+                                    return $retval;
+                                }
+
+                                // array consisting data for 3 matchups
+                                $playinData = array();
+
+                                $getSchedulePlayin = $wpdb->get_results('SELECT id_user_team1, id_user_team2, team1_score, team2_score, team1_seed, team2_seed FROM megaliga_schedule_playin');
+
+                                // get current megaliga standings
+                                $getDolceUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1');
+                                $getGabbanaUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 2');
+
+                                $getDolceSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 1');
+                                $getGabbanaSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 2');
+
+                                function calculateStandingsData($scheduleQuery, $userIDquery)
+                                {
+                                    global $wpdb;
+                                    $standingsData = array();
+                                    foreach ($userIDquery as $user) {
+                                        $standingsData[$user->ID] = array('gamesPlayed' => 0, 'wins' => 0, 'looses' => 0, 'draws' => 0, 'balance' => 0, 'points' => 0, 'ID' => $user->ID, 'totalScore' => 0);
+                                    }
+
+                                    foreach ($scheduleQuery as $game) {
+                                        if ($game->team1_score != null) {
+                                            $standingsData[$game->id_user_team1]['totalScore'] = $standingsData[$game->id_user_team1]['totalScore'] + $game->team1_score;
+                                            $standingsData[$game->id_user_team2]['totalScore'] = $standingsData[$game->id_user_team2]['totalScore'] + $game->team2_score;
+
+                                            //when team1 wins
+                                            if ($game->team1_score > $game->team2_score) {
+                                                $standingsData[$game->id_user_team1]['gamesPlayed'] = $standingsData[$game->id_user_team1]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team1]['wins'] = $standingsData[$game->id_user_team1]['wins'] + 1;
+                                                $standingsData[$game->id_user_team1]['balance'] = $standingsData[$game->id_user_team1]['balance'] + $game->team1_score - $game->team2_score;
+                                                $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 2;
+
+                                                $standingsData[$game->id_user_team2]['gamesPlayed'] = $standingsData[$game->id_user_team2]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team2]['looses'] = $standingsData[$game->id_user_team2]['looses'] + 1;
+                                                $standingsData[$game->id_user_team2]['balance'] = $standingsData[$game->id_user_team2]['balance'] + $game->team2_score - $game->team1_score;
+                                            }
+
+                                            //when team2 wins
+                                            if ($game->team1_score < $game->team2_score) {
+                                                $standingsData[$game->id_user_team2]['gamesPlayed'] = $standingsData[$game->id_user_team2]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team2]['wins'] = $standingsData[$game->id_user_team2]['wins'] + 1;
+                                                $standingsData[$game->id_user_team2]['balance'] = $standingsData[$game->id_user_team2]['balance'] + $game->team2_score - $game->team1_score;
+                                                $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 2;
+
+                                                $standingsData[$game->id_user_team1]['gamesPlayed'] = $standingsData[$game->id_user_team1]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team1]['looses'] = $standingsData[$game->id_user_team1]['looses'] + 1;
+                                                $standingsData[$game->id_user_team1]['balance'] = $standingsData[$game->id_user_team1]['balance'] + $game->team1_score - $game->team2_score;
+                                            }
+
+                                            //when team1 draws with team2
+                                            if ($game->team1_score == $game->team2_score) {
+                                                $standingsData[$game->id_user_team1]['gamesPlayed'] = $standingsData[$game->id_user_team1]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team1]['draws'] = $standingsData[$game->id_user_team1]['draws'] + 1;
+                                                $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 1;
+
+                                                $standingsData[$game->id_user_team2]['gamesPlayed'] = $standingsData[$game->id_user_team2]['gamesPlayed'] + 1;
+                                                $standingsData[$game->id_user_team2]['draws'] = $standingsData[$game->id_user_team2]['draws'] + 1;
+                                                $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
+                                            }
+
+                                            //if $game is played during rematch round -> add bonus point for team that has better balance after 2 matches
+                                            if ($game->id_rematch_schedule !== null) {
+                                                $getRematchSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule);
+
+                                                //count total points scored by each team during both rounds (1st and rematch)
+                                                $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule[0]->id_user_team1 ? $game->team1_score + $getRematchSchedule[0]->team1_score : $game->team1_score + $getRematchSchedule[0]->team2_score;
+                                                $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule[0]->id_user_team2 ? $game->team2_score + $getRematchSchedule[0]->team2_score : $game->team2_score + $getRematchSchedule[0]->team1_score;
+
+                                                //if given teams play more than 2 times witch each other -> take into account also third match
+                                                if ($game->id_rematch_schedule2 !== null) {
+                                                    $getRematchSchedule2 = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule2);
+
+                                                    $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule2[0]->id_user_team1 ? $team1MatchupScore + $getRematchSchedule2[0]->team1_score : $team1MatchupScore + $getRematchSchedule2[0]->team2_score;
+                                                    $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule2[0]->id_user_team2 ? $team2MatchupScore + $getRematchSchedule2[0]->team2_score : $team2MatchupScore + $getRematchSchedule2[0]->team1_score;
+                                                }
+
+                                                //when team 1 wins the matchup
+                                                if ($team1MatchupScore > $team2MatchupScore) {
+                                                    $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 1;
+                                                } else if ($team1MatchupScore < $team2MatchupScore) {
+                                                    //when team 2 wins the matchup
+                                                    $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    uasort($standingsData, 'compareTeams');
+                                    return $standingsData;
+                                }
+
+                                $standingsDolce = calculateStandingsData($getDolceSchedule, $getDolceUserID);
+                                $standingsGabbana = calculateStandingsData($getGabbanaSchedule, $getGabbanaUserID);
+
+                                for ($i = 0; $i < 5; $i++) {
+                                    $matchupData = array('id_user_team1' => 0, 'id_user_team2' => 0, 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalScoreTeam1' => null, 'totalScoreTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'none', 'winnerTotalWinsNumber' => 0, 'winnerTotalScore' => 0);
+
+                                    $matchupData['id_user_team1'] = $getSchedulePlayin[$i]->id_user_team1;
+                                    $matchupData['id_user_team2'] = $getSchedulePlayin[$i]->id_user_team2;
+
+                                    //setting score for teams for  round 1 and 2
+                                    $matchupData['scoreTeam1Round1'] = $getSchedulePlayin[$i]->team1_score;
+                                    $matchupData['scoreTeam2Round1'] = $getSchedulePlayin[$i]->team2_score;
+
+                                    $matchupData['scoreTeam1Round2'] = $getSchedulePlayin[$i + 1]->team1_score;
+                                    $matchupData['scoreTeam2Round2'] = $getSchedulePlayin[$i + 1]->team2_score;
+
+                                    //setting totalScore
+                                    $matchupData['totalScoreTeam1'] = $matchupData['scoreTeam1Round1'] + $matchupData['scoreTeam1Round2'];
+                                    $matchupData['totalScoreTeam2'] = $matchupData['scoreTeam2Round1'] + $matchupData['scoreTeam2Round2'];
+
+                                    //setting seed number
+                                    $matchupData['seedNumberTeam1'] = $getSchedulePlayin[$i]->team1_seed;
+                                    $matchupData['seedNumberTeam2'] = $getSchedulePlayin[$i]->team2_seed;
+
+                                    //setting winning team. Used to set special styling
+                                    if ($matchupData['scoreTeam1Round1'] != 0 && $matchupData['scoreTeam1Round2'] != 0 && $matchupData['scoreTeam2Round1'] != 0 && $matchupData['scoreTeam2Round2'] != 0) {
+                                        if ($matchupData['totalScoreTeam1'] > $matchupData['totalScoreTeam2']) {
+                                            $matchupData['winner'] = 'team1';
+                                        } else if ($matchupData['totalScoreTeam1'] < $matchupData['totalScoreTeam2']) {
+                                            $matchupData['winner'] = 'team2';
+                                        } else {
+                                            //if totalScore of team1 and 2 equals -> team with highier seed wins
+                                            // if team's seed equals -> use the same criteria as when calculating position of team in season standigs (sort by points, then by balance, finally by totalScore)
+                                            if ($matchupData['seedNumberTeam1'] == $matchupData['seedNumberTeam2']) {
+                                                $dolceTeamSeasonStandings = $standingsDolce[$getSchedulePlayin[$i]->id_user_team1];
+                                                $gabbanaTeamSeasonStandings = $standingsGabbana[$getSchedulePlayin[$i]->id_user_team2];
+
+                                                if ($dolceTeamSeasonStandings['points'] > $gabbanaTeamSeasonStandings['points']) {
+                                                    $matchupData['winner'] = 'team1';
+                                                } else if ($dolceTeamSeasonStandings['points'] < $gabbanaTeamSeasonStandings['points']) {
+                                                    $matchupData['winner'] = 'team2';
+                                                } else {
+                                                    if ($dolceTeamSeasonStandings['balance'] > $gabbanaTeamSeasonStandings['balance']) {
+                                                        $matchupData['winner'] = 'team1';
+                                                    } else if ($dolceTeamSeasonStandings['balance'] < $gabbanaTeamSeasonStandings['balance']) {
+                                                        $matchupData['winner'] = 'team2';
+                                                    } else {
+                                                        if ($dolceTeamSeasonStandings['totalScore'] > $gabbanaTeamSeasonStandings['totalScore']) {
+                                                            $matchupData['winner'] = 'team1';
+                                                        } else if ($dolceTeamSeasonStandings['totalScore'] < $gabbanaTeamSeasonStandings['totalScore']) {
+                                                            $matchupData['winner'] = 'team2';
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                //if totalScore of team1 and 2 equals -> team with highier seed wins
+                                                $matchupData['winner'] = ($matchupData['seedNumberTeam1'] > $matchupData['seedNumberTeam2']) ? 'team2' : 'team1';
+                                            }
+                                        }
+                                    }
+
+                                    //Fill in winnerTotalWinsNumber, winnerTotalScore as those 2 parameters will be used to define seed number in playoff
+                                    if ($matchupData['winner'] == 'team1') {
+                                        $dolceTeamSeasonStandings = $standingsDolce[$getSchedulePlayin[$i]->id_user_team1];
+                                        $playinWins = 0;
+
+                                        if ($matchupData['scoreTeam1Round1'] > $matchupData['scoreTeam2Round1']) {
+                                            $playinWins++;
+                                        }
+                                        if ($matchupData['scoreTeam1Round2'] > $matchupData['scoreTeam2Round2']) {
+                                            $playinWins++;
+                                        }
+
+                                        $matchupData['winnerTotalWinsNumber'] = $dolceTeamSeasonStandings['wins'] + $playinWins;
+                                        $matchupData['winnerTotalScore'] = $dolceTeamSeasonStandings['totalScore'] +  $matchupData['totalScoreTeam1'];
+                                    } else if ($matchupData['winner'] == 'team2') {
+                                        $gabbanaTeamSeasonStandings = $standingsGabbana[$getSchedulePlayin[$i]->id_user_team2];
+                                        $playinWins = 0;
+
+                                        if ($matchupData['scoreTeam2Round1'] > $matchupData['scoreTeam1Round1']) {
+                                            $playinWins++;
+                                        }
+                                        if ($matchupData['scoreTeam2Round2'] > $matchupData['scoreTeam1Round2']) {
+                                            $playinWins++;
+                                        }
+
+                                        $matchupData['winnerTotalWinsNumber'] = $gabbanaTeamSeasonStandings['wins'] + $playinWins;
+                                        $matchupData['winnerTotalScore'] = $gabbanaTeamSeasonStandings['totalScore'] +  $matchupData['totalScoreTeam2'];
+                                    }
+
+
+                                    array_push($playinData, $matchupData);
+
+                                    $i++;
+                                }
+
+                                // get seed numbers for teams advancing to playoff
+                                function compareWinners($a, $b)
+                                {
+                                    // sort by total wins
+                                    $retval = strnatcmp($b['winnerTotalWinsNumber'], $a['winnerTotalWinsNumber']);
+                                    // if total wins are identical, sort by total score
+                                    if (!$retval) {
+                                        $retval = (int)$b['winnerTotalScore'] - (int)$a['winnerTotalScore'];
+                                    }
+
+                                    return $retval;
+                                }
+
+                                function compareLoosers($a, $b)
+                                {
+                                    // sort by score gap to winner
+                                    $retval = strnatcmp($b['scoreGapToWinner'], $a['scoreGapToWinner']);
+
+                                    return -$retval;
+                                }
+
+                                $luckyLooserData = array();
+                                $winnersData = array();
+
+                                foreach ($playinData as $matchup) {
+                                    if ($matchup['winner'] == 'team1') {
+                                        array_push($winnersData, array('id_user' => $matchup['id_user_team1'], 'winnerTotalWinsNumber' => $matchup['winnerTotalWinsNumber'], 'winnerTotalScore' => $matchup['winnerTotalScore']));
+
+                                        array_push($luckyLooserData,  array('id_user' => $matchup['id_user_team2'], 'scoreGapToWinner' => $matchup['totalScoreTeam1'] - $matchup['totalScoreTeam2']));
+                                    } else if ($matchup['winner'] == 'team2') {
+                                        array_push($winnersData, array('id_user' => $matchup['id_user_team2'], 'winnerTotalWinsNumber' => $matchup['winnerTotalWinsNumber'], 'winnerTotalScore' => $matchup['winnerTotalScore']));
+
+                                        array_push($luckyLooserData,  array('id_user' => $matchup['id_user_team1'], 'scoreGapToWinner' => $matchup['totalScoreTeam2'] - $matchup['totalScoreTeam1']));
+                                    }
+                                }
+
+                                uasort($winnersData, 'compareWinners');
+
+                                uasort($luckyLooserData, 'compareLoosers');
+
+                                array_push($winnersData, $luckyLooserData[array_key_first($luckyLooserData)]);
+
+                                $checkIfRecordsExists = $wpdb->get_results('SELECT id_schedule, round_number FROM megaliga_schedule_playoff');
+                                if (count($checkIfRecordsExists) > 0) {
+                                    $i = 1;
+                                    $winnerIterator = 0;
+                                    $loserIterator = 3;
+                                    foreach ($checkIfRecordsExists as $record) {
+                                        $winnerUserId = 0;
+                                        $loserUserId = 0;
+                                        $j = 0;
+
+                                        foreach ($winnersData as $data) {
+                                            if ($winnerIterator == $j) {
+                                                $winnerUserId = $data['id_user'];
+                                            }
+
+                                            if ($loserIterator == $j) {
+                                                $loserUserId = $data['id_user'];
+                                            }
+
+                                            $j++;
+                                        }
+
+                                        $submitDataArray = array();
+                                        $submitDataArray['id_user_team1'] = $winnerUserId;
+                                        $submitDataArray['id_user_team2'] = $loserUserId;
+                                        $submitDataArray['round_number'] = $record->round_number;
+                                        $submitDataArray['team1_score'] = null;
+                                        $submitDataArray['team2_score'] = null;
+                                        $submitDataArray['team1_seed'] = $winnerIterator + 1;
+                                        $submitDataArray['team2_seed'] = $loserIterator + 1;
+                                        $submitDataArray['stage'] = 'semifinal';
+
+
+                                        $where = array('id_schedule' => $record->id_schedule);
+                                        $wpdb->update('megaliga_schedule_playoff', $submitDataArray, $where);
+
+                                        if ($i % 2 == 0) {
+                                            $winnerIterator++;
+                                            $loserIterator--;
+                                        }
+
+                                        $i++;
+                                    }
+                                } else {
+                                    $loserIterator = 3;
+                                    for ($winnerIterator = 0; $winnerIterator < 2; $winnerIterator++) {
+                                        $winnerUserId = 0;
+                                        $loserUserId = 0;
+                                        $i = 0;
+
+                                        foreach ($winnersData as $data) {
+                                            if ($winnerIterator == $i) {
+                                                $winnerUserId = $data['id_user'];
+                                            }
+
+                                            if ($loserIterator == $i) {
+                                                $loserUserId = $data['id_user'];
+                                            }
+
+                                            $i++;
+                                        }
+
+                                        $submitDataArray = array();
+                                        $submitDataArray['id_user_team1'] = $winnerUserId;
+                                        $submitDataArray['id_user_team2'] = $loserUserId;
+                                        $submitDataArray['round_number'] = 1;
+                                        $submitDataArray['team1_score'] = null;
+                                        $submitDataArray['team2_score'] = null;
+                                        $submitDataArray['team1_seed'] = $winnerIterator + 1;
+                                        $submitDataArray['team2_seed'] = $loserIterator + 1;
+                                        $submitDataArray['stage'] = 'semifinal';
+                                        $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
+
+                                        $submitDataArray['round_number'] = 2;
+                                        $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
+
+                                        $loserIterator--;
+                                    }
+                                }
+
+                                // set megaliga_user_data.reached_playin = 1 for teams that have reached playins
+                                $getAllUsers = $wpdb->get_results('SELECT ID FROM megaliga_user_data');
+
+                                //clear reached_playoff to 0 for all users
+                                foreach ($getAllUsers as $record) {
+                                    $submitDataArray = array();
+                                    $submitDataArray['reached_playoff'] = 0;
+                                    $where = array('ID' => $record->ID);
+                                    $wpdb->update('megaliga_user_data', $submitDataArray, $where);
+                                }
+
+                                // set reached_playoff for those users, who reached playoff
+                                for ($i = 0; $i < 4; $i++) {
+                                    $submitDataArray = array();
+                                    $submitDataArray['reached_playoff'] = 1;
+                                    $where = array('ID' => $winnersData[$i]['id_user']);
+                                    $wpdb->update('megaliga_user_data', $submitDataArray, $where);
+                                }
+
+                                echo "<div class='displayFlex marginTop20 marginBottom20 schedulePlayinGeneratorSuccess'>";
+                                echo "  Terminarz dla fazy playoff - półfinały wygenerowany poprawnie";
+                                echo "</div>";
+                            }
+
                             function drawSchedule($queryTeam1Result, $queryTeam2Result, $gameIdentificationData, $side, $round_number)
                             {
                                 $margin = $side == 'left' ? 'marginRight40' : '';
@@ -934,6 +1286,29 @@ do_action('hestia_before_single_page_wrapper');
 
                             //content of the megaliga page
                             the_content();
+
+                            //show button to generate schedule for playoff for semifinal stage only if user with ID == 14 (mbaginski) and round_number = 2
+                            if ($userId == 14 && $round_number == 2) {
+                                // get all records from megaliga_schedule_playoff to check if any score has already been added
+                                $getPlayOffScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playoff');
+
+                                $scoresAdded = false;
+                                foreach ($getPlayOffScores as $record) {
+                                    if ($record->team1_score > 0 || $record->team2_score > 0) {
+                                        $scoresAdded = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!$scoresAdded) {
+                                    echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
+                                    echo '  <form action="" method="post">';
+                                    echo '      <input type="submit" name="submitPlayOffSchedule" value="Generuj terminarz dla fazy play off">';
+                                    echo '  </form>';
+                                    echo '</div>';
+                                }
+                            }
+
                             echo '<div class="scheduleContainer">';
                             drawSchedule($getSchedule4PlayinTeam1, $getSchedule4PlayinTeam2, $getGames4Playin, 'left', $round_number);
 
