@@ -42,37 +42,33 @@ do_action('hestia_before_single_page_wrapper');
                             //custom code starts here
                             global $wpdb;
 
-                            function getStageData($stage, $type)
+                            function getStageData($leg1, $leg2, $type)
                             {
                                 global $wpdb;
 
-                                $returnData = array('team1Name' => '', 'team2Name' => '', 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalTeam1' => null, 'totalTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'noone');
+                                $returnData = array('team1Name' => '', 'team2Name' => '', 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalTeam1' => null, 'totalTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'none');
 
                                 //get team names of both users
-                                $getTeam1Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $stage->id_user_team1);
-                                $getTeam2Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url  FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $stage->id_user_team2);
+                                $getTeam1Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $leg1->id_user_team1);
+                                $getTeam2Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url  FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $leg1->id_user_team2);
 
                                 $returnData['team1Name'] = $getTeam1Name[0]->team_name;
                                 $returnData['team2Name'] = $getTeam2Name[0]->team_name;
 
-                                //get teams' score for both rounds
-                                $getScoreRound1 = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playoff WHERE id_schedule = ' . $stage->id_schedule_round1);
-                                $getScoreRound2 = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playoff WHERE id_schedule = ' . $stage->id_schedule_round2);
-
                                 //setting score for teams for  round 1 and 2
-                                $returnData['scoreTeam1Round1'] = $getScoreRound1[0]->team1_score;
-                                $returnData['scoreTeam2Round1'] = $getScoreRound1[0]->team2_score;
+                                $returnData['scoreTeam1Round1'] = $leg1->team1_score;
+                                $returnData['scoreTeam2Round1'] = $leg1->team2_score;
 
-                                $returnData['scoreTeam1Round2'] = $getScoreRound2[0]->team1_score;
-                                $returnData['scoreTeam2Round2'] = $getScoreRound2[0]->team2_score;
+                                $returnData['scoreTeam1Round2'] = $leg2->team1_score;
+                                $returnData['scoreTeam2Round2'] = $leg2->team2_score;
 
                                 //setting totalScore
                                 $returnData['totalScoreTeam1'] = $returnData['scoreTeam1Round1'] + $returnData['scoreTeam1Round2'];
                                 $returnData['totalScoreTeam2'] = $returnData['scoreTeam2Round1'] + $returnData['scoreTeam2Round2'];
 
                                 //setting seed number
-                                $returnData['seedNumberTeam1'] = $stage->seed_number_team1;
-                                $returnData['seedNumberTeam2'] = $stage->seed_number_team2;
+                                $returnData['seedNumberTeam1'] = $leg1->team1_seed;
+                                $returnData['seedNumberTeam2'] = $leg1->team2_seed;
 
                                 //setting winning team. Used to set special styling
                                 if ($returnData['scoreTeam1Round1'] != 0 && $returnData['scoreTeam1Round2'] != 0 && $returnData['scoreTeam2Round1'] != 0 && $returnData['scoreTeam2Round2'] != 0) {
@@ -192,7 +188,6 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</div>';
                             }
 
-
                             function drawLadder()
                             {
                                 global $wpdb;
@@ -200,13 +195,9 @@ do_action('hestia_before_single_page_wrapper');
                                 //get data for semifinal stage
                                 $semifinalData = array();
 
-                                $getSemifinalStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2, seed_number_team1, seed_number_team2 FROM megaliga_playoff_ladder WHERE stage = "semifinal"');
+                                $getSemifinalStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, round_number, stage, team1_score, team2_score, team1_seed, team2_seed FROM megaliga_schedule_playoff WHERE stage = "semifinal"');
 
-                                $i = 0;
-                                foreach ($getSemifinalStage as $stage) {
-                                    $semifinalData[$i] = getStageData($stage, 'semifinals');
-                                    $i++;
-                                }
+                                $semifinalData[0] = getStageData($getSemifinalStage[0], $getSemifinalStage[1],  'semifinals');
 
                                 //draw 1st semifinal stage
                                 echo '<div class="phaseContainer order-1">';
@@ -216,52 +207,52 @@ do_action('hestia_before_single_page_wrapper');
 
 
                                 //get data for final and 3rd place matchup stage
-                                $finalData = array();
-                                $thridPlaceData = array();
+                                // $finalData = array();
+                                // $thridPlaceData = array();
 
-                                $getfinalStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2, seed_number_team1, seed_number_team2 FROM megaliga_playoff_ladder WHERE stage = "final"');
+                                // $getfinalStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2, seed_number_team1, seed_number_team2 FROM megaliga_playoff_ladder WHERE stage = "final"');
 
-                                $getThirdPlaceStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2, seed_number_team1, seed_number_team2 FROM megaliga_playoff_ladder WHERE stage = "3rdplace"');
+                                // $getThirdPlaceStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2, seed_number_team1, seed_number_team2 FROM megaliga_playoff_ladder WHERE stage = "3rdplace"');
 
-                                $finalData = getStageData($getfinalStage[0], 'final');
-                                $thridPlaceData = getStageData($getThirdPlaceStage[0], '3rdpalce');
+                                // $finalData = getStageData($getfinalStage[0], 'final');
+                                // $thridPlaceData = getStageData($getThirdPlaceStage[0], '3rdpalce');
 
-                                //draw 2nd stage
-                                echo '<div class="phaseContainer order-3">';
+                                // //draw 2nd stage
+                                // echo '<div class="phaseContainer order-3">';
 
-                                //draw results
-                                //draw results only when winner of each matchup is complete
-                                if ($finalData['winner'] != 'noone' && $thridPlaceData['winner'] != 'noone') {
-                                    //get data
-                                    $winnerId = $finalData['winner'] == 'team1' ? $getfinalStage[0]->id_user_team1 : $getfinalStage[0]->id_user_team2;
+                                // //draw results
+                                // //draw results only when winner of each matchup is complete
+                                // if ($finalData['winner'] != 'none' && $thridPlaceData['winner'] != 'none') {
+                                //     //get data
+                                //     $winnerId = $finalData['winner'] == 'team1' ? $getfinalStage[0]->id_user_team1 : $getfinalStage[0]->id_user_team2;
 
-                                    $getWinnerData = $wpdb->get_results('SELECT logo_url FROM megaliga_user_data WHERE reached_playoff = 1 AND ID = ' . $winnerId);
+                                //     $getWinnerData = $wpdb->get_results('SELECT logo_url FROM megaliga_user_data WHERE reached_playoff = 1 AND ID = ' . $winnerId);
 
-                                    $winnerTeamNameKey = $finalData['winner'] . 'Name';
-                                    echo '<div class="order-3">';
-                                    echo '  <div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">mistrz megaligi</span></div>';
-                                    echo '  <div class="winnerContainer">';
-                                    echo '      <div class="winnerImgContainer displayFlex">';
-                                    echo '          <img class="winner" src="' . $getWinnerData[0]->logo_url . '" width="75px" height="75px">';
-                                    echo '      </div>';
-                                    echo '      <div class="winnerNameContainer displayFlex center">';
-                                    echo '        <span class="winnerName">' . $finalData[$winnerTeamNameKey] . '</span>';
-                                    echo '      </div>';
-                                    echo '  </div>';
-                                    echo '</div>';
-                                }
+                                //     $winnerTeamNameKey = $finalData['winner'] . 'Name';
+                                //     echo '<div class="order-3">';
+                                //     echo '  <div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">mistrz megaligi</span></div>';
+                                //     echo '  <div class="winnerContainer">';
+                                //     echo '      <div class="winnerImgContainer displayFlex">';
+                                //     echo '          <img class="winner" src="' . $getWinnerData[0]->logo_url . '" width="75px" height="75px">';
+                                //     echo '      </div>';
+                                //     echo '      <div class="winnerNameContainer displayFlex center">';
+                                //     echo '        <span class="winnerName">' . $finalData[$winnerTeamNameKey] . '</span>';
+                                //     echo '      </div>';
+                                //     echo '  </div>';
+                                //     echo '</div>';
+                                // }
 
-                                //draw final stage
-                                echo '  <div clas="order-1">';
-                                drawSecondStageMatchup($finalData, 'finał', '20');
-                                echo '  </div>';
-                                //draw 3rd place stage
-                                echo '  <div clas="order-2">';
-                                drawSecondStageMatchup($thridPlaceData, 'mecz o 3 miejsce', '40');
-                                echo '  </div>';
-                                echo '</div>';
+                                // //draw final stage
+                                // echo '  <div clas="order-1">';
+                                // drawSecondStageMatchup($finalData, 'finał', '20');
+                                // echo '  </div>';
+                                // //draw 3rd place stage
+                                // echo '  <div clas="order-2">';
+                                // drawSecondStageMatchup($thridPlaceData, 'mecz o 3 miejsce', '40');
+                                // echo '  </div>';
+                                // echo '</div>';
 
-
+                                $semifinalData[1] = getStageData($getSemifinalStage[2], $getSemifinalStage[3],  'semifinals');
 
                                 //draw 2nd semifinal stage
                                 echo '<div class="phaseContainer order-2">';
@@ -270,14 +261,10 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</div>';
                             }
 
-                            $getSchedulePlayoff = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, round_number FROM megaliga_schedule_playoff ORDER BY round_number');
-
-                            $getPlayoffLadderData = $wpdb->get_results('SELECT id_user_team1, id_user_team2, stage, id_schedule_round1, id_schedule_round2 FROM megaliga_playoff_ladder');
-
                             //content of the team page
                             echo '<div>';
                             echo '  <div class="playoffLadder displayFlex playoffLadderflexDirection">';
-                            drawLadder($getSchedulePlayoff);
+                            drawLadder();
                             echo '  </div>';
                             echo '</div>';
                             //custom code ends here
