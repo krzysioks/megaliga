@@ -1287,7 +1287,7 @@ do_action('hestia_before_single_page_wrapper');
                             //content of the megaliga page
                             the_content();
 
-                            //show button to generate schedule for playoff for semifinal stage only if user with ID == 14 (mbaginski) and round_number = 2
+                            //show button to generate schedule for playoff for semifinal stage only if user with ID == 14 (mbaginski) and round_number == 2
                             if ($userId == 14 && $round_number == 2) {
                                 // get all records from megaliga_schedule_playoff to check if any score has already been added
                                 $getPlayOffScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playoff');
@@ -1303,7 +1303,7 @@ do_action('hestia_before_single_page_wrapper');
                                 if (!$scoresAdded) {
                                     echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
                                     echo '  <form action="" method="post">';
-                                    echo '      <input type="submit" name="submitPlayOffSchedule" value="Generuj terminarz dla fazy play off">';
+                                    echo '      <input type="submit" name="submitPlayOffSchedule" value="Generuj terminarz dla fazy play off (półfinał)">';
                                     echo '  </form>';
                                     echo '</div>';
                                 }
