@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.296
+Version: 0.299
 */
 
 :root {
@@ -15,6 +15,10 @@ Version: 0.296
     --megaliga--disabled-color: #d1d1d1;
     --megaliga--success: #66c847;
 
+}
+
+ul {
+    padding-inline-start: 0px !important;
 }
 
 @media all and (max-width: 1440px) {

@@ -505,7 +505,7 @@ do_action('hestia_before_single_page_wrapper');
                                     }
                                 }
 
-                                // set megaliga_user_data.reached_playin = 1 for teams that have reached playins
+                                // set megaliga_user_data.reached_playoff = 1 for teams that have reached playins
                                 $getAllUsers = $wpdb->get_results('SELECT ID FROM megaliga_user_data');
 
                                 //clear reached_playoff to 0 for all users

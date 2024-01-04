@@ -133,13 +133,18 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
     -   2D : 2G
     -   3D : 1G
 
-    Administrator ligi w zakładce `megaliga->kolejka 14` będzie miał dostępny guzik `Generuj terminarz dla fazy play in`, który automatycznie przygotuje terminarz dla tej fazy rozgrywek.
+    Administrator ligi w zakładce `wyniki->megaliga->kolejka 14` będzie miał dostępny guzik `Generuj terminarz dla fazy play in`, który automatycznie przygotuje terminarz dla tej fazy rozgrywek.
 
     Guzik ten dostępny jest dopóki nie zostanie zapisany przynajmniej jeden wynik meczu jakiejkolwiek z trzech par.
 
 20. Przygotowanie fazy playoff
 
--   w tabeli megaliga_user_data oznacz drużyny, które awansowały do fazy playoff poprzez ustawienie wartości 1 w polu „reached_playoff”
+    Do fazy playoff awansuje 3 zwycięzców dwumeczów z fazy playin oraz lucky loser, który zdobył największą liczbę punktów spośród tych, którzy przegrali w fazie playin
+
+    Administrator ligi w zakładce `wyniki->playins->kolejka 2` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (półfinał)`, który automatycznie przygotuje terminarz dla fazy półfinałowej wraz z oznaczeniem w tabeli megaliga_user_data drużyn które osiągnęły faze playoff.
+
+    Po zakończonych półfinałach, administrator ligi w zakładce `wyniki->playoffs->kolejka 2` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (finał)`, który automatycznie przygotuje terminarz dla fazy finałowej i meczu o 3 miejsce.
+
 -   dokonaj konfiguracji draftu w tabeli megaliga_draft_data
     a) playoff_draft_window_open = 1 – udostepnij formularz do draftowania zawodnikow; 0 – ukryj formularz draftu
     b) playoff_draft_credit_enabled = 1 – draft uwzględnia wartość zawodników i dostępny kredyt gracza. W formularzu draftu, na liście wyboru zawodników pojawią się tylko Ci zawodnicy, na których stać będzie danego gracza; 0 – draft nie uwzglednia wartości zawodników (wartość domyślna)
@@ -147,36 +152,6 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 -   po zakończonym drafcie ustawiamy w tabeli megaliga_draft_data pole playoff_draft_window_open na wartość 0 (ukrycie formularza).
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
-
-20. Wprowadź rozpiskę meczy dla fazy playoff w tabeli megaliga_schedule_playoff
-
--   należy pamiętać, że id gracza zapisane w polu np.: id_user_team1 dla rundy 1 musi być również zapisane w tym samym polu dla rundy 2.
--   tabele uzupełnia się na bierząco. Najpierw dla fazy półfinałowej mecze 1 i 2 rundy, potem, gdy znane będą pary finałowe i meczu o 3 miejsce, wprowadzamy kolejne mecze.
-
-Przykład:
-id_schedule id_user_team1 id_user_team2 round_number team1_score team2_score
-1, 10, 12, 1, NULL, NULL
-2, 10, 12, 2, NULL, NULL
-
-21. Uzupełnij tabele megaliga_playoff_ladder w celu wyświeltenia danych w zakładce tabela->play-off
-
--   każdy rekord tej tabeli opisuje pare drużyn grających ze sobą w danej fazie playoff:
-    a) półfinał (semifinal)
-    b) finał (final)
-    c) mecz o 3 miejsce (3rdplace)
--   w każdej fazie playoff rozgrywane są 2 rundy
--   tabele uzupełnia się na bierząco w trakcie trwania playoff (nie znane są pary finałowe i meczu o 3 miejsce po zakończeniu rundy zasadniczej)
--   w fazie półfinałowej pary tworzy się na podstawie miejsca zajętego przez drużyny w sezonie zasadniczym:
-    a) 1 z 4 i 2 z 3
-
-22. Przykład uzupełnienia tabeli megaliga_playoff_ladder
-    id_playoff_ladder id_user_team1 id_user_team2 stage id_schedule_round1 id_schedule_round2 seed_number_team1 seed_number_team2
-    1, 10, 12, semifinal, 1, 2, 1, 4
-
--   id_user_team1/2 – ta sama wartość id gracza jak zapisana w tabeli megaliga_schedule_playoff
--   stage – semifinal|final|3rdplace
--   id_schedule_round1/2 – id_schedule z tabeli megaliga_schedule_playoff wskazujący na rekord reprezentujący mecz dla rundy odpowiednio 1/2 dla tej pary w danej fazie playoff
--   seed_number_team1/2 miejsce jakie dana drużyna zajmowała po zakończeniu sezonu zasadniczego (tzw. numer rozstawienia)
 
 Tests:
 

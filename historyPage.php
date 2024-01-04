@@ -130,7 +130,6 @@ do_action('hestia_before_single_page_wrapper');
                                     drawStandings($playinStandings, 'none', '', false);
                                     echo '</div>';
                                 }
-                                echo '</div>';
 
                                 //get playoff data
                                 $playoffStandings = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND table_type = "playoff" ORDER BY place');
@@ -144,10 +143,8 @@ do_action('hestia_before_single_page_wrapper');
                                     drawStandings($playoffStandings, 'none', '', true);
                                     echo '</div>';
                                 }
-                                echo '</div>';
                             }
 
-                            echo '</div>';
                             //custom code ends here
 
                             echo apply_filters('hestia_filter_blog_social_icons', '');

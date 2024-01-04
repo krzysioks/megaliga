@@ -147,7 +147,7 @@ do_action('hestia_before_single_page_wrapper');
                                     if (count($getPlayoffRoster) != 0) {
                                         echo '  <div class="teamRosterTeamPageContainer">';
                                         echo '      <span class="teamOverviewRosterLabel">skład playoffs:</span>';
-                                        echo '          <ul>';
+                                        echo '          <ul class="noDecoration">';
 
                                         foreach ($getPlayoffRoster as $rosterField) {
                                             echo '          <li><span class="teamOverviewRosterPlayerName">' . $rosterField->ekstraliga_player_name . '</span></li>';
