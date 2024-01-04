@@ -222,8 +222,8 @@ do_action('hestia_before_single_page_wrapper');
                                 $semifinalData[0] = getStageData($getSemifinalStage[0], $getSemifinalStage[1]);
                                 $semifinalData[1] = getStageData($getSemifinalStage[2], $getSemifinalStage[3]);
 
-                                $checkIf3rdPlaceRecordsExists = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE stage = "3rdplace"');
-                                $checkIfFinalRecordsExists = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE stage = "final"');
+                                $checkIf3rdPlaceRecordsExists = $wpdb->get_results('SELECT id_schedule, round_number FROM megaliga_schedule_playoff WHERE stage = "3rdplace"');
+                                $checkIfFinalRecordsExists = $wpdb->get_results('SELECT id_schedule, round_number FROM megaliga_schedule_playoff WHERE stage = "final"');
 
                                 if (count($checkIf3rdPlaceRecordsExists) > 0) {
                                     foreach ($checkIf3rdPlaceRecordsExists as $record) {
