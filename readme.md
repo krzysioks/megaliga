@@ -153,6 +153,10 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
 
+21. Przygotowanie Grand Prix
+
+-   Uzupełnij tabelę `megaliga_grandprix_bet_status` 10 kolejkami i ustaw wrtość `is_open` == 1
+
 Tests:
 
 1. set dolce teams
