@@ -46,6 +46,7 @@ do_action('hestia_before_single_page_wrapper');
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
                             // $userId = 14;
+                            // $userId = 20;
 
                             //handling submision of form's status
                             if ($_POST['submitFormStatus']) {
@@ -97,9 +98,45 @@ do_action('hestia_before_single_page_wrapper');
                                 // echo '</form>';
                             }
 
-                            function drawPLayerBetForm($queryResult, $userId, $isOpen)
+                            function drawPlayerBetForm($playersResult, $userId, $isOpen, $round_number)
                             {
-                                echo "form";
+                                global $wpdb;
+
+                                echo '<div class="gpPlayersWrapper">';
+                                echo '  <form action="" method="post">';
+
+                                foreach ($playersResult as $player) {
+                                    //get position that user bet for given player
+                                    $fieldName = $player->field_name;
+                                    $getBetPositionQuery = $wpdb->get_results('SELECT ' . $fieldName . ' as "betPosition" FROM megaliga_grandprix_bets WHERE ID=' . $userId . ' AND round_number = ' . $round_number);
+
+                                    $betPosition = count($getBetPositionQuery) > 0 ? $getBetPositionQuery[0]->betPosition : '';
+
+                                    echo '<div class="gpPlayerWrapper">';
+                                    echo '  <div class="gpPlayerRow">';
+                                    echo '      <div class="playerImageWrapper>';
+                                    echo '      </div>';
+                                    echo '      <div class="playerBetPosition>';
+                                    echo '      </div>';
+                                    echo '  </div>';
+                                    echo '  <div class="row2">';
+                                    echo '      <div class="playerTitleWrapper">';
+                                    echo '          <a class="playerNameLink"> </a>';
+                                    echo '      </div>';
+                                    echo '      <div class="playerNationality">';
+                                    echo '      </div>';
+                                    echo '  </div>';
+                                    echo '</div>';
+
+                                    // print_r($getBetPositionQuery);
+
+                                    // echo '$betPosition: ' . $betPosition;
+
+                                    // echo '<br/>';
+                                }
+
+                                echo '  </form>';
+                                echo '</div>';
                             }
 
                             //check if bet form is enabled (this option prevent from resubmission of betting player final position in the given round by user after position of players in real Grand Prix for given round has been announced)
@@ -124,7 +161,7 @@ do_action('hestia_before_single_page_wrapper');
                                 }
                             }
 
-                            drawPlayerBetForm($getPlayersQuery, $userId, $isFormEnabled[0]->is_open);
+                            drawPlayerBetForm($getPlayersQuery, $userId, $isFormEnabled[0]->is_open, $round_number);
 
                             echo "</div>";
 
