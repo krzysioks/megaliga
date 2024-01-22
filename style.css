@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.299
+Version: 0.301
 */
 
 :root {
@@ -1090,6 +1090,37 @@ div.individualCommentsContainer > p {
 
 .luckyLooser {
     color: var(--megaliga--disabled-color);
+}
+
+.gpPlayerWrapper {
+    display: grid;
+    grid-template-areas: "playerImage betPosTitle betPos"
+    "playerTitle playerTitle playerNationality";
+}
+
+.playerImageWrapper {
+    grid-area: playerImage;
+}
+
+.playerBetPositionTitleWrapper {
+    grid-area: betPosTitle;
+}
+
+.playerBetPositionLabel {
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.playerBetPosition {
+    grid-area: betPos;
+}
+
+.playerTitleWrapper {
+    grid-area: playerTitle;
+}
+
+.playerNationality {
+    grid-area: playerNationality;
 }
 
 /* Overrides of parent theme rules */

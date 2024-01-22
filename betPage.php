@@ -102,29 +102,72 @@ do_action('hestia_before_single_page_wrapper');
                             {
                                 global $wpdb;
 
+                                //defining if bet form should be on
+                                $isUserMegaligaMemberQuery = $wpdb->get_results('SELECT user_data_id FROM megaliga_user_data WHERE ID = ' . $userId);
+
+                                $isForm = $userId != 0 && count($isUserMegaligaMemberQuery) == 1 && $isOpen && is_user_logged_in();
+
                                 echo '<div class="gpPlayersWrapper">';
-                                echo '  <form action="" method="post">';
+
+                                if ($isForm) {
+                                    echo '  <form action="" method="post">';
+                                }
+
+                                /*     ?>*/
+                                //     <script>
+                                //         function clearSpinner(spinnerId, checkboxId) {
+                                //             if (!document.getElementById(checkboxId).checked) {
+                                //                 document.getElementById(spinnerId).value = '';
+                                //             }
+                                //         }
+
+                                //         function handleNumberInputOnChange(spinnerId, checkboxId) {
+                                //             var spinner = document.getElementById(spinnerId);
+                                //             document.getElementById(checkboxId).checked = spinner.value > 0;
+                                //             if (spinner.value === '0') {
+                                //                 spinner.value = '';
+                                //             }
+                                //         }
+                                //     </script>
+                                /* <?php*/
 
                                 foreach ($playersResult as $player) {
+                                    // print_r($player);
+                                    // echo $player->bio_url;
+                                    echo '<br>';
+                                    echo '<br>';
+
+                                    // ( [player_name] => Bartosz Zmarzlik [photo_url] => https://megaliga.eu/wp-content/uploads/2024/01/zmarzlik_grand_prix.png [flag_url] => https://megaliga.eu/wp-content/uploads/2024/01/poland-flag.png [bio_url] => https://ekstraliga.pl/zawodnik/97)
+
                                     //get position that user bet for given player
                                     $fieldName = $player->field_name;
                                     $getBetPositionQuery = $wpdb->get_results('SELECT ' . $fieldName . ' as "betPosition" FROM megaliga_grandprix_bets WHERE ID=' . $userId . ' AND round_number = ' . $round_number);
 
+
+
                                     $betPosition = count($getBetPositionQuery) > 0 ? $getBetPositionQuery[0]->betPosition : '';
 
                                     echo '<div class="gpPlayerWrapper">';
-                                    echo '  <div class="gpPlayerRow">';
-                                    echo '      <div class="playerImageWrapper>';
-                                    echo '      </div>';
-                                    echo '      <div class="playerBetPosition>';
-                                    echo '      </div>';
+                                    // TODO KP no cursor pointer over image link. Link data are escaped
+                                    echo '  <div class="playerImageWrapper pointer">';
+                                    echo '    <a href="' . htmlspecialchars($player->bio_url) . '">';
+                                    echo '      <img src="' . $player->photo_url . '" />';
+                                    echo '    </a>';
                                     echo '  </div>';
-                                    echo '  <div class="row2">';
-                                    echo '      <div class="playerTitleWrapper">';
-                                    echo '          <a class="playerNameLink"> </a>';
-                                    echo '      </div>';
-                                    echo '      <div class="playerNationality">';
-                                    echo '      </div>';
+
+                                    if ($isForm) {
+                                        echo '  <div class="playerBetPositionTitleWrapper>';
+                                        echo '    <span class="playerBetPositionLabel">Miejsce:</span>';
+                                        echo '  </div>';
+                                        echo '  <div class="playerBetPosition>';
+                                        echo '<input type="number" class="spinner" name="betPos' . $fieldName . '" id="betPos' . $fieldName . '" min="1" max="16" value="' . $betPosition . '">';
+                                        echo '  </div>';
+                                    }
+                                    // TODO KP continue on enriching rest of player presenation
+                                    echo '  <div class="playerTitleWrapper">';
+                                    echo '    <a class="playerNameLink"> </a>';
+                                    echo '  </div>';
+                                    echo '  <div class="playerNationality">';
                                     echo '  </div>';
                                     echo '</div>';
 
@@ -135,7 +178,10 @@ do_action('hestia_before_single_page_wrapper');
                                     // echo '<br/>';
                                 }
 
-                                echo '  </form>';
+                                if ($isForm) {
+                                    echo '  </form>';
+                                }
+
                                 echo '</div>';
                             }
 
