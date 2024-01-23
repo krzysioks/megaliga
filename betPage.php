@@ -48,6 +48,11 @@ do_action('hestia_before_single_page_wrapper');
                             // $userId = 14;
                             // $userId = 20;
 
+                            // TODO KP implement submit logic with validation of fields (if all provided and are not repeating) + checking if to INSERT or UPDATE record
+                            if ($_POST['submitBet']) {
+                                // echo 'test: ' . $_POST['betPosplayer_1'];
+                            }
+
                             //handling submision of form's status
                             if ($_POST['submitFormStatus']) {
                                 $submitDataArray = array();
@@ -113,42 +118,14 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  <form action="" method="post">';
                                 }
 
-                                /*     ?>*/
-                                //     <script>
-                                //         function clearSpinner(spinnerId, checkboxId) {
-                                //             if (!document.getElementById(checkboxId).checked) {
-                                //                 document.getElementById(spinnerId).value = '';
-                                //             }
-                                //         }
-
-                                //         function handleNumberInputOnChange(spinnerId, checkboxId) {
-                                //             var spinner = document.getElementById(spinnerId);
-                                //             document.getElementById(checkboxId).checked = spinner.value > 0;
-                                //             if (spinner.value === '0') {
-                                //                 spinner.value = '';
-                                //             }
-                                //         }
-                                //     </script>
-                                /* <?php*/
-
                                 foreach ($playersResult as $player) {
-                                    // print_r($player);
-                                    // echo $player->bio_url;
-                                    echo '<br>';
-                                    echo '<br>';
-
-                                    // ( [player_name] => Bartosz Zmarzlik [photo_url] => https://megaliga.eu/wp-content/uploads/2024/01/zmarzlik_grand_prix.png [flag_url] => https://megaliga.eu/wp-content/uploads/2024/01/poland-flag.png [bio_url] => https://ekstraliga.pl/zawodnik/97)
-
                                     //get position that user bet for given player
                                     $fieldName = $player->field_name;
                                     $getBetPositionQuery = $wpdb->get_results('SELECT ' . $fieldName . ' as "betPosition" FROM megaliga_grandprix_bets WHERE ID=' . $userId . ' AND round_number = ' . $round_number);
 
-
-
                                     $betPosition = count($getBetPositionQuery) > 0 ? $getBetPositionQuery[0]->betPosition : '';
 
                                     echo '<div class="gpPlayerWrapper">';
-                                    // TODO KP no cursor pointer over image link. Link data are escaped
                                     echo '  <div class="playerImageWrapper pointer">';
                                     echo '    <a href="' . htmlspecialchars($player->bio_url) . '">';
                                     echo '      <img src="' . $player->photo_url . '" />';
@@ -156,29 +133,25 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  </div>';
 
                                     if ($isForm) {
-                                        echo '  <div class="playerBetPositionTitleWrapper>';
+                                        echo '  <div class="playerBetPositionTitleWrapper">';
                                         echo '    <span class="playerBetPositionLabel">Miejsce:</span>';
                                         echo '  </div>';
-                                        echo '  <div class="playerBetPosition>';
+                                        echo '  <div class="playerBetPosition">';
                                         echo '<input type="number" class="spinner" name="betPos' . $fieldName . '" id="betPos' . $fieldName . '" min="1" max="16" value="' . $betPosition . '">';
                                         echo '  </div>';
                                     }
-                                    // TODO KP continue on enriching rest of player presenation
+
                                     echo '  <div class="playerTitleWrapper">';
-                                    echo '    <a class="playerNameLink"> </a>';
+                                    echo '    <a class="playerNameLink" href="' . htmlspecialchars($player->bio_url) . '">' . $player->player_name . '</a>';
                                     echo '  </div>';
                                     echo '  <div class="playerNationality">';
+                                    echo '      <img src="' . $player->flag_url . '" />';
                                     echo '  </div>';
                                     echo '</div>';
-
-                                    // print_r($getBetPositionQuery);
-
-                                    // echo '$betPosition: ' . $betPosition;
-
-                                    // echo '<br/>';
                                 }
 
                                 if ($isForm) {
+                                    echo '    <input type="submit" name="submitBet" value="Typuj">';
                                     echo '  </form>';
                                 }
 
