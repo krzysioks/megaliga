@@ -46,11 +46,50 @@ do_action('hestia_before_single_page_wrapper');
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
                             // $userId = 14;
-                            // $userId = 20;
+                            $userId = 20;
 
-                            // TODO KP implement submit logic with validation of fields (if all provided and are not repeating) + checking if to INSERT or UPDATE record
                             if ($_POST['submitBet']) {
-                                // echo 'test: ' . $_POST['betPosplayer_1'];
+                                $betValueList = array();
+                                $isEmpty = false;
+                                for ($i = 1; $i <= 16; $i++) {
+                                    $value =  $_POST['betPosplayer_' . $i];
+
+                                    if (!$value) {
+                                        $isEmpty = true;
+                                    }
+
+                                    array_push($betValueList, $value);
+                                }
+
+                                $uniqueValueList = array_unique($betValueList);
+
+                                //case if form invalidated
+                                if ($isEmpty || count($uniqueValueList) != 16) {
+                                    echo "<div class='displayFlex marginTop20 marginBottom20 messageError'>";
+                                    echo "Nie wytypowałeś wszystkich zawodników lub to samo miejsce podałeś wielokrotnie. Spróbuj jeszcze raz";
+                                    echo "</div>";
+                                    // case when all data provided correctly
+                                } else {
+                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $userId);
+                                    $submitDataArray = array();
+                                    $submitDataArray['ID'] = $userId;
+                                    $i = 1;
+                                    foreach ($uniqueValueList as $value) {
+                                        $submitDataArray['player_' . $i] = $value;
+                                        $i++;
+                                    }
+
+                                    if (count($checkIfRecordsExists) > 0) {
+                                        $where = array('id_bet' => $checkIfRecordsExists[0]->id_bet);
+                                        $wpdb->update('megaliga_grandprix_bets', $submitDataArray, $where);
+                                    } else {
+                                        $wpdb->insert('megaliga_grandprix_bets', $submitDataArray);
+                                    }
+
+                                    echo "<div class='displayFlex marginTop20 marginBottom20 schedulePlayinGeneratorSuccess'>";
+                                    echo "Wyniki wytypowane poprawnie";
+                                    echo "</div>";
+                                }
                             }
 
                             //handling submision of form's status
@@ -125,10 +164,15 @@ do_action('hestia_before_single_page_wrapper');
 
                                     $betPosition = count($getBetPositionQuery) > 0 ? $getBetPositionQuery[0]->betPosition : '';
 
+                                    // in case submit form was triggered show values typed in. This is usefull to keep user's selection if form was invalidated
+                                    if ($_POST['submitBet']) {
+                                        $betPosition = $_POST['betPos' . $fieldName];
+                                    }
+                                    // TODO KP add styles for players presentation
                                     echo '<div class="gpPlayerWrapper">';
                                     echo '  <div class="playerImageWrapper pointer">';
                                     echo '    <a href="' . htmlspecialchars($player->bio_url) . '">';
-                                    echo '      <img src="' . $player->photo_url . '" />';
+                                    echo '      <img src="' . $player->photo_url . '" width="250px" height="162px" />';
                                     echo '    </a>';
                                     echo '  </div>';
 
@@ -150,6 +194,7 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '</div>';
                                 }
 
+                                // TODO KP place submit button as fixed to the bottom on mobile
                                 if ($isForm) {
                                     echo '    <input type="submit" name="submitBet" value="Typuj">';
                                     echo '  </form>';
