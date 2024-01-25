@@ -46,7 +46,7 @@ do_action('hestia_before_single_page_wrapper');
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
                             // $userId = 14;
-                            $userId = 20;
+                            // $userId = 20;
 
                             if ($_POST['submitBet']) {
                                 $betValueList = array();
@@ -111,7 +111,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '  </div>';
                                 echo '</form>';
                             }
-
+                            // TODO KP implement emergency form for admins
                             function emergencyBetSelectionForm($selectedValue)
                             {
                                 echo '<div>emergencyBetSelectionForm</div>';
@@ -151,12 +151,13 @@ do_action('hestia_before_single_page_wrapper');
 
                                 $isForm = $userId != 0 && count($isUserMegaligaMemberQuery) == 1 && $isOpen && is_user_logged_in();
 
-                                echo '<div class="gpPlayersWrapper">';
-
                                 if ($isForm) {
-                                    echo '  <form action="" method="post">';
+                                    echo '<form action="" method="post">';
                                 }
 
+                                echo '  <div class="gpPlayersWrapper">';
+
+                                $i = 0;
                                 foreach ($playersResult as $player) {
                                     //get position that user bet for given player
                                     $fieldName = $player->field_name;
@@ -168,8 +169,11 @@ do_action('hestia_before_single_page_wrapper');
                                     if ($_POST['submitBet']) {
                                         $betPosition = $_POST['betPos' . $fieldName];
                                     }
-                                    // TODO KP add styles for players presentation
-                                    echo '<div class="gpPlayerWrapper">';
+
+                                    $playerGridPos = $i % 2 == 0 ? 'gpBetPosLeft' : 'gpBetPosRight';
+
+                                    echo '<div class="gpPlayerWrapper ' . $playerGridPos . '">';
+                                    echo '<div class="gpPlayerBorder"></div>';
                                     echo '  <div class="playerImageWrapper pointer">';
                                     echo '    <a href="' . htmlspecialchars($player->bio_url) . '">';
                                     echo '      <img src="' . $player->photo_url . '" width="250px" height="162px" />';
@@ -180,8 +184,8 @@ do_action('hestia_before_single_page_wrapper');
                                         echo '  <div class="playerBetPositionTitleWrapper">';
                                         echo '    <span class="playerBetPositionLabel">Miejsce:</span>';
                                         echo '  </div>';
-                                        echo '  <div class="playerBetPosition">';
-                                        echo '<input type="number" class="spinner" name="betPos' . $fieldName . '" id="betPos' . $fieldName . '" min="1" max="16" value="' . $betPosition . '">';
+                                        echo '  <div class="playerBetPositionWrapper">';
+                                        echo '<input type="number" class="spinner gpSpinner" name="betPos' . $fieldName . '" id="betPos' . $fieldName . '" min="1" max="16" value="' . $betPosition . '">';
                                         echo '  </div>';
                                     }
 
@@ -189,18 +193,28 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '    <a class="playerNameLink" href="' . htmlspecialchars($player->bio_url) . '">' . $player->player_name . '</a>';
                                     echo '  </div>';
                                     echo '  <div class="playerNationality">';
-                                    echo '      <img src="' . $player->flag_url . '" />';
+
+                                    if ($player->flag_url) {
+                                        echo '      <img class="playerFlagImg" src="' . $player->flag_url . '" width="53px" height="40px" />';
+                                    }
+
                                     echo '  </div>';
+                                    echo '</div>';
+
+                                    $i++;
+                                }
+
+                                if ($isForm) {
+                                    echo '<div class="gpBetSubmitButtonWrapper">';
+                                    echo '    <input type="submit" name="submitBet" value="Typuj">';
                                     echo '</div>';
                                 }
 
-                                // TODO KP place submit button as fixed to the bottom on mobile
-                                if ($isForm) {
-                                    echo '    <input type="submit" name="submitBet" value="Typuj">';
-                                    echo '  </form>';
-                                }
+                                echo '  </div>';
 
-                                echo '</div>';
+                                if ($isForm) {
+                                    echo '</form>';
+                                }
                             }
 
                             //check if bet form is enabled (this option prevent from resubmission of betting player final position in the given round by user after position of players in real Grand Prix for given round has been announced)
