@@ -65,14 +65,15 @@ do_action('hestia_before_single_page_wrapper');
 
                                 //case if form invalidated
                                 if ($isEmpty || count($uniqueValueList) != 16) {
-                                    echo "<div class='displayFlex marginTop20 marginBottom20 messageError'>";
+                                    echo "<div class='displayFlex marginTop20 marginBottom20 messageError gpEmergencyForm'>";
                                     echo "Nie wytypowałeś wszystkich zawodników lub to samo miejsce podałeś wielokrotnie. Spróbuj jeszcze raz";
                                     echo "</div>";
                                     // case when all data provided correctly
                                 } else {
-                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $userId);
+                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $_POST['userId']);
                                     $submitDataArray = array();
-                                    $submitDataArray['ID'] = $userId;
+                                    $submitDataArray['round_number'] = $round_number;
+                                    $submitDataArray['ID'] = $_POST['userId'];
                                     $i = 1;
                                     foreach ($uniqueValueList as $value) {
                                         $submitDataArray['player_' . $i] = $value;
@@ -86,7 +87,7 @@ do_action('hestia_before_single_page_wrapper');
                                         $wpdb->insert('megaliga_grandprix_bets', $submitDataArray);
                                     }
 
-                                    echo "<div class='displayFlex marginTop20 marginBottom20 schedulePlayinGeneratorSuccess'>";
+                                    echo "<div class='displayFlex marginTop20 marginBottom20 schedulePlayinGeneratorSuccess gpEmergencyForm'>";
                                     echo "Wyniki wytypowane poprawnie";
                                     echo "</div>";
                                 }
@@ -105,41 +106,40 @@ do_action('hestia_before_single_page_wrapper');
                                 $buttonTitle = $isFormEnabled[0]->is_open ? 'Zablokuj typowanie wyników' : 'Odblokuj typowanie wyników';
 
                                 echo '<form action="" method="post">';
-                                echo '  <div class="marginLeft1em marginBottom20">';
+                                echo '  <div class="marginBottom20 gpToggleFormStatus">';
                                 echo '      <input type="submit" name="submitFormStatus" value="' . $buttonTitle . '">';
                                 echo '      <input type="hidden" name="is_open" value="' . !$isFormEnabled[0]->is_open . '">';
                                 echo '  </div>';
                                 echo '</form>';
                             }
-                            // TODO KP implement emergency form for admins
+
                             function emergencyBetSelectionForm($selectedValue)
                             {
-                                echo '<div>emergencyBetSelectionForm</div>';
-                                // global $wpdb;
-                                // $getTeams = $wpdb->get_results('SELECT megaliga_team_names.name, megaliga_user_data.ID FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id');
+                                global $wpdb;
+                                $getTeams = $wpdb->get_results('SELECT wp_users.user_login, megaliga_user_data.ID FROM wp_users, megaliga_user_data WHERE wp_users.ID = megaliga_user_data.ID');
 
-                                // echo '<form action="" method="post">';
-                                // echo '<div class="rosterContainer teamContainerDimentions">';
-                                // echo '  <div>';
-                                // echo '      <span class="emergencyTeamSelectionTitle">Formularz awaryjnego przydziału składu</span>';
-                                // echo '  </div>';
-                                // echo '  <div class="displayFlex flexDirectionColumn marginTop20">';
-                                // echo '      <div><span class="teamOverviewLabel">Drużyna:</span></div>';
-                                // echo '            <select class="teamSelect" name="team" id="selectTeam">';
-                                // foreach ($getTeams as $option) {
-                                //     if ($selectedValue == $option->ID) {
-                                //         echo '            <option selected value="' . $option->ID . '">' . $option->name . '</option>';
-                                //     } else {
-                                //         echo '            <option value="' . $option->ID . '">' . $option->name . '</option>';
-                                //     }
-                                // }
-                                // echo '            </select>';
-                                // echo '  </div>';
-                                // echo '  <div class="submitEmergencyTeamSelectionContainer">';
-                                // echo '      <input type="submit" name="submitEmergencyTeamSelection" value="Wybierz">';
-                                // echo '  </div>';
-                                // echo '</div>';
-                                // echo '</form>';
+                                echo '<form action="" method="post">';
+                                echo '<div class="rosterContainer gpEmergencyForm">';
+                                echo '  <div>';
+                                echo '      <span class="emergencyTeamSelectionTitle">Formularz awaryjnego typowania</span>';
+                                echo '  </div>';
+                                echo '  <div class="displayFlex flexDirectionColumn marginTop20">';
+                                echo '      <div><span class="teamOverviewLabel">Trener:</span></div>';
+                                echo '            <select class="trainerSelect" name="trainer" id="trainerSelect">';
+                                foreach ($getTeams as $option) {
+                                    if ($selectedValue == $option->ID) {
+                                        echo '            <option selected value="' . $option->ID . '">' . $option->user_login . '</option>';
+                                    } else {
+                                        echo '            <option value="' . $option->ID . '">' . $option->user_login . '</option>';
+                                    }
+                                }
+                                echo '            </select>';
+                                echo '  </div>';
+                                echo '  <div class="submitEmergencyTeamSelectionContainer">';
+                                echo '      <input type="submit" name="submitEmergencyTrainerSelection" value="Wybierz">';
+                                echo '  </div>';
+                                echo '</div>';
+                                echo '</form>';
                             }
 
                             function drawPlayerBetForm($playersResult, $userId, $isOpen, $round_number)
@@ -207,6 +207,7 @@ do_action('hestia_before_single_page_wrapper');
                                 if ($isForm) {
                                     echo '<div class="gpBetSubmitButtonWrapper">';
                                     echo '    <input type="submit" name="submitBet" value="Typuj">';
+                                    echo '    <input type="hidden" name="userId" value="' . $userId . '">';
                                     echo '</div>';
                                 }
 
@@ -217,11 +218,18 @@ do_action('hestia_before_single_page_wrapper');
                                 }
                             }
 
+                            // player data
+                            $getPlayersQuery = $wpdb->get_results('SELECT player_name, photo_url, flag_url, bio_url, field_name FROM megaliga_grandprix_players');
+
                             //check if bet form is enabled (this option prevent from resubmission of betting player final position in the given round by user after position of players in real Grand Prix for given round has been announced)
                             $isFormEnabled = $wpdb->get_results('SELECT is_open FROM megaliga_grandprix_bet_status WHERE round_number = ' . $round_number);
 
-                            // player data
-                            $getPlayersQuery = $wpdb->get_results('SELECT player_name, photo_url, flag_url, bio_url, field_name FROM megaliga_grandprix_players');
+                            if ($_POST['submitEmergencyTrainerSelection']) {
+                                echo '<div class="rosterContainer teamContainerDimentions">';
+                                emergencyBetSelectionForm($_POST['trainer']);
+                                drawPlayerBetForm($getPlayersQuery, $_POST['trainer'], $isFormEnabled[0]->is_open, $round_number);
+                                echo '</div>';
+                            }
 
                             echo "<div>";
 
@@ -231,7 +239,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</div>';
                             }
 
-                            if ($userId == 14) {
+                            if ($userId == 14 && !$_POST['submitEmergencyTrainerSelection']) {
                                 drawToggleFormStatusButton($isFormEnabled);
                                 //draw emergencyBetSelectionForm form if user is admin and betting has not already been set    
                                 if (!isset($_POST['submitEmergencyBetSelection'])) {
@@ -273,7 +281,7 @@ do_action('hestia_before_single_page_wrapper');
     <script type="text/javascript">
         (function() {
             var title = document.querySelector('#primary > div.container > div > div > h1');
-            title.innerHTML = 'megaliga - ' + title.innerHTML;
+            title.innerHTML = 'Grand Prix - ' + title.innerHTML;
         })();
     </script>
     <?php get_footer(); ?>

@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.307
+Version: 0.309
 */
 
 :root {
@@ -1198,6 +1198,18 @@ div.individualCommentsContainer > p {
     transform: skewX(0deg);
 }
 
+.gpEmergencyForm {
+    margin: 0 30px 0 30px;
+}
+
+.gpToggleFormStatus {
+    margin-left: 30px;
+}
+
+.playerNameLink:hover {
+    color: white;
+}
+
 @media all and (max-width: 1200px) {
     .gpPlayerWrapper {
         display: grid;
@@ -1224,6 +1236,14 @@ div.individualCommentsContainer > p {
         transform: skewX(-30deg);
         height: 30px;
         box-shadow: 0px 0px 5px rgba(200, 200, 200, 0.5);
+    }
+
+    .gpEmergencyForm {
+        margin: 0 0.5em 0 0.5em;
+    }
+
+    .gpToggleFormStatus {
+        margin-left: 0.5em;
     }
 }
 
@@ -1274,6 +1294,14 @@ div.individualCommentsContainer > p {
     .gpBetSubmitButtonWrapper input {
         margin: 0;
         padding: 0;
+    }
+
+    .gpEmergencyForm {
+        margin: 0 0.5em 0 0.5em;
+    }
+
+    .gpToggleFormStatus {
+        margin-left: 0.5em;
     }
 }
 
