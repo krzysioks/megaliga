@@ -1141,12 +1141,20 @@ div.individualCommentsContainer > p {
 .playerImageWrapper {
     grid-area: playerImage;
     margin-left: -20px;
+    align-self: end;
+    
+}
+
+.playerImage {
+    /* TODO KP set proper aspect ratio */
+    min-width: 150px;
+    min-height: 102px;
 }
 
 .playerBetPositionTitleWrapper {
     grid-area: betPosTitle;
     align-self: center;
-    margin-right: 10px;;
+    margin-right: 10px;
 }
 
 .playerBetPositionLabel {
@@ -1173,6 +1181,28 @@ div.individualCommentsContainer > p {
     transform: skewX(-30deg);
 }
 
+.playerTitleResultsWrapper {
+    padding-top: 2px;
+    grid-area: 2/2/2/5;
+    background-color: var(--megaliga-primary-color);
+    height: 35px;
+    margin-left: -20px;
+    z-index: 1;
+    transform: skewX(-30deg);
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+}
+
+.playerTitleResultsWrapper .posLeft {
+    justify-self: start;
+    margin-left: 30px;
+}
+
+.playerTitleResultsWrapper .posRight {
+    justify-self: end;
+}
+
 .playerNationality {
     grid-area: playerNationality;
     justify-self: right;
@@ -1195,7 +1225,15 @@ div.individualCommentsContainer > p {
     color: white;
     font-weight: bold;
     font-size: 18px;
-    transform: skewX(0deg);
+    transform: skewX(30deg);
+}
+
+.playerNameResults {
+    margin-right: 80px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    transform: skewX(30deg);
 }
 
 .gpEmergencyForm {
@@ -1208,6 +1246,10 @@ div.individualCommentsContainer > p {
 
 .playerNameLink:hover {
     color: white;
+}
+
+.gpResultsTitleWrapper {
+    margin: 2em 0 1em 2em;
 }
 
 @media all and (max-width: 1200px) {
@@ -1232,6 +1274,19 @@ div.individualCommentsContainer > p {
         transform: skewX(-30deg);
     }
 
+    .playerTitleResultsWrapper {
+        padding-top: 2px;
+        grid-area: 2/2/2/5;
+        background-color: var(--megaliga-primary-color);
+        height: 30px;
+        margin-left: -20px;
+        z-index: 1;
+        transform: skewX(-30deg);
+        display: flex;
+        flex-direction: row;
+        justify-content:space-between;
+    }
+
     .playerFlagImg {
         transform: skewX(-30deg);
         height: 30px;
@@ -1244,6 +1299,10 @@ div.individualCommentsContainer > p {
 
     .gpToggleFormStatus {
         margin-left: 0.5em;
+    }
+
+    .gpResultsTitleWrapper {
+        margin: 2em 0 1em 0.5em;
     }
 }
 
@@ -1277,6 +1336,18 @@ div.individualCommentsContainer > p {
         transform: skewX(-30deg);
     }
 
+    .playerTitleResultsWrapper {
+        padding-top: 5px;
+        grid-area: 2/2/2/5;
+        background-color: var(--megaliga-primary-color);
+        height: 30px;
+        margin-left: -20px;
+        z-index: 1;
+        transform: skewX(-30deg);
+        display: flex;
+        flex-direction: row;
+    }
+
     .playerFlagImg {
         transform: skewX(-30deg);
         height: 30px;
@@ -1302,6 +1373,26 @@ div.individualCommentsContainer > p {
 
     .gpToggleFormStatus {
         margin-left: 0.5em;
+    }
+
+    .gpResultsTitleWrapper {
+        margin: 2em 0 1em 0.5em;
+    }
+
+    .playerNameResults {
+        margin-right: 80px;
+        color: white;
+        font-weight: bold;
+        font-size: 14px;
+        transform: skewX(30deg);
+    }
+
+    .playerTitleResultsWrapper .posLeft {
+        margin-left: 30px;
+        margin-right: 0;
+    }
+    
+    .playerTitleResultsWrapper .posRight {
     }
 }
 

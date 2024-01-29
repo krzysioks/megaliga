@@ -174,10 +174,18 @@ do_action('hestia_before_single_page_wrapper');
 
                                     echo '<div class="gpPlayerWrapper ' . $playerGridPos . '">';
                                     echo '<div class="gpPlayerBorder"></div>';
-                                    echo '  <div class="playerImageWrapper pointer">';
-                                    echo '    <a href="' . htmlspecialchars($player->bio_url) . '">';
+                                    echo '  <div class="playerImageWrapper">';
+
+                                    if ($player->bio_url) {
+                                        echo '    <a href="' . htmlspecialchars($player->bio_url) . '">';
+                                    }
+
                                     echo '      <img src="' . $player->photo_url . '" width="250px" height="162px" />';
-                                    echo '    </a>';
+
+                                    if ($player->bio_url) {
+                                        echo '    </a>';
+                                    }
+
                                     echo '  </div>';
 
                                     if ($isForm) {
@@ -190,7 +198,20 @@ do_action('hestia_before_single_page_wrapper');
                                     }
 
                                     echo '  <div class="playerTitleWrapper">';
-                                    echo '    <a class="playerNameLink" href="' . htmlspecialchars($player->bio_url) . '">' . $player->player_name . '</a>';
+                                    if ($player->bio_url) {
+                                        echo '    <a class="playerNameLink" href="' . htmlspecialchars($player->bio_url) . '">';
+                                    } else {
+                                        echo '  <span class="playerNameLink">';
+                                    }
+
+                                    echo $player->player_name;
+
+                                    if ($player->bio_url) {
+                                        echo '</a>';
+                                    } else {
+                                        echo '</span>';
+                                    }
+
                                     echo '  </div>';
                                     echo '  <div class="playerNationality">';
 
