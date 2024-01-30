@@ -123,11 +123,29 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '<div class="gpPlayerWrapper ' . $playerGridPos . '">';
                                     echo '<div class="gpPlayerBorder"></div>';
                                     echo '  <div class="playerImageWrapper">';
-                                    echo '      <img class="playerImage" src="' . $player->photo_url . '" width="250px" height="162px" />';
+                                    echo '      <img class="playerImage" src="' . $player->photo_url . '" width="280px" height="181px" />';
                                     echo '  </div>';
 
-                                    // TODO KP if not a form and $isOpen == false -> show bets of other trainers
-                                    // TODO KP highlight on blue those who bet correctly
+                                    // if not a form and $isOpen == false -> show bets of other trainers
+                                    if (!$isForm && !$isOpen) {
+                                        $getTrainersBetResultsQuery = $wpdb->get_results('SELECT megaliga_grandprix_bets.' . $fieldName . ' as "position", wp_users.display_name FROM megaliga_grandprix_bets, wp_users WHERE wp_users.ID = megaliga_grandprix_bets.ID AND round_number = ' . $round_number);
+
+                                        echo '  <div class="trainersBetResultsWrapper">';
+                                        echo '  <div class="trainerBetTitle">Typy trenerów:</div>';
+
+                                        $j = 0;
+                                        foreach ($getTrainersBetResultsQuery as $trainer) {
+                                            $successBetClass =  $trainer->position == $position ? 'class="trainerBetValue trainerBetSuccess"' : '';
+                                            $areaClass = $j % 2 == 0 ? 'tCol1' : 'tCol2';
+                                            echo '<div class="' . $areaClass . '">';
+                                            echo '  <span ' . $successBetClass . '>' . $trainer->display_name . ': ' . $trainer->position . '</span>';
+                                            echo '</div>';
+
+                                            $j++;
+                                        }
+
+                                        echo '  </div>';
+                                    }
 
                                     if ($isForm) {
                                         echo '  <div class="playerBetPositionTitleWrapper">';
