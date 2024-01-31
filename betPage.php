@@ -46,7 +46,7 @@ do_action('hestia_before_single_page_wrapper');
                             $round_number = substr($title, 0, strlen($title) - 8);
                             $userId = $current_user->ID;
                             // $userId = 14;
-                            // $userId = 20;
+                            // $userId = 46;
 
                             if ($_POST['submitBet']) {
                                 $betValueList = array();
@@ -70,7 +70,7 @@ do_action('hestia_before_single_page_wrapper');
                                     echo "</div>";
                                     // case when all data provided correctly
                                 } else {
-                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $_POST['userId']);
+                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $_POST['userId'] . 'AND round_number = ' . $round_number);
                                     $submitDataArray = array();
                                     $submitDataArray['round_number'] = $round_number;
                                     $submitDataArray['ID'] = $_POST['userId'];
@@ -256,7 +256,7 @@ do_action('hestia_before_single_page_wrapper');
 
                             if (!$isFormEnabled[0]->is_open) {
                                 echo '<div class="marginLeft1em marginBottom20">';
-                                echo '<span class="scoreTableName"Typowanie wyników w tej rundzie zostało zakończone.</Span>';
+                                echo '<span class="scoreTableName">Typowanie wyników w tej rundzie zostało zakończone.</Span>';
                                 echo '</div>';
                             }
 
@@ -302,7 +302,7 @@ do_action('hestia_before_single_page_wrapper');
     <script type="text/javascript">
         (function() {
             var title = document.querySelector('#primary > div.container > div > div > h1');
-            title.innerHTML = 'Grand Prix - ' + title.innerHTML;
+            title.innerHTML = 'Grand Prix - typuj - ' + title.innerHTML;
         })();
     </script>
     <?php get_footer(); ?>
