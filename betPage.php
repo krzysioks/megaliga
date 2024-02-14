@@ -70,7 +70,7 @@ do_action('hestia_before_single_page_wrapper');
                                     echo "</div>";
                                     // case when all data provided correctly
                                 } else {
-                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $_POST['userId'] . 'AND round_number = ' . $round_number);
+                                    $checkIfRecordsExists = $wpdb->get_results('SELECT id_bet FROM megaliga_grandprix_bets WHERE ID = ' . $_POST['userId'] . ' AND round_number = ' . $round_number);
                                     $submitDataArray = array();
                                     $submitDataArray['round_number'] = $round_number;
                                     $submitDataArray['ID'] = $_POST['userId'];

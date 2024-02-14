@@ -83,7 +83,7 @@ do_action('hestia_before_single_page_wrapper');
 
                                     //if winner is defined -> save his ID to megaliga_champion to be able to show current champion on dashboard if data is of type "final"
                                     if ($type == 'final') {
-                                        //define if insert od update record of megaliga_champion
+                                        //define if insert or update record of megaliga_champion
                                         $checkIfRecordExist = $wpdb->get_results('SELECT COUNT(*) as "champion" FROM megaliga_champion');
 
                                         // prepare data for submission
