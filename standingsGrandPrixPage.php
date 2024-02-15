@@ -69,26 +69,18 @@ do_action('hestia_before_single_page_wrapper');
                                     }
 
                                     foreach ($getGrandPrixResultsQuery as $result) {
-                                        // echo '-----result-----';
-                                        // echo '</br>';
-                                        // print_r($result);
+                                        // DEBUG DATA
+                                        // echo 'round: ' . $result->round_number;
                                         // echo '</br>';
                                         // echo '</br>';
 
                                         $getTrainersBetsQuery = $wpdb->get_results('SELECT * FROM megaliga_grandprix_bets WHERE round_number =' . $result->round_number);
 
-                                        // stdClass Object ( [id_result] => 3 [round_number] => 1 [player_1] => 1 [player_2] => 2 [player_3] => 3 [player_4] => 4 [player_5] => 5 [player_6] => 6 [player_7] => 14 [player_8] => 15 [player_9] => 13 [player_10] => 12 [player_11] => 11 [player_12] => 10 [player_13] => 9 [player_14] => 8 [player_15] => 7 [player_16] => 16 )
-
-                                        // stdClass Object ( [id_bet] => 20 [ID] => 46 [round_number] => 1 [player_1] => 1 [player_2] => 2 [player_3] => 3 [player_4] => 4 [player_5] => 5 [player_6] => 6 [player_7] => 7 [player_8] => 8 [player_9] => 9 [player_10] => 10 [player_11] => 11 [player_12] => 12 [player_13] => 13 [player_14] => 14 [player_15] => 15 [player_16] => 16 )
-
-                                        // stdClass Object ( [id_bet] => 21 [ID] => 44 [round_number] => 1 [player_1] => 16 [player_2] => 2 [player_3] => 3 [player_4] => 4 [player_5] => 5 [player_6] => 6 [player_7] => 7 [player_8] => 8 [player_9] => 9 [player_10] => 10 [player_11] => 11 [player_12] => 12 [player_13] => 13 [player_14] => 14 [player_15] => 15 [player_16] => 1 )
-
-                                        // stdClass Object ( [id_bet] => 22 [ID] => 26 [round_number] => 1 [player_1] => 16 [player_2] => 15 [player_3] => 14 [player_4] => 13 [player_5] => 12 [player_6] => 11 [player_7] => 10 [player_8] => 9 [player_9] => 8 [player_10] => 7 [player_11] => 6 [player_12] => 5 [player_13] => 4 [player_14] => 3 [player_15] => 2 [player_16] => 1 )
-
                                         foreach ($getTrainersBetsQuery as $trainerBet) {
                                             // for given trainer add played grand prix to "gamesPlayed"
                                             $standingsData[$trainerBet->ID]['gamesPlayed'] = $standingsData[$trainerBet->ID]['gamesPlayed'] + 1;
-                                            // print_r($trainerBet);
+                                            // DEBUG DATA
+                                            // echo 'trainer id: ' . $trainerBet->ID . ' trainerName: ' . $standingsData[$trainerBet->ID]['trainerName'];
                                             // echo '</br>';
                                             // echo '</br>';
 
@@ -97,9 +89,12 @@ do_action('hestia_before_single_page_wrapper');
                                             $fieldNameList = array('player_1', 'player_2', 'player_3', 'player_4', 'player_5', 'player_6', 'player_7', 'player_8', 'player_9', 'player_10', 'player_11', 'player_12', 'player_13', 'player_14', 'player_15', 'player_16');
 
                                             for ($i = 0; $i < 16; $i++) {
+                                                // DEBUG DATA
                                                 // echo 'result: ' . $result->{$fieldNameList[$i]};
                                                 // echo '</br>';
                                                 // echo 'bet: ' . $trainerBet->{$fieldNameList[$i]};
+                                                // echo '</br>';
+                                                // echo '</br>';
 
                                                 if ($trainerBet->{$fieldNameList[$i]} == $result->{$fieldNameList[$i]}) {
                                                     // if trainer bet correctly position of given player -> add 1 point
@@ -154,8 +149,6 @@ do_action('hestia_before_single_page_wrapper');
 
                                 function drawStandings($standings)
                                 {
-                                    // Array ( [46] => Array ( [trainerName] => Maro [ID] => 46 [gamesPlayed] => 2 [points] => 48 ) [44] => Array ( [trainerName] => Olo [ID] => 44 [gamesPlayed] => 2 [points] => 38 ) [20] => Array ( [trainerName] => Boggias [ID] => 20 [gamesPlayed] => 0 [points] => 0 ) [26] => Array ( [trainerName] => Vitoy [ID] => 26 [gamesPlayed] => 2 [points] => 0 ) [27] => Array ( [trainerName] => LUKASZ_ENKO [ID] => 27 [gamesPlayed] => 0 [points] => 0 ) [40] => Array ( [trainerName] => Gruby [ID] => 40 [gamesPlayed] => 0 [points] => 0 ) [47] => Array ( [trainerName] => zdruch [ID] => 47 [gamesPlayed] => 0 [points] => 0 ) [51] => Array ( [trainerName] => TORBYD [ID] => 51 [gamesPlayed] => 0 [points] => 0 ) [52] => Array ( [trainerName] => Kubi [ID] => 52 [gamesPlayed] => 0 [points] => 0 ) [55] => Array ( [trainerName] => Klopsy2 [ID] => 55 [gamesPlayed] => 0 [points] => 0 ) [56] => Array ( [trainerName] => Bizon [ID] => 56 [gamesPlayed] => 0 [points] => 0 ) [57] => Array ( [trainerName] => luk [ID] => 57 [gamesPlayed] => 0 [points] => 0 ) )
-                                    global $wpdb;
                                     echo '<table class="scheduleTable" border="0">';
                                     echo '  <tr>
                                     <th class="scheduleHeader textLeft">miejsce</th>
@@ -180,15 +173,26 @@ do_action('hestia_before_single_page_wrapper');
                                 }
 
                                 $standings = calculateStandingsData();
-                                // echo '</br>';
-                                // echo '</br>';
-                                // echo 'standings: ';
-                                // echo '</br>';
-                                // print_r($standings);
+                                $getGpChamptionQuery = $wpdb->get_results('SELECT user_name FROM megaliga_grandprix_champion');
 
                                 //content of the team page
                                 echo '<div class="scheduleContainer flexDirectionColumn">';
-                                // TODOKP render here info about GP Champion if exists
+
+                                if (count($getGpChamptionQuery) > 0) {
+                                    echo '<div class="displayFlex flexDirectionColumn justifyContentCenter">';
+                                    echo '  <div class="gpWinnerContainer">';
+                                    echo '      <div class="displayFlex">';
+                                    echo '          <img src="https://megaliga.eu/wp-content/uploads/2024/02/pucharGP.png" width="75px" height="100px">';
+                                    echo '      </div>';
+                                    echo '      <div class="marginLeft10 displayFlex flexDirectionColumn">';
+                                    echo '        <span class="gpChampionTitle">Mistrz Grand Prix</span>';
+                                    echo '        <span class="gpWinnerName">' . $getGpChamptionQuery[0]->user_name . '</span>';
+                                    echo '      </div>';
+                                    echo '  </div>';
+                                    echo '</div>';
+                                }
+
+
                                 echo '  <div class="standingsTableContainer">';
                                 drawStandings($standings);
                                 echo '  </div>';

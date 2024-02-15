@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.312
+Version: 0.313
 */
 
 :root {
@@ -1281,6 +1281,27 @@ div.individualCommentsContainer > p {
 
 .gpResultsTitleWrapper {
     margin: 2em 0 1em 2em;
+}
+
+.gpWinnerContainer {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 2em;
+}
+
+.gpWinnerName {
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.gpChampionTitle {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--megaliga-primary-color);
 }
 
 @media all and (max-width: 1200px) {
