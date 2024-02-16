@@ -539,6 +539,10 @@ td.scoreSeparator {
     margin-top: 20px;
 }
 
+.marginTop2em {
+    margin-top: 2em;
+}
+
 .marginLeft10 {
     margin-left: 10px;
 }
@@ -1494,6 +1498,10 @@ div.individualCommentsContainer > p {
     background-color: var(--megaliga--error);
     justify-content: center;
     padding: 20px;
+}
+
+.gpTd {
+    width: 120px;
 }
 
 /* Overrides of parent theme rules */

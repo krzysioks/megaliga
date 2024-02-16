@@ -45,7 +45,6 @@ do_action('hestia_before_single_page_wrapper');
 
                             function drawStandings($standings, $side, $groupName, $isPlayoff)
                             {
-                                global $wpdb;
                                 $margin = $side == 'left' ? 'marginRight40' : '';
                                 echo '<table class="scheduleTable marginTop10 ' . $margin . '" border="0">';
 
@@ -88,7 +87,37 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</table>';
                             }
 
+                            function drawGrandPrixStandings($standings)
+                            {
+                                echo '<table class="scheduleTable marginTop10" border="0">';
+                                echo '  <tr>
+                                            <th class="scheduleHeader textLeft">miejsce</th>
+                                            <th class="scheduleHeader standingsHeader textLeft">trener</th>
+                                            <th class="scheduleHeader standingsHeader textLeft">rozegrane GP</th>
+                                            <th class="scheduleHeader standingsHeader textLeft">pkt</th>
+                                        </tr>';
+
+                                $i = 1;
+                                foreach ($standings as $trainer) {
+                                    $trClass = $i % 2 == 0 ? 'even' : 'odd';
+                                    $medal = $i == 1 ? '<img class="marginLeft1em" src="http://megaliga.eu/wp-content/uploads/2022/03/medal' . $i . '.png">' : '';
+
+                                    echo '<tr class="' . $trClass . '">
+                                            <td class="scheduleTdImg paddingLeft10">' . $trainer->place . '</td>
+                                            <td class="scheduleTd textLeft">' . $trainer->user_name . $medal . '</td>
+                                            <td class="gpTd">' . $trainer->games_played . '</td>
+                                            <td class="scheduleTdImg">' . $trainer->points . '</td>';
+                                    echo '</tr>';
+
+                                    $i++;
+                                }
+
+                                echo '</table>';
+                            }
+
                             $getSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name, number_of_groups FROM megaliga_season WHERE current = 0 ORDER BY season_name DESC');
+
+                            $getGrandPrixSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name FROM megaliga_grandprix_season WHERE current = 0 ORDER BY season_name DESC');
 
                             //content of the history page
                             echo '<div>';
@@ -142,6 +171,28 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  <div class="historyTableContainer">';
                                     drawStandings($playoffStandings, 'none', '', true);
                                     echo '</div>';
+                                }
+
+                                // get Grand Prix data
+                                $isGrandPrixSeasonPresent = false;
+                                foreach ($getGrandPrixSeasonIdToShow as $gpSeason) {
+                                    if ($gpSeason->season_name == $season->season_name) {
+                                        $isGrandPrixSeasonPresent = true;
+                                    }
+                                }
+
+                                if ($isGrandPrixSeasonPresent) {
+                                    $grandPrixStandings = $wpdb->get_results('SELECT place, user_name, games_played, points  FROM megaliga_grandprix_history WHERE id_season = ' . $gpSeason->id_season . ' ORDER BY place');
+
+                                    //draw playoff data
+                                    if (count($grandPrixStandings) != 0) {
+                                        echo '<div class="marginLeft1em marginTop2em">';
+                                        echo '  <span class="roundName">Grand Prix</span>';
+                                        echo '</div>';
+                                        echo '  <div class="historyTableContainer">';
+                                        drawGrandPrixStandings($grandPrixStandings);
+                                        echo '</div>';
+                                    }
                                 }
                             }
 

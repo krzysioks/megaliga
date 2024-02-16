@@ -155,7 +155,27 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 
 21. Przygotowanie Grand Prix
 
--   Uzupełnij tabelę `megaliga_grandprix_bet_status` 10 kolejkami i ustaw wrtość `is_open` == 1
+    a) Wpisz wyniki z tabeli GP do tabeli `megaliga_grandprix_history`
+
+    b) Dokonaj aktualizacji zawodników biorących udział w realnym GP w tabeli `megaliga_grandprix_players`
+
+    c) Uzupełnij tabelę `megaliga_grandprix_bet_status` 10 kolejkami i ustaw wrtość `is_open` == 1
+
+    d) Dodaj nowy sezon GP do tabeli `megaliga_grandprix_season`:
+
+    -   w polu „season_name” wprowadź rok, w którym odbywa się dana edycja megaligi
+    -   w polu „current” wpisz jeden dla obecnie rozgrywanego sezonu. Jednocześnie dla wszystkich pozostałych wpisów odpowiadającym poprzednim sezonom w pole „current” wpisz wartość = 0
+
+    c) Wpisz do `megaliga_grandprix_history_champion` mistrza GP z kończącego się sezonu
+
+    -   user_name - wp_users.display_name
+
+    d) Wyczyść rekordy z następujących tabel:
+
+    -   megaliga_grandprix_bets
+    -   megaliga_grandprix_results
+
+    e) Wpisz aktualne daty kolejek w tabeli `megaliga_grandprix_round_calendar`
 
 Tests:
 
