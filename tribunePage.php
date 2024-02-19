@@ -52,6 +52,21 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '  </div>';
                             }
 
+                            function drawGrandPrixChampion($championData, $title)
+                            {
+                                echo '<div class="displayFlex flexDirectionColumn justifyContentCenter">';
+                                echo '  <div class="gpWinnerTribuneContainer">';
+                                echo '      <div class="displayFlex">';
+                                echo '          <img src="https://megaliga.eu/wp-content/uploads/2024/02/pucharGP.png" width="75px" height="100px">';
+                                echo '      </div>';
+                                echo '      <div class="marginLeft10 displayFlex flexDirectionColumn">';
+                                echo '        <span class="gpChampionTitle">' . $title . '</span>';
+                                echo '        <span class="gpWinnerName">' . $championData->user_name . '</span>';
+                                echo '      </div>';
+                                echo '  </div>';
+                                echo '</div>';
+                            }
+
                             function drawCurrentRoundScore($queryTeam1Result, $queryTeam2Result, $gameIdentificationData, $groupName, $side, $round_number)
                             {
                                 $margin = $side == 'left' ? 'marginRight40' : '';
@@ -146,7 +161,22 @@ do_action('hestia_before_single_page_wrapper');
                             //get data for previous champions
                             $getPreviousChampions = $wpdb->get_results('SELECT team_name, logo_url, season_name FROM megaliga_history_champion ORDER BY season_name DESC');
 
+                            //get data for current GP champion
+                            $getGrandPrixChampionData = $wpdb->get_results('SELECT user_name FROM megaliga_grandprix_champion');
+
+                            //get data for previous GP champions
+                            $getPreviousGrandPrixChampions = $wpdb->get_results('SELECT user_name, season_name FROM megaliga_grandprix_champion_history ORDER BY season_name DESC');
+
                             //custom code starts here
+                            echo '<div class="displayFlex championsContainer">';
+                            echo '  <div class="currentChampion">';
+                            drawChampion($getChampionData[0], 'Mistrz megaligi');
+                            echo '  </div>';
+                            echo '  <div class="currentChampion">';
+                            drawGrandPrixChampion($getGrandPrixChampionData[0], 'Mistrz Grand Prix');
+                            echo '  </div>';
+                            echo '</div>';
+
                             echo '<div class="displayFlex dashboardContainer">';
                             echo '  <div class="displayFlex dashboardCol1">';
                             echo '      <div class="individualCommentsTitle">Komunikaty</div>';
@@ -164,16 +194,6 @@ do_action('hestia_before_single_page_wrapper');
                             echo '      </div>';
                             echo '  </div>';
                             echo '  <div class="displayFlex dashboardCol2">';
-                            echo '      <div class="currentChampion">';
-                            drawChampion($getChampionData[0], 'Mistrz megaligi');
-                            echo '      </div>';
-                            foreach ($getPreviousChampions as $champion) {
-                                echo '  <div class="previousChampion">';
-                                $title = 'Mistrz megaligi ' . $champion->season_name;
-                                drawChampion($champion, $title);
-                                echo '  </div>';
-                            }
-
                             if ($lastPlayedRound > 0) {
                                 echo '      <div class="individualCommentsTitle">Wyniki ostatniej kolejki</div>';
                                 echo '      <div class="scoreTableDolce">';
@@ -184,8 +204,25 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '      </div>';
                             }
 
-                            echo '  </div>';
+                            echo '      <div class="individualCommentsTitle">Poprzedni Mistrzowie Megaligi</div>';
+                            foreach ($getPreviousChampions as $champion) {
+                                echo '  <div class="previousChampion">';
+                                $title = 'Mistrz megaligi ' . $champion->season_name;
+                                drawChampion($champion, $title);
+                                echo '  </div>';
+                            }
 
+                            if (count($getPreviousGrandPrixChampions) > 0) {
+                                echo '      <div class="individualCommentsTitle">Poprzedni Mistrzowie Grand Prix</div>';
+                                foreach ($getPreviousGrandPrixChampions as $gpChampion) {
+                                    echo '  <div class="previousChampion">';
+                                    $title = 'Mistrz Grand Prix ' . $gpChampion->season_name;
+                                    drawGrandPrixChampion($gpChampion, $title);
+                                    echo '  </div>';
+                                }
+                            }
+
+                            echo '  </div>';
                             echo '</div>';
                             //custom code ends here
                             ?>
