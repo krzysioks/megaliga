@@ -117,21 +117,63 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</table>';
                             }
 
+                            function drawCurrentGrandPrixRoundScore($standings, $showPoints)
+                            {
+                                echo '<table class="megaligaScoresTable scheduleTable" border="0">';
+                                echo '  <tr>
+                            <th class="scheduleHeader textLeft">trener</th>
+                            <th colspan="2" class="scheduleHeader textRight">punkty</th>
+                        </tr>';
+                                $i = 1;
+                                foreach ($standings as $trainer) {
+                                    $trClass = $i % 2 == 0 ? 'even' : 'odd';
+                                    echo '<tr class="' . $trClass . '">
+                        <td class="scheduleTdImg paddingLeft10">' . $i . '</td>
+                        <td class="scheduleTdImg">' . $trainer['trainerName'] . '</td>
+                        <td class="scheduleTdImg">' . ($showPoints ? $trainer['points'] : 'tbd') . '</td>';
+                                    echo '</tr>';
+
+                                    $i++;
+                                }
+
+                                echo '</table>';
+                            }
+
+                            function getPlayedRounds($roundsCalendarData, $currentDateTimestamp)
+                            {
+                                $playedRounds = array();
+                                foreach ($roundsCalendarData as $roundCalendar) {
+                                    $roundDateTimestamp = strtotime($roundCalendar->round_date);
+                                    if ($currentDateTimestamp > $roundDateTimestamp) {
+                                        array_push($playedRounds, $roundCalendar->round_number);
+                                    }
+                                }
+
+                                return $playedRounds;
+                            }
+
+                            function compareTrainers($a, $b)
+                            {
+                                // sort by points
+                                $retval = strnatcmp($b['points'], $a['points']);
+
+                                // if points are identical, sort number of completed GP's
+                                if (!$retval) {
+                                    $retval = (int)$b['gamesPlayed'] - (int)$a['gamesPlayed'];
+                                }
+
+                                return $retval;
+                            }
+
                             $getRoundsCalendar = $wpdb->get_results('SELECT round_number, round_date FROM megaliga_round_calendar');
                             $currentDate = getdate();
 
                             $currentDateTimestamp = strtotime($currentDate['year'] . '-' . $currentDate['mon'] . '-' . $currentDate['mday']);
 
-                            // $currentDateTimestamp = strtotime('2023-05-25');
+                            // $currentDateTimestamp = strtotime('2024-04-29');
 
                             //find last round
-                            $playedRounds = array();
-                            foreach ($getRoundsCalendar as $roundCalendar) {
-                                $roundDateTimestamp = strtotime($roundCalendar->round_date);
-                                if ($currentDateTimestamp > $roundDateTimestamp) {
-                                    array_push($playedRounds, $roundCalendar->round_number);
-                                }
-                            }
+                            $playedRounds = getPlayedRounds($getRoundsCalendar, $currentDateTimestamp);
 
                             //last played round is the highiest round from those which have been played
                             $lastPlayedRound = count($playedRounds) > 0 ? max($playedRounds) : 0;
@@ -154,6 +196,70 @@ do_action('hestia_before_single_page_wrapper');
                                 $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $lastPlayedRound);
                             }
 
+                            // get data for displaying scores of last GP round
+                            $getGrandPrixRoundsCalendar = $wpdb->get_results('SELECT round_number, round_date FROM megaliga_grandprix_round_calendar');
+                            //find last GP round
+                            $playedGrandPrixRounds = getPlayedRounds($getGrandPrixRoundsCalendar, $currentDateTimestamp);
+                            //last played round is the highiest round from those which have been played
+                            $lastPlayedGrandPrixRound = count($playedGrandPrixRounds) > 0 ? max($playedGrandPrixRounds) : 0;
+
+                            // defines if to show scores of trainers for current round. Scores will be visible as soon as results for given round are added by admin
+                            $showGrandPrixRoundPoints = false;
+                            if ($lastPlayedGrandPrixRound > 0) {
+                                $getUserDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_user_data.ID FROM wp_users, megaliga_user_data WHERE wp_users.ID = megaliga_user_data.ID');
+
+                                $standingsData = array();
+                                foreach ($getUserDataQuery as $user) {
+                                    $standingsData[$user->ID] = array('trainerName' => $user->user_login, 'ID' => $user->ID, 'points' => 0, 'showPoints' => false);
+                                }
+
+                                $getGrandPrixResultQuery = $wpdb->get_results('SELECT * FROM megaliga_grandprix_results WHERE round_number = ' . $lastPlayedGrandPrixRound);
+
+                                if (count($getGrandPrixResultQuery) > 0) {
+                                    $showGrandPrixRoundPoints = true;
+                                    $getTrainersBetsQuery = $wpdb->get_results('SELECT * FROM megaliga_grandprix_bets WHERE round_number =' . $lastPlayedGrandPrixRound);
+
+                                    foreach ($getTrainersBetsQuery as $trainerBet) {
+                                        // DEBUG DATA
+                                        // echo 'trainer id: ' . $trainerBet->ID . ' trainerName: ' . $standingsData[$trainerBet->ID]['trainerName'];
+                                        // echo '</br>';
+                                        // echo '</br>';
+
+                                        $fieldNameList = array('player_1', 'player_2', 'player_3', 'player_4', 'player_5', 'player_6', 'player_7', 'player_8', 'player_9', 'player_10', 'player_11', 'player_12', 'player_13', 'player_14', 'player_15', 'player_16');
+
+                                        for ($i = 0; $i < 16; $i++) {
+                                            // DEBUG DATA
+                                            // echo 'result: ' . $result->{$fieldNameList[$i]};
+                                            // echo '</br>';
+                                            // echo 'bet: ' . $trainerBet->{$fieldNameList[$i]};
+                                            // echo '</br>';
+                                            // echo '</br>';
+
+                                            if ($trainerBet->{$fieldNameList[$i]} == $getGrandPrixResultQuery[0]->{$fieldNameList[$i]}) {
+                                                // if trainer bet correctly position of given player -> add 1 point
+                                                $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
+
+                                                if ($trainerBet->{$fieldNameList[$i]} == 1) {
+                                                    //additionally if correctly bet position is exactly 1st place -> add additional 1 point
+                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
+                                                }
+
+                                                if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 4) {
+                                                    //additionally if correctly bet position is from place 1-4 -> add additional 1 point
+                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
+                                                }
+
+                                                if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 8) {
+                                                    //additionally if correctly bet position is from place 1-8 -> add additional 1 point
+                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    uasort($standingsData, 'compareTrainers');
+                                }
+                            }
 
                             //get data for current champion
                             $getChampionData = $wpdb->get_results('SELECT team_name, logo_url FROM megaliga_champion');
@@ -194,13 +300,21 @@ do_action('hestia_before_single_page_wrapper');
                             echo '      </div>';
                             echo '  </div>';
                             echo '  <div class="displayFlex dashboardCol2">';
+
                             if ($lastPlayedRound > 0) {
-                                echo '      <div class="individualCommentsTitle">Wyniki ostatniej kolejki</div>';
+                                echo '      <div class="individualCommentsTitle">Wyniki ostatniej kolejki megaligi</div>';
                                 echo '      <div class="scoreTableDolce">';
                                 drawCurrentRoundScore($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'right', $lastPlayedRound);
                                 echo '      </div>';
                                 echo '      <div class="scoreTableGabbana">';
                                 drawCurrentRoundScore($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $lastPlayedRound);
+                                echo '      </div>';
+                            }
+
+                            if ($lastPlayedGrandPrixRound > 0) {
+                                echo '      <div class="individualCommentsTitle">Wyniki ' . $lastPlayedGrandPrixRound . ' kolejki Grand Prix</div>';
+                                echo '      <div class="scoreTableDolce">';
+                                drawCurrentGrandPrixRoundScore($standingsData, $showGrandPrixRoundPoints);
                                 echo '      </div>';
                             }
 
