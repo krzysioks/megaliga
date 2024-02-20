@@ -220,21 +220,9 @@ do_action('hestia_before_single_page_wrapper');
                                     $getTrainersBetsQuery = $wpdb->get_results('SELECT * FROM megaliga_grandprix_bets WHERE round_number =' . $lastPlayedGrandPrixRound);
 
                                     foreach ($getTrainersBetsQuery as $trainerBet) {
-                                        // DEBUG DATA
-                                        // echo 'trainer id: ' . $trainerBet->ID . ' trainerName: ' . $standingsData[$trainerBet->ID]['trainerName'];
-                                        // echo '</br>';
-                                        // echo '</br>';
-
                                         $fieldNameList = array('player_1', 'player_2', 'player_3', 'player_4', 'player_5', 'player_6', 'player_7', 'player_8', 'player_9', 'player_10', 'player_11', 'player_12', 'player_13', 'player_14', 'player_15', 'player_16');
 
                                         for ($i = 0; $i < 16; $i++) {
-                                            // DEBUG DATA
-                                            // echo 'result: ' . $result->{$fieldNameList[$i]};
-                                            // echo '</br>';
-                                            // echo 'bet: ' . $trainerBet->{$fieldNameList[$i]};
-                                            // echo '</br>';
-                                            // echo '</br>';
-
                                             if ($trainerBet->{$fieldNameList[$i]} == $getGrandPrixResultQuery[0]->{$fieldNameList[$i]}) {
                                                 // if trainer bet correctly position of given player -> add 1 point
                                                 $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
