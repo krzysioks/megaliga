@@ -534,7 +534,7 @@ do_action('hestia_before_single_page_wrapper');
                                 $margin = $side == 'left' ? 'marginRight40' : '';
                                 echo '<table class="scheduleTable playoffs ' . $margin . '" border="0">';
                                 echo '  <tr>
-                            <th colspan="3" class="scheduleHeader textLeft">playoffs</th>
+                            <th colspan="3" class="scheduleHeader textLeft">playins</th>
                             <th colspan="3" class="scheduleHeader textRight">' . $round_number . '. kolejka</th>
                         </tr>';
                                 $i = 0;
