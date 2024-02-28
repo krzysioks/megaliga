@@ -264,10 +264,10 @@ do_action('hestia_before_single_page_wrapper');
                             //custom code starts here
                             echo '<div class="displayFlex championsContainer">';
                             echo '  <div class="currentChampion">';
-                            drawChampion($getChampionData[0], 'Mistrz megaligi');
+                            drawChampion($getChampionData[0], 'Obecny Mistrz megaligi');
                             echo '  </div>';
                             echo '  <div class="currentChampion">';
-                            drawGrandPrixChampion($getGrandPrixChampionData[0], 'Mistrz Grand Prix');
+                            drawGrandPrixChampion($getGrandPrixChampionData[0], 'Obecny Mistrz Grand Prix');
                             echo '  </div>';
                             echo '</div>';
 
