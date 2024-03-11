@@ -1,4 +1,4 @@
-megaliga – instrukcja obsługi v.5.0
+megaliga – instrukcja obsługi v.6.0
 
 1. Wpisz wyniki z tabel z rundy zasadniczej, playin i playoff do tabeli megaliga_history
 
@@ -60,22 +60,21 @@ megaliga – instrukcja obsługi v.5.0
 
 10. Wyczyść rekordy z następujących tabel:
 
--   megaliga_playoff_ladder
--   megaliga_scores
--   megaliga_scores_playin
--   megaliga_scores_playoff
--   megaliga_trainer_score
--   megaliga_trainer_score_playin
--   megaliga_trainer_score_playoff
--   megaliga_schedule
--   megaliga_schedule_playin
--   megaliga_schedule_playoff
--   megaliga_starting_lineup
--   megaliga_starting_lineup_playin
--   megaliga_starting_lineup_playoff
--   megaliga_season_draft_order_dolce
--   megaliga_season_draft_order_gabbana
--   megaliga_playoff_draft_order
+-   megaliga_scores (AUTO_INCREMENT = 1)
+-   megaliga_scores_playin (AUTO_INCREMENT = 1)
+-   megaliga_scores_playoff (AUTO_INCREMENT = 1)
+-   megaliga_trainer_score (AUTO_INCREMENT = 1)
+-   megaliga_trainer_score_playin (AUTO_INCREMENT = 1)
+-   megaliga_trainer_score_playoff (AUTO_INCREMENT = 1)
+-   megaliga_schedule (AUTO_INCREMENT = 1)
+-   megaliga_schedule_playin (AUTO_INCREMENT = 1)
+-   megaliga_schedule_playoff (AUTO_INCREMENT = 1)
+-   megaliga_starting_lineup (AUTO_INCREMENT = 1)
+-   megaliga_starting_lineup_playin (AUTO_INCREMENT = 1)
+-   megaliga_starting_lineup_playoff (AUTO_INCREMENT = 1)
+-   megaliga_season_draft_order_dolce (AUTO_INCREMENT = 1)
+-   megaliga_season_draft_order_gabbana (AUTO_INCREMENT = 1)
+-   megaliga_playoff_draft_order (AUTO_INCREMENT = 1)
 
 11. Wpisz aktualne daty kolejek w tabeli megaliga_round_calendar
 
@@ -172,8 +171,8 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 
     d) Wyczyść rekordy z następujących tabel:
 
-    -   megaliga_grandprix_bets
-    -   megaliga_grandprix_results
+    -   megaliga_grandprix_bets (AUTO_INCREMENT = 1)
+    -   megaliga_grandprix_results (AUTO_INCREMENT = 1)
 
     e) Wpisz aktualne daty kolejek w tabeli `megaliga_grandprix_round_calendar`
 

@@ -266,9 +266,13 @@ do_action('hestia_before_single_page_wrapper');
                             echo '  <div class="currentChampion">';
                             drawChampion($getChampionData[0], 'Obecny Mistrz megaligi');
                             echo '  </div>';
-                            echo '  <div class="currentChampion">';
-                            drawGrandPrixChampion($getGrandPrixChampionData[0], 'Obecny Mistrz Grand Prix');
-                            echo '  </div>';
+
+                            if (count($getGrandPrixChampionData) > 0) {
+                                echo '  <div class="currentChampion">';
+                                drawGrandPrixChampion($getGrandPrixChampionData[0], 'Obecny Mistrz Grand Prix');
+                                echo '  </div>';
+                            }
+
                             echo '</div>';
 
                             echo '<div class="displayFlex dashboardContainer">';
