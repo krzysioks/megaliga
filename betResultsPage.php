@@ -97,7 +97,7 @@ do_action('hestia_before_single_page_wrapper');
                                 global $wpdb;
 
                                 //show form only for user with ID == 14 (mbaginski)
-                                $isForm = $userId == 14 && is_user_logged_in();
+                                $isForm = ($userId == 14 || $userId == 48) && is_user_logged_in();
 
                                 if ($isForm) {
                                     echo '<form action="" method="post">';

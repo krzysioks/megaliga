@@ -347,8 +347,8 @@ do_action('hestia_before_single_page_wrapper');
                             function drawScoreBoard($scoreBoardData, $userId)
                             {
                                 global $wpdb;
-                                //show form only for user with ID == 14 (mbaginski)
-                                $isForm = $userId == 14;
+                                //show form only for user with ID == 14 (mbaginski) || 48 (Gabbana)
+                                $isForm = $userId == 14 || $userId == 48;
                                 $setplayTeam1 = ($scoreBoardData['team1StartingLineup']->setplays != '') ? $scoreBoardData['team1StartingLineup']->setplays : 'nie wybrano';
                                 $setplayTeam2 = ($scoreBoardData['team2StartingLineup']->setplays != '') ? $scoreBoardData['team2StartingLineup']->setplays : 'nie wybrano';
                                 $playerNoTeam1 = 0;
@@ -1056,8 +1056,8 @@ do_action('hestia_before_single_page_wrapper');
                             //content of the megaliga page
                             the_content();
 
-                            //show button to generate schedule for playoff for final and 3rd place stage only if user with ID == 14 (mbaginski) and round_number == 2
-                            if ($userId == 14 && $round_number == 2) {
+                            //show button to generate schedule for playoff for final and 3rd place stage only if user with ID == 14 (mbaginski) || 48 (Gabbana) and round_number == 2
+                            if (($userId == 14 || $userId == 48) && $round_number == 2) {
                                 // get semifinals records from megaliga_schedule_playoff to check if at least one score is not added -> do not show generation button
                                 $getPlayOffSemifinalsScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playoff WHERE stage = "semifinal"');
 

@@ -260,7 +260,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</div>';
                             }
 
-                            if ($userId == 14 && !$_POST['submitEmergencyTrainerSelection']) {
+                            if (($userId == 14 || $userId == 48) && !$_POST['submitEmergencyTrainerSelection']) {
                                 drawToggleFormStatusButton($isFormEnabled);
                                 //draw emergencyBetSelectionForm form if user is admin and betting has not already been set    
                                 if (!isset($_POST['submitEmergencyBetSelection'])) {

@@ -116,7 +116,7 @@ function handle_csv_export_callback()
     $userId = $current_user->ID;
     global $wpdb;
 
-    if (($_POST['submitExportMegaliga'] || $_POST['submitEksportPlayoff']) && is_user_logged_in() && ($userId == 14 || $userId == 1)) {
+    if (($_POST['submitExportMegaliga'] || $_POST['submitEksportPlayoff']) && is_user_logged_in() && ($userId == 14 || $userId == 48 || $userId == 1)) {
         //TODO round number will be taken from forEach loop (14 - megaliga; 4 - playoff)
         //TODO 1st step - logic for 1 round of megaliga
         //TODO 2nd step - add logic to fetch all 14 rounds at once
