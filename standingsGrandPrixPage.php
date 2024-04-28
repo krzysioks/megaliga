@@ -84,7 +84,7 @@ do_action('hestia_before_single_page_wrapper');
                                             // echo '</br>';
                                             // echo '</br>';
 
-                                            // za dobre obstawienie każdego z miejsc (1-16) jest 1 punkt, za dobre obstawienie miejsc 1-8 jest kolejny punkt za każde dobre obstawienie,  za dobre obstawienie miejsc 1-4 jest kolejny punkt za każde dobre obstawienie (czyli łącznie 3 za każde dobre obstawienie miejsc 1-4) i za dobre obstawienie miejsca 1 jest dodatkowo 1 punkt (czyli razem 4)
+                                            // za dobre obstawienie każdego z miejsc (1-16) jest 1 punkt, za wytypowanie zawodnika w półfinale (miejsca 1-8) jest kolejny punkt (nie musi być dokładne miejsce tylko to, że typowaliśmy że zawodnik znajdzie się w ósemce i rzeczywiście zajął miejsce od 1-8. przykład: typ: 3, zawodnik zajął 7 czyli +1),  za wytypowanie zawodnika w finale (miejsca 1-4) jest kolejny punkt i za dobre obstawienie miejsca 1 jest dodatkowo 1 punkt (czyli razem 4)
 
                                             $fieldNameList = array('player_1', 'player_2', 'player_3', 'player_4', 'player_5', 'player_6', 'player_7', 'player_8', 'player_9', 'player_10', 'player_11', 'player_12', 'player_13', 'player_14', 'player_15', 'player_16');
 
@@ -104,16 +104,18 @@ do_action('hestia_before_single_page_wrapper');
                                                         //additionally if correctly bet position is exactly 1st place -> add additional 1 point
                                                         $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
                                                     }
+                                                }
 
-                                                    if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 4) {
-                                                        //additionally if correctly bet position is from place 1-4 -> add additional 1 point
-                                                        $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
-                                                    }
+                                                //additionally if trainer correctly estimateed position, that is from place 1-4 -> add additional 1 point
+                                                if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 4 && $result->{$fieldNameList[$i]} >= 1 && $result->{$fieldNameList[$i]} <= 4) {
 
-                                                    if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 8) {
-                                                        //additionally if correctly bet position is from place 1-8 -> add additional 1 point
-                                                        $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
-                                                    }
+                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
+                                                }
+
+                                                //additionally if correctly estimateed position, that is from place 1-8 -> add additional 1 point
+                                                if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 8 && $result->{$fieldNameList[$i]} >= 1 && $result->{$fieldNameList[$i]} <= 8) {
+
+                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
                                                 }
                                             }
                                         }
