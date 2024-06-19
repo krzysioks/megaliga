@@ -70,6 +70,8 @@ do_action('hestia_before_single_page_wrapper');
 
                                     foreach ($getGrandPrixResultsQuery as $result) {
                                         // DEBUG DATA
+                                        // echo '</br>';
+                                        // echo '</br>';
                                         // echo 'round: ' . $result->round_number;
                                         // echo '</br>';
                                         // echo '</br>';
@@ -98,9 +100,13 @@ do_action('hestia_before_single_page_wrapper');
 
                                                 if ($trainerBet->{$fieldNameList[$i]} == $result->{$fieldNameList[$i]}) {
                                                     // if trainer bet correctly position of given player -> add 1 point
+                                                    // echo 'position correct' . $fieldNameList[$i];
+                                                    // echo '</br>';
                                                     $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
 
                                                     if ($trainerBet->{$fieldNameList[$i]} == 1) {
+                                                        // echo 'player won ' . $fieldNameList[$i];
+                                                        // echo '</br>';
                                                         //additionally if correctly bet position is exactly 1st place -> add additional 1 point
                                                         $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
                                                     }
@@ -108,16 +114,22 @@ do_action('hestia_before_single_page_wrapper');
 
                                                 //additionally if trainer correctly estimateed position, that is from place 1-4 -> add additional 1 point
                                                 if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 4 && $result->{$fieldNameList[$i]} >= 1 && $result->{$fieldNameList[$i]} <= 4) {
-
+                                                    // echo 'final correct ' . $fieldNameList[$i];
+                                                    // echo '</br>';
                                                     $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
                                                 }
 
                                                 //additionally if correctly estimateed position, that is from place 1-8 -> add additional 1 point
                                                 if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 8 && $result->{$fieldNameList[$i]} >= 1 && $result->{$fieldNameList[$i]} <= 8) {
-
+                                                    // echo 'semifinal correct ' . $fieldNameList[$i];
+                                                    // echo '</br>';
                                                     $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
                                                 }
                                             }
+                                            // DEBUG DATA
+                                            // echo 'trainer id: ' . $trainerBet->ID . ' trainerName: ' . $standingsData[$trainerBet->ID]['trainerName'] . ' points received after round ' . $result->round_number . ': ' . $standingsData[$trainerBet->ID]['points'];
+                                            // echo '</br>';
+                                            // echo '</br>';
                                         }
                                     }
 
