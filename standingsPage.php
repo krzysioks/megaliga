@@ -61,6 +61,35 @@ do_action('hestia_before_single_page_wrapper');
                                     return $retval;
                                 }
 
+                                function getRematchNumber($idUserTeam1, $idUserTeam2, $scheduleQuery)
+                                {
+                                    // echo '$idUserTeam1: ' . $idUserTeam1 . ' $idUserTeam2: ' . $idUserTeam2;
+                                    // echo '</br>';
+                                    $rematchNumber = 0;
+                                    foreach ($scheduleQuery as $game) {
+                                        // echo ' $game->id_user_team1: ' . $game->id_user_team1 . '  $game->id_user_team2: ' . $game->id_user_team2;
+                                        // echo '</br>';
+                                        // echo '</br>';
+
+                                        // check if given pair of users has 1 or 2 rematch
+                                        if (($idUserTeam1 == $game->id_user_team1 || $idUserTeam1 == $game->id_user_team2) && ($idUserTeam2 == $game->id_user_team1 || $idUserTeam2 == $game->id_user_team2)) {
+                                            // if first id_rematch_schedule is not null and second id_rematch_schedule2 is null -> add 1 to rematch
+                                            if ($game->id_rematch_schedule !== null && $game->id_rematch_schedule2 == null) {
+                                                $rematchNumber = $rematchNumber + 1;
+                                            } else if ($game->id_rematch_schedule !== null && $game->id_rematch_schedule2 !== null) {
+                                                // if first id_rematch_schedule is not null and second id_rematch_schedule2 is not null -> add 1 to rematch. It means, that given pair of players has 2 rematches.
+                                                $rematchNumber = $rematchNumber + 1;
+                                            }
+                                        }
+                                    }
+
+                                    // echo 'team ' . $idUserTeam1 . ' ' . $idUserTeam2 . ': rematch number: ' . $rematchNumber;
+                                    // echo '</br>';
+                                    // echo '</br>';
+
+                                    return $rematchNumber;
+                                }
+
                                 function calculateStandingsData($scheduleQuery, $userIDquery)
                                 {
                                     global $wpdb;
@@ -71,6 +100,9 @@ do_action('hestia_before_single_page_wrapper');
 
                                     foreach ($scheduleQuery as $game) {
                                         if ($game->team1_score != null) {
+
+                                            $rematchNumber = getRematchNumber($game->id_user_team1, $game->id_user_team2, $scheduleQuery);
+
                                             $standingsData[$game->id_user_team1]['totalScore'] = $standingsData[$game->id_user_team1]['totalScore'] + $game->team1_score;
                                             $standingsData[$game->id_user_team2]['totalScore'] = $standingsData[$game->id_user_team2]['totalScore'] + $game->team2_score;
 
@@ -109,8 +141,8 @@ do_action('hestia_before_single_page_wrapper');
                                                 $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
                                             }
 
-                                            //if $game is played during rematch round -> add bonus point for team that has better balance after 2 matches
-                                            if ($game->id_rematch_schedule !== null) {
+                                            //if $game is played during rematch round -> add bonus point for team that has better balance after 2 matches. If teams has 2 rematches -> add bonus after 2nd rematch
+                                            if (($rematchNumber === 1 && $game->id_rematch_schedule !== null && $game->id_rematch_schedule2 === null) || ($rematchNumber === 2 && $game->id_rematch_schedule !== null && $game->id_rematch_schedule2 !== null)) {
                                                 // print_r($game);
                                                 // echo '<br>';
                                                 $getRematchSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule);
