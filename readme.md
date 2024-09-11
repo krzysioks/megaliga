@@ -158,7 +158,7 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 
     b) Dokonaj aktualizacji zawodników biorących udział w realnym GP w tabeli `megaliga_grandprix_players`
 
-    c) Uzupełnij tabelę `megaliga_grandprix_bet_status` 10 kolejkami i ustaw wrtość `is_open` == 1
+    c) Uzupełnij tabelę `megaliga_grandprix_bet_status` 11 kolejkami i ustaw wrtość `is_open` == 1
 
     d) Dodaj nowy sezon GP do tabeli `megaliga_grandprix_season`:
 
