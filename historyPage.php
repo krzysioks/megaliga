@@ -155,7 +155,7 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '<div class="marginLeft1em">';
                                     echo '  <span class="roundName">runda: playin</span>';
                                     echo '</div>';
-                                    echo '  <div class="historyTableContainer">';
+                                    echo '  <div class="historyTableContainer marginBottom20">';
                                     drawStandings($playinStandings, 'none', '', false);
                                     echo '</div>';
                                 }

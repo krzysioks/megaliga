@@ -1144,28 +1144,6 @@ do_action('hestia_before_single_page_wrapper');
                             //content of the megaliga page
                             the_content();
 
-                            //show button to generate schedule for playin only if user with ID == 14 (mbaginski) || 48 (Gabbana) and round_number = 14
-                            if (($userId == 14 || $userId == 48) && $round_number == 14) {
-                                // get all records from megaliga_schedule_playin to check if any score has already been added
-                                $getPlayInScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playin');
-
-                                $scoresAdded = false;
-                                foreach ($getPlayInScores as $record) {
-                                    if ($record->team1_score > 0 || $record->team2_score > 0) {
-                                        $scoresAdded = true;
-                                        break;
-                                    }
-                                }
-
-                                if (!$scoresAdded) {
-                                    echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
-                                    echo '  <form action="" method="post">';
-                                    echo '      <input type="submit" name="submitPlayInSchedule" value="Generuj terminarz dla fazy play in">';
-                                    echo '  </form>';
-                                    echo '</div>';
-                                }
-                            }
-
                             echo '<div class="megaligaScores scheduleContainer">';
                             drawSchedule($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'left', $round_number);
                             drawSchedule($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $round_number);
