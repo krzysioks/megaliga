@@ -61,13 +61,10 @@ megaliga – instrukcja obsługi v.6.0
 10. Wyczyść rekordy z następujących tabel:
 
 -   megaliga_scores (AUTO_INCREMENT = 1)
--   megaliga_scores_playin (AUTO_INCREMENT = 1)
 -   megaliga_scores_playoff (AUTO_INCREMENT = 1)
 -   megaliga_trainer_score (AUTO_INCREMENT = 1)
--   megaliga_trainer_score_playin (AUTO_INCREMENT = 1)
 -   megaliga_trainer_score_playoff (AUTO_INCREMENT = 1)
 -   megaliga_schedule (AUTO_INCREMENT = 1)
--   megaliga_schedule_playin (AUTO_INCREMENT = 1)
 -   megaliga_schedule_playoff (AUTO_INCREMENT = 1)
 -   megaliga_starting_lineup (AUTO_INCREMENT = 1)
 -   megaliga_starting_lineup_playin (AUTO_INCREMENT = 1)
@@ -115,28 +112,14 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
 
-18. Wprowadź rozpiskę meczy dla każdej z 10 kolejek rundy zasadniczej do tabeli megaliga_schedule
+18. Rozpiska meczy dla rundy zasadniczej generuje się automatycznie za pomocą przycisku `Generuj terminarz dla rundy zasadniczej` w zakładce `wyniki->megaliga->kolejka 1`. Guzik będzie widoczny, gdy przydział zespołów do grup będzie zakończony i żaden wynik meczu nie zostanie zapisany.
 
--   po 5 kolejkach rozpoczyna się runda rewanżowa, gdzie zwycięzca dwumeczu otrzymuje dodatkowy punkt
--   jeżeli drużyny grają ze sobą 2 razy:
-    -   w tabeli megaliga_schedule w kolumnie id_rematch_schedule dla kolejek rewanżowych podaj id_schedule pierwszego spotkania
--   jeżeli drużyny grają ze sobą 3 razy:
-    -   w tabeli megaliga_schedule dla reokrdu opisującego 3 spotkanie w kolumnie id_rematch_schedule podaj id_schedule pierwszego spotkania, w kolumnie id_rematch_schedule2 podaj id_schedule drugiego spotkania
--   każda drużyna rozgrywa mecz i rewanż z każdą z pozostałych 5 drużyn. Zwycięzca każdego z pojedynków ( liczy się suma małych punktów) otrzymuję w dodatkowy punkt po rozegranym meczu rundy rewanżowej
+Zasady generowania terminarza:
 
-19. Przygotowanie fazy playin
+-   Pierwsze 10 kolejek to mecz i rewanż zespołow w ramach grupy (`dolce` lub `gabbana`)
+-   Kolejki 11-16 to mecze pomiędzy drużynami z przeciwnej grupy (bez rewanżu)
 
-    Do fazy playin awansuje po trzy drużyny z każdej z grup. Mecze rozgrywają się według schematu (D - dolce; G - gabbana):
-
-    -   1D : 3G
-    -   2D : 2G
-    -   3D : 1G
-
-    Administrator ligi w zakładce `wyniki->megaliga->kolejka 14` będzie miał dostępny guzik `Generuj terminarz dla fazy play in`, który automatycznie przygotuje terminarz dla tej fazy rozgrywek.
-
-    Guzik ten dostępny jest dopóki nie zostanie zapisany przynajmniej jeden wynik meczu jakiejkolwiek z trzech par.
-
-20. Przygotowanie fazy playoff
+19. Przygotowanie fazy playoff
 
     Do fazy playoff awansuje 3 zwycięzców dwumeczów z fazy playin oraz lucky loser, który zdobył największą liczbę punktów spośród tych, którzy przegrali w fazie playin
 
@@ -152,7 +135,7 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
 
-21. Przygotowanie Grand Prix
+20. Przygotowanie Grand Prix
 
     a) Wpisz wyniki z tabeli GP do tabeli `megaliga_grandprix_history`
 

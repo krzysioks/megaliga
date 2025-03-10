@@ -174,6 +174,113 @@ do_action('hestia_before_single_page_wrapper');
                                 $wpdb->update('megaliga_schedule', array('team2_score' => $team2Outcome), $where);
                             }
 
+                            if ($_POST['submitMegaligaSchedule']) {
+                                function generateBergerTable($teams)
+                                {
+                                    $n = count($teams);
+                                    $rounds = $n - 1;
+                                    $matchesPerRound = $n / 2;
+                                    $schedule = [];
+
+                                    for ($round = 0; $round < $rounds; $round++) {
+                                        $roundMatches = [];
+                                        for ($match = 0; $match < $matchesPerRound; $match++) {
+                                            $home = ($round + $match) % ($n - 1);
+                                            $away = ($n - 1 - $match + $round) % ($n - 1);
+
+                                            if ($match == 0) {
+                                                $away = $n - 1;
+                                            }
+
+                                            $roundMatches[] = [$teams[$home]->ID, $teams[$away]->ID];
+                                        }
+                                        $schedule[] = $roundMatches;
+                                    }
+
+                                    return $schedule;
+                                }
+
+                                function insertSchedule($schedule, $idGroup)
+                                {
+                                    global $wpdb;
+
+                                    // insert schedule for first 5 rounds
+                                    foreach ($schedule as $round => $matches) {
+                                        $roundNumber = $round + 1;
+                                        foreach ($matches as $match) {
+                                            $wpdb->insert('megaliga_schedule', [
+                                                'id_user_team1' => $match[0],
+                                                'id_user_team2' => $match[1],
+                                                'round_number' => $roundNumber,
+                                                'id_ligue_group' => $idGroup
+                                            ]);
+                                        }
+                                    }
+
+                                    // insert schedule for remaining 5 rematch rounds
+                                    foreach ($schedule as $round => $matches) {
+                                        $roundNumber = $round + 6;
+                                        foreach ($matches as $match) {
+                                            $wpdb->insert('megaliga_schedule', [
+                                                'id_user_team1' => $match[0],
+                                                'id_user_team2' => $match[1],
+                                                'round_number' => $roundNumber,
+                                                'id_ligue_group' => $idGroup
+                                            ]);
+                                        }
+                                    }
+                                }
+
+                                function generateAndInsertInterGroupSchedule($group1Teams, $group2Teams)
+                                {
+                                    global $wpdb;
+
+                                    $schedule = [];
+                                    $numberOfRounds = count($group1Teams);
+                                    for ($round = 0; $round < $numberOfRounds; $round++) {
+                                        $roundSchedule = [];
+                                        for ($i = 0; $i < count($group1Teams); $i++) {
+                                            $homeIndex = ($i + $round) % count($group1Teams);
+                                            $roundSchedule[] = [$group1Teams[$homeIndex]->ID, $group2Teams[$i]->ID];
+                                        }
+                                        $schedule[] = $roundSchedule;
+                                    }
+
+                                    foreach ($schedule as $round => $matches) {
+                                        $roundNumber = $round + 11;
+                                        foreach ($matches as $match) {
+                                            $wpdb->insert('megaliga_schedule', [
+                                                'id_user_team1' => $match[0],
+                                                'id_user_team2' => $match[1],
+                                                'round_number' => $roundNumber,
+                                                'id_ligue_group' => 3
+                                            ]);
+                                        }
+                                    }
+                                }
+
+                                // prevent from form resubmission if schedule has records
+                                $isScheduleGenerated = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule WHERE round_number = 1 AND id_ligue_group = 1');
+                                if (!count($isScheduleGenerated)) {
+                                    $getDolceTeams = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1');
+                                    $getGabbanaTeams = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 2');
+
+                                    $scheduleDolce = generateBergerTable($getDolceTeams);
+                                    $scheduleGabbana = generateBergerTable($getGabbanaTeams);
+
+                                    // insert schedule for dolce teams (first 10 rounds)
+                                    insertSchedule($scheduleDolce, 1);
+                                    // insert schedule for gabbana teams (first 10 rounds)
+                                    insertSchedule($scheduleGabbana, 2);
+
+                                    generateAndInsertInterGroupSchedule($getDolceTeams, $getGabbanaTeams);
+
+                                    echo "<div class='displayFlex marginTop20 marginBottom20 schedulePlayinGeneratorSuccess'>";
+                                    echo "  Terminarz dla rundy zasadniczej wygenerowany poprawnie";
+                                    echo "</div>";
+                                }
+                            }
+
                             // handle playin schedule generation
                             if ($_POST['submitPlayInSchedule']) {
                                 function compareTeams($a, $b)
@@ -1143,6 +1250,34 @@ do_action('hestia_before_single_page_wrapper');
 
                             //content of the megaliga page
                             the_content();
+
+                            //show button to generate schedule for megaliga only if user with ID == 14 (mbaginski) || 48 (Gabbana) and round_number == 1
+                            if (($userId == 14 || $userId == 48) && $round_number == 1 && is_user_logged_in()) {
+                                // get all records from megaliga_schedule to check if any score has already been added
+                                $getMegaligaScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule');
+
+                                // get all records from megaliga_user_data to check if all teams have been assigned to groups. This means that team group assignment has been done and admin can generate schedule for megaliga
+                                $getTeamsGroupAssign = $wpdb->get_results('SELECT ligue_groups_id FROM megaliga_user_data WHERE ligue_groups_id != 4');
+
+                                $areAllTeamsAssigned = count($getTeamsGroupAssign) == 12 ? true : false;
+
+                                $scoresAdded = false;
+                                foreach ($getMegaligaScores as $record) {
+                                    if ($record->team1_score > 0 || $record->team2_score > 0) {
+                                        $scoresAdded = true;
+                                        break;
+                                    }
+                                }
+
+                                // show button in case all teams have group assigned and no scores have been added yet
+                                if (!$scoresAdded && $areAllTeamsAssigned) {
+                                    echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
+                                    echo '  <form action="" method="post">';
+                                    echo '      <input type="submit" name="submitMegaligaSchedule" value="Generuj terminarz dla rundy zasadniczej">';
+                                    echo '  </form>';
+                                    echo '</div>';
+                                }
+                            }
 
                             echo '<div class="megaligaScores scheduleContainer">';
                             drawSchedule($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'left', $round_number);
