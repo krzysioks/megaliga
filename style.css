@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.313
+Version: 0.314
 */
 
 :root {
@@ -472,7 +472,7 @@ body::-webkit-scrollbar-thumb {
 
 .megaligaScores {
     flex-direction: row;
-    width: 100%;
+    width: 50%;
 }
 
 .standingsTableContainer {

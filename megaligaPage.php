@@ -62,7 +62,7 @@ do_action('hestia_before_single_page_wrapper');
                                         //$col - value of given key (player1, player2..)
                                         $i = 0;
                                         foreach ($row as $col) {
-                                            //perform validation for egxisting id (omit null, 0 which indicates that given //starting lineup position is not used yet)
+                                            //perform validation for existing id (omit null, 0 which indicates that given starting lineup position is not used yet)
                                             if ($col) {
                                                 $checkIfExistQuery = $wpdb->get_results('SELECT id_scores FROM megaliga_scores WHERE id_schedule = ' . $_POST['id_schedule'] . ' AND id_starting_lineup = ' . $_POST[$idStartingLineup] . ' AND id_player = ' . $col);
 
@@ -76,7 +76,7 @@ do_action('hestia_before_single_page_wrapper');
                                 }
 
                                 //posts score for players of given team
-                                function postPlayersScore($getPlayersIdQuery, $playerKeyList, $selectedAction, $keysToSubmitArray, $idStartingLineup)
+                                function postPlayersScore($getPlayersIdQuery, $playerKeyList, $selectedAction, $keysToSubmitArray, $idStartingLineup, $ID)
                                 {
                                     global $wpdb;
                                     $score = 0;
@@ -88,7 +88,7 @@ do_action('hestia_before_single_page_wrapper');
                                                 //prepare data for submission
                                                 $submitDataArray = array();
                                                 foreach ($keysToSubmitArray as $key) {
-                                                    $submitDataArray[$key['key']] = $_POST['id' . $col . '_' . $key['postKey']];
+                                                    $submitDataArray[$key['key']] = $_POST['id' . $ID . '-' . $col . '_' . $key['postKey']];
                                                     if ($key['key'] != 'comment') {
                                                         $score += $submitDataArray[$key['key']];
                                                     }
@@ -121,7 +121,7 @@ do_action('hestia_before_single_page_wrapper');
                                     //prepare data for submission
                                     $submitDataArray = array();
                                     foreach ($keysToSubmitArray as $key) {
-                                        $submitDataArray[$key['key']] = $_POST['id_trainerTeam' . $teamNumber . '_' . $key['postKey']];
+                                        $submitDataArray[$key['key']] = $_POST['id' . $ID . '_trainerTeam' . $teamNumber . '_' . $key['postKey']];
                                         if ($key['key'] != 'comment') {
                                             $score += $submitDataArray[$key['key']];
                                         }
@@ -159,11 +159,11 @@ do_action('hestia_before_single_page_wrapper');
                                 $selectedActionTrainerTeam2 = (count($checkIfExistTrainerTeam2Query) == 1) ? $checkIfExistTrainerTeam2Query[0]->id_trainer : 0;
 
                                 //submit data team1
-                                $team1Score = postPlayersScore($getTeam1PlayersIdQuery, $playerKeyList, $selectedActionTeam1, $keysToSubmitArray, $_POST['id_starting_lineup_team1']);
+                                $team1Score = postPlayersScore($getTeam1PlayersIdQuery, $playerKeyList, $selectedActionTeam1, $keysToSubmitArray, $_POST['id_starting_lineup_team1'], $_POST['id_user_team1']);
                                 $trainerTeam1Score = postTrainerScore('1', $selectedActionTrainerTeam1, $keysToSubmitArray, $_POST['id_user_team1']);
 
                                 //submit data team2
-                                $team2Score = postPlayersScore($getTeam2PlayersIdQuery, $playerKeyList, $selectedActionTeam2, $keysToSubmitArray, $_POST['id_starting_lineup_team2']);
+                                $team2Score = postPlayersScore($getTeam2PlayersIdQuery, $playerKeyList, $selectedActionTeam2, $keysToSubmitArray, $_POST['id_starting_lineup_team2'], $_POST['id_user_team2']);
                                 $trainerTeam2Score = postTrainerScore('2', $selectedActionTrainerTeam2, $keysToSubmitArray, $_POST['id_user_team2']);
 
                                 //save score of both teams
@@ -484,7 +484,10 @@ do_action('hestia_before_single_page_wrapper');
                             {
                                 $margin = $side == 'left' ? 'marginRight40' : '';
                                 echo '<table class="megaligaScoresTable scheduleTable ' . $margin . '" border="0">';
-                                echo '  <tr><td colspan="6" class="scheduleTableName textLeft">Grupa ' . $groupName . '</td></tr>';
+                                // if $groupName not provided -> don't draw group name row
+                                if ($groupName) {
+                                    echo '  <tr><td colspan="6" class="scheduleTableName textLeft">Grupa ' . $groupName . '</td></tr>';
+                                }
                                 echo '  <tr>
                             <th colspan="3" class="scheduleHeader textLeft">megaliga</th>
                             <th colspan="3" class="scheduleHeader textRight">' . $round_number . '. kolejka</th>
@@ -577,15 +580,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <td class="padding10">' . $scoreBoardData['player1DataTeam1']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team1Data']->team_name . '</td>';
 
-                                    $id1 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team1StartingLineup']->player1 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player1 . '_comment';
                                     $value1 = $getScoreDataTeam1Query[0]->heat1;
                                     $value2 = $getScoreDataTeam1Query[0]->heat2;
                                     $value3 = $getScoreDataTeam1Query[0]->heat3;
@@ -623,15 +626,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  <tr class="odd">';
                                     echo '      <td class="padding10">' . $scoreBoardData['player2DataTeam1']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team1Data']->team_name . '</td>';
-                                    $id1 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team1StartingLineup']->player2 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player2 . '_comment';
                                     $value1 = $getScoreDataTeam1Query[1]->heat1;
                                     $value2 = $getScoreDataTeam1Query[1]->heat2;
                                     $value3 = $getScoreDataTeam1Query[1]->heat3;
@@ -669,15 +672,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  <tr class="even">';
                                     echo '      <td class="padding10">' . $scoreBoardData['player3DataTeam1']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team1Data']->team_name . '</td>';
-                                    $id1 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team1StartingLineup']->player3 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player3 . '_comment';
                                     $value1 = $getScoreDataTeam1Query[2]->heat1;
                                     $value2 = $getScoreDataTeam1Query[2]->heat2;
                                     $value3 = $getScoreDataTeam1Query[2]->heat3;
@@ -715,15 +718,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  <tr class="odd">';
                                     echo '      <td class="padding10">' . $scoreBoardData['player4DataTeam1']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team1Data']->team_name . '</td>';
-                                    $id1 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team1StartingLineup']->player4 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player4 . '_comment';
                                     $value1 = $getScoreDataTeam1Query[3]->heat1;
                                     $value2 = $getScoreDataTeam1Query[3]->heat2;
                                     $value3 = $getScoreDataTeam1Query[3]->heat3;
@@ -762,15 +765,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <td class="padding10">' . $scoreBoardData['player5DataTeam1']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team1Data']->team_name . '</td>';
 
-                                    $id1 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team1StartingLineup']->player5 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team1'] . '-' . $scoreBoardData['team1StartingLineup']->player5 . '_comment';
                                     $value1 = $getScoreDataTeam1Query[4]->heat1;
                                     $value2 = $getScoreDataTeam1Query[4]->heat2;
                                     $value3 = $getScoreDataTeam1Query[4]->heat3;
@@ -806,15 +809,15 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '  <tr class="odd">';
                                 echo '      <td class="padding10">Trener</td>';
                                 echo '      <td class="padding10">' . $scoreBoardData['team1Data']->team_name . '</td>';
-                                $id1 = 'id_trainerTeam1_1';
-                                $id2 = 'id_trainerTeam1_2';
-                                $id3 = 'id_trainerTeam1_3';
-                                $id4 = 'id_trainerTeam1_4';
-                                $id5 = 'id_trainerTeam1_5';
-                                $id6 = 'id_trainerTeam1_6';
-                                $id7 = 'id_trainerTeam1_7';
-                                $id8 = 'id_trainerTeam1_setplay';
-                                $id9 = 'id_trainerTeam1_comment';
+                                $id1 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_1';
+                                $id2 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_2';
+                                $id3 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_3';
+                                $id4 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_4';
+                                $id5 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_5';
+                                $id6 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_6';
+                                $id7 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_7';
+                                $id8 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_setplay';
+                                $id9 = 'id' . $scoreBoardData['id_user_team1'] . '_trainerTeam1_comment';
                                 $value1 = $getScoreDataTeam1TrainerQuery[0]->heat1;
                                 $value2 = $getScoreDataTeam1TrainerQuery[0]->heat2;
                                 $value3 = $getScoreDataTeam1TrainerQuery[0]->heat3;
@@ -873,15 +876,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <td class="padding10">' . $scoreBoardData['player1DataTeam2']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team2Data']->team_name . '</td>';
 
-                                    $id1 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team2StartingLineup']->player1 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team2'] . '-' . $scoreBoardData['team2StartingLineup']->player1 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team2'] . '-' . $scoreBoardData['team2StartingLineup']->player1 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player1 . '_comment';
                                     $value1 = $getScoreDataTeam2Query[0]->heat1;
                                     $value2 = $getScoreDataTeam2Query[0]->heat2;
                                     $value3 = $getScoreDataTeam2Query[0]->heat3;
@@ -920,15 +923,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <td class="padding10">' . $scoreBoardData['player2DataTeam2']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team2Data']->team_name . '</td>';
 
-                                    $id1 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team2StartingLineup']->player2 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player2 . '_comment';
                                     $value1 = $getScoreDataTeam2Query[1]->heat1;
                                     $value2 = $getScoreDataTeam2Query[1]->heat2;
                                     $value3 = $getScoreDataTeam2Query[1]->heat3;
@@ -967,15 +970,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <td class="padding10">' . $scoreBoardData['player3DataTeam2']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team2Data']->team_name . '</td>';
 
-                                    $id1 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team2StartingLineup']->player3 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player3 . '_comment';
                                     $value1 = $getScoreDataTeam2Query[2]->heat1;
                                     $value2 = $getScoreDataTeam2Query[2]->heat2;
                                     $value3 = $getScoreDataTeam2Query[2]->heat3;
@@ -1014,15 +1017,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '      <td class="padding10">' . $scoreBoardData['player4DataTeam2']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team2Data']->team_name . '</td>';
 
-                                    $id1 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team2StartingLineup']->player4 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player4 . '_comment';
                                     $value1 = $getScoreDataTeam2Query[3]->heat1;
                                     $value2 = $getScoreDataTeam2Query[3]->heat2;
                                     $value3 = $getScoreDataTeam2Query[3]->heat3;
@@ -1061,15 +1064,15 @@ do_action('hestia_before_single_page_wrapper');
                                     echo '  <tr class="even">';
                                     echo '      <td class="padding10">' . $scoreBoardData['player5DataTeam2']->ekstraliga_player_name . '</td>';
                                     echo '      <td class="padding10">' . $scoreBoardData['team2Data']->team_name . '</td>';
-                                    $id1 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_1';
-                                    $id2 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_2';
-                                    $id3 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_3';
-                                    $id4 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_4';
-                                    $id5 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_5';
-                                    $id6 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_6';
-                                    $id7 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_7';
-                                    $id8 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_setplay';
-                                    $id9 = 'id' . $scoreBoardData['team2StartingLineup']->player5 . '_comment';
+                                    $id1 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_1';
+                                    $id2 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_2';
+                                    $id3 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_3';
+                                    $id4 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_4';
+                                    $id5 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_5';
+                                    $id6 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_6';
+                                    $id7 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_7';
+                                    $id8 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_setplay';
+                                    $id9 = 'id' . $scoreBoardData['id_user_team2'] . '-'  . $scoreBoardData['team2StartingLineup']->player5 . '_comment';
                                     $value1 = $getScoreDataTeam2Query[4]->heat1;
                                     $value2 = $getScoreDataTeam2Query[4]->heat2;
                                     $value3 = $getScoreDataTeam2Query[4]->heat3;
@@ -1105,15 +1108,15 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '  <tr class="odd">';
                                 echo '      <td class="padding10">Trener</td>';
                                 echo '      <td class="padding10">' . $scoreBoardData['team2Data']->team_name . '</td>';
-                                $id1 = 'id_trainerTeam2_1';
-                                $id2 = 'id_trainerTeam2_2';
-                                $id3 = 'id_trainerTeam2_3';
-                                $id4 = 'id_trainerTeam2_4';
-                                $id5 = 'id_trainerTeam2_5';
-                                $id6 = 'id_trainerTeam2_6';
-                                $id7 = 'id_trainerTeam2_7';
-                                $id8 = 'id_trainerTeam2_setplay';
-                                $id9 = 'id_trainerTeam2_comment';
+                                $id1 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_1';
+                                $id2 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_2';
+                                $id3 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_3';
+                                $id4 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_4';
+                                $id5 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_5';
+                                $id6 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_6';
+                                $id7 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_7';
+                                $id8 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_setplay';
+                                $id9 = 'id' . $scoreBoardData['id_user_team2'] . '_trainerTeam2_comment';
                                 $value1 = $getScoreDataTeam2TrainerQuery[0]->heat1;
                                 $value2 = $getScoreDataTeam2TrainerQuery[0]->heat2;
                                 $value3 = $getScoreDataTeam2TrainerQuery[0]->heat3;
@@ -1227,26 +1230,15 @@ do_action('hestia_before_single_page_wrapper');
                                 return $returnData;
                             }
 
-                            //get teams for Dolce ligue
-                            $getSchedule4DolceTeam1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
+                            //get teams for Dolce and Gabbana ligue for given $round_number
+                            $getSchedule4Team1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
 
-                            $getSchedule4DolceTeam2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 1 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
-
-                            //get teams for Gabbama ligue
-                            $getSchedule4GabbanaTeam1 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team1_score, megaliga_schedule.id_user_team1, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team1 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
-
-                            $getSchedule4GabbanaTeam2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.ligue_groups_id = megaliga_schedule.id_ligue_group AND megaliga_schedule.id_ligue_group = 2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
+                            $getSchedule4Team2 = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name", megaliga_schedule.team2_score, megaliga_schedule.id_user_team2, megaliga_user_data.logo_url FROM megaliga_user_data, megaliga_team_names, megaliga_schedule WHERE megaliga_user_data.ID = megaliga_schedule.id_user_team2 AND megaliga_user_data.team_names_id = megaliga_team_names.team_names_id AND megaliga_schedule.round_number = ' . $round_number);
 
                             //get data for the scoreboard
-                            //get all games for Dolce for given round
-                            $getGames4Dolce = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 1 AND round_number = ' . $round_number);
-                            $scoreBoradDolceData = getAllGameData($getGames4Dolce, $round_number);
-
-                            //get all games for Gabbana for given round
-                            $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $round_number);
-                            $scoreBoradGabbanaData = getAllGameData($getGames4Gabbana, $round_number);
-
-
+                            //get all games for given round
+                            $getGames = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE round_number = ' . $round_number);
+                            $scoreBoradData = getAllGameData($getGames, $round_number);
 
                             //content of the megaliga page
                             the_content();
@@ -1261,16 +1253,8 @@ do_action('hestia_before_single_page_wrapper');
 
                                 $areAllTeamsAssigned = count($getTeamsGroupAssign) == 12 ? true : false;
 
-                                $scoresAdded = false;
-                                foreach ($getMegaligaScores as $record) {
-                                    if ($record->team1_score > 0 || $record->team2_score > 0) {
-                                        $scoresAdded = true;
-                                        break;
-                                    }
-                                }
-
-                                // show button in case all teams have group assigned and no scores have been added yet
-                                if (!$scoresAdded && $areAllTeamsAssigned) {
+                                // show button in case all teams have group assigned and schedule has not been generated yet
+                                if (!count($getMegaligaScores) && $areAllTeamsAssigned) {
                                     echo '<div class="generatePlayInScheduleWrapper marginTop10 marginBottom10">';
                                     echo '  <form action="" method="post">';
                                     echo '      <input type="submit" name="submitMegaligaSchedule" value="Generuj terminarz dla rundy zasadniczej">';
@@ -1280,20 +1264,14 @@ do_action('hestia_before_single_page_wrapper');
                             }
 
                             echo '<div class="megaligaScores scheduleContainer">';
-                            drawSchedule($getSchedule4DolceTeam1, $getSchedule4DolceTeam2, $getGames4Dolce, 'dolce', 'left', $round_number);
-                            drawSchedule($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $round_number);
+                            drawSchedule($getSchedule4Team1, $getSchedule4Team2, $getGames, '', 'left', $round_number);
                             echo '</div>';
+
                             echo '<div>';
                             echo '  <div class="scoreTtitleContainer">';
-                            echo '      <span class="scoreTableName">Wyniki Dolce</span>';
+                            echo '      <span class="scoreTableName">Wyniki</span>';
                             echo '  </div>';
-                            foreach ($scoreBoradDolceData as $gameData) {
-                                drawScoreBoard($gameData, $userId);
-                            }
-                            echo '  <div class="scoreTtitleContainer">';
-                            echo '      <span class="scoreTableName">Wyniki Gabbana</span>';
-                            echo '  </div>';
-                            foreach ($scoreBoradGabbanaData as $gameData) {
+                            foreach ($scoreBoradData as $gameData) {
                                 drawScoreBoard($gameData, $userId);
                             }
                             echo '</div>';
