@@ -121,11 +121,11 @@ Zasady generowania terminarza:
 
 19. Przygotowanie fazy playoff
 
-    Do fazy playoff awansuje 3 zwycięzców dwumeczów z fazy playin oraz lucky loser, który zdobył największą liczbę punktów spośród tych, którzy przegrali w fazie playin
+    Do fazy playoff awansują 4 najlepsze drużyny z rundy zasadniczej
 
-    Administrator ligi w zakładce `wyniki->playins->kolejka 2` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (półfinał)`, który automatycznie przygotuje terminarz dla fazy półfinałowej wraz z oznaczeniem w tabeli megaliga_user_data drużyn które osiągnęły faze playoff.
+    Administrator ligi w zakładce `wyniki->megaliga->kolejka 16` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (półfinał)`, który automatycznie przygotuje terminarz dla fazy półfinałowej wraz z oznaczeniem w tabeli megaliga_user_data drużyn które osiągnęły faze playoff.
 
-    Po zakończonych półfinałach, administrator ligi w zakładce `wyniki->playoffs->kolejka 2` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (finał)`, który automatycznie przygotuje terminarz dla fazy finałowej i meczu o 3 miejsce.
+    Po zakończonych półfinałach, administrator ligi w zakładce `wyniki->playoffs->kolejka 1` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (finał)`, który automatycznie przygotuje terminarz dla fazy finałowej i meczu o 3 miejsce.
 
 -   dokonaj konfiguracji draftu w tabeli megaliga_draft_data
     a) playoff_draft_window_open = 1 – udostepnij formularz do draftowania zawodnikow; 0 – ukryj formularz draftu
@@ -134,30 +134,6 @@ Zasady generowania terminarza:
 -   po zakończonym drafcie ustawiamy w tabeli megaliga_draft_data pole playoff_draft_window_open na wartość 0 (ukrycie formularza).
 -   formularz widoczny jest w danym momencie, tylko dla gracza, którego kolej wypada. Po wybraniu zawodnika lub spasowaniu, system udostępnia formularz następnemu graczowi w kolejności
 -   gracz może ominąć kolejkę i nie wybierać zawodnika poprzez naciśnięcie przyciku „Pas”.
-
-20. Przygotowanie Grand Prix
-
-    a) Wpisz wyniki z tabeli GP do tabeli `megaliga_grandprix_history`
-
-    b) Dokonaj aktualizacji zawodników biorących udział w realnym GP w tabeli `megaliga_grandprix_players`
-
-    c) Uzupełnij tabelę `megaliga_grandprix_bet_status` 11 kolejkami i ustaw wrtość `is_open` == 1
-
-    d) Dodaj nowy sezon GP do tabeli `megaliga_grandprix_season`:
-
-    -   w polu „season_name” wprowadź rok, w którym odbywa się dana edycja megaligi
-    -   w polu „current” wpisz jeden dla obecnie rozgrywanego sezonu. Jednocześnie dla wszystkich pozostałych wpisów odpowiadającym poprzednim sezonom w pole „current” wpisz wartość = 0
-
-    c) Wpisz do `megaliga_grandprix_history_champion` mistrza GP z kończącego się sezonu
-
-    -   user_name - wp_users.display_name
-
-    d) Wyczyść rekordy z następujących tabel:
-
-    -   megaliga_grandprix_bets (AUTO_INCREMENT = 1)
-    -   megaliga_grandprix_results (AUTO_INCREMENT = 1)
-
-    e) Wpisz aktualne daty kolejek w tabeli `megaliga_grandprix_round_calendar`
 
 Tests:
 
