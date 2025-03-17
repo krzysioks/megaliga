@@ -105,31 +105,6 @@ do_action('hestia_before_single_page_wrapper');
                                             $standingsData[$game->id_user_team2]['draws'] = $standingsData[$game->id_user_team2]['draws'] + 1;
                                             $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
                                         }
-
-                                        //if $game is played during rematch round -> add bonus point for team that has better balance after 2 matches
-                                        if ($game->id_rematch_schedule !== null) {
-                                            $getRematchSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule);
-
-                                            //count total points scored by each team during both rounds (1st and rematch)
-                                            $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule[0]->id_user_team1 ? $game->team1_score + $getRematchSchedule[0]->team1_score : $game->team1_score + $getRematchSchedule[0]->team2_score;
-                                            $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule[0]->id_user_team2 ? $game->team2_score + $getRematchSchedule[0]->team2_score : $game->team2_score + $getRematchSchedule[0]->team1_score;
-
-                                            //if given teams play more than 2 times witch each other -> take into account also third match
-                                            if ($game->id_rematch_schedule2 !== null) {
-                                                $getRematchSchedule2 = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_schedule = ' . $game->id_rematch_schedule2);
-
-                                                $team1MatchupScore = $game->id_user_team1 == $getRematchSchedule2[0]->id_user_team1 ? $team1MatchupScore + $getRematchSchedule2[0]->team1_score : $team1MatchupScore + $getRematchSchedule2[0]->team2_score;
-                                                $team2MatchupScore = $game->id_user_team2 == $getRematchSchedule2[0]->id_user_team2 ? $team2MatchupScore + $getRematchSchedule2[0]->team2_score : $team2MatchupScore + $getRematchSchedule2[0]->team1_score;
-                                            }
-
-                                            //when team 1 wins the matchup
-                                            if ($team1MatchupScore > $team2MatchupScore) {
-                                                $standingsData[$game->id_user_team1]['points'] = $standingsData[$game->id_user_team1]['points'] + 1;
-                                            } else if ($team1MatchupScore < $team2MatchupScore) {
-                                                //when team 2 wins the matchup
-                                                $standingsData[$game->id_user_team2]['points'] = $standingsData[$game->id_user_team2]['points'] + 1;
-                                            }
-                                        }
                                     }
                                 }
 
@@ -154,50 +129,14 @@ do_action('hestia_before_single_page_wrapper');
                                 return $teamsReachedPlayoff;
                             }
 
-                            //function return ID of user, which team reached playoff
-                            function getReachedPlayoffID($teamsReachedPlayoff)
-                            {
-                                $reachedPlayoffIDarray = array();
-                                foreach ($teamsReachedPlayoff as $teamReachedPlayoff) {
-                                    array_push($reachedPlayoffIDarray, $teamReachedPlayoff['ID']);
-                                }
+                            $getUsersID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1 OR ligue_groups_id = 2');
 
-                                return $reachedPlayoffIDarray;
-                            }
+                            $getSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2 FROM megaliga_schedule');
 
-                            //assessing first 4 (2 from each group) teams in the leage which currently reach playoff
-                            $getDolceUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 1');
-                            $getGabbanaUserID = $wpdb->get_results('SELECT ID FROM megaliga_user_data WHERE ligue_groups_id = 2');
+                            $standings = calculateStandingsData($getSchedule, $getUsersID);
 
-                            $getDolceSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 1');
-                            $getGabbanaSchedule = $wpdb->get_results('SELECT team1_score, team2_score, id_user_team1, id_user_team2, id_rematch_schedule, id_rematch_schedule2 FROM megaliga_schedule WHERE id_ligue_group = 2');
-
-                            $standingsDolce = calculateStandingsData($getDolceSchedule, $getDolceUserID);
-                            $standingsGabbana = calculateStandingsData($getGabbanaSchedule, $getGabbanaUserID);
-
-                            //get 2 best teams from each group
-                            $teamsReachedPlayoffDolce = getReachedPlayoffTeams($standingsDolce, 2);
-                            $teamsReachedPlayoffGabbana = getReachedPlayoffTeams($standingsGabbana, 2);
-
-                            //calculate standings data for those 4 selected teams to sort them from the best to the worst
-                            //get ID of teams that reached playoff
-                            $reachedPlayoffDolceIDarray = getReachedPlayoffID($teamsReachedPlayoffDolce);
-                            $reachedPlayoffGabbanaIDarray = getReachedPlayoffID($teamsReachedPlayoffGabbana);
-
-                            //filter standings to get standings for 4 teams that reached playoffs
-                            $reachedPlayoffStandings = array();
-                            foreach ($reachedPlayoffDolceIDarray as $ID) {
-                                $reachedPlayoffStandings[$ID] = $standingsDolce[$ID];
-                            }
-                            foreach ($reachedPlayoffGabbanaIDarray as $ID) {
-                                $reachedPlayoffStandings[$ID] = $standingsGabbana[$ID];
-                            }
-
-                            //sort them to get order from best to the worst
-                            uasort($reachedPlayoffStandings, 'compareTeams');
-
-                            //for those 4 (2 from each group) teams playoff draft order will be set. It is dynamic table which will change during season while teams change their positions in the table
-                            $teamsReachedPlayoff = getReachedPlayoffTeams($reachedPlayoffStandings, 4);
+                            //get 4 first best teams from standings
+                            $teamsReachedPlayoff = getReachedPlayoffTeams($standings, 4);
 
                             //update draft order table only if there are any teams that reached playoff (case when teams are not yet assigned to groups)
                             if (count($teamsReachedPlayoff)) {
