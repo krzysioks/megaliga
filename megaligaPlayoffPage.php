@@ -48,7 +48,7 @@ do_action('hestia_before_single_page_wrapper');
 
                             //values for test
                             //$round_number = 1;
-                            $userId = 14; //58;//14;
+                            // $userId = 14; //58;//14;
 
                             //handle submission
                             if ($_POST['submitScore']) {
