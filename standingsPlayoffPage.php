@@ -42,11 +42,11 @@ do_action('hestia_before_single_page_wrapper');
                             //custom code starts here
                             global $wpdb;
 
-                            function getStageData($leg1, $leg2, $type)
+                            function getStageData($leg1, $type)
                             {
                                 global $wpdb;
 
-                                $returnData = array('team1Name' => '', 'team2Name' => '', 'scoreTeam1Round1' => 0, 'scoreTeam2Round1' => 0, 'scoreTeam1Round2' => 0, 'scoreTeam2Round2' => 0, 'totalTeam1' => null, 'totalTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'none');
+                                $returnData = array('team1Name' => '', 'team2Name' => '', 'totalScoreTeam1' => null, 'totalScoreTeam2' => null, 'seedNumberTeam1' => 0, 'seedNumberTeam2' => 0, 'winner' => 'none');
 
                                 //get team names of both users
                                 $getTeam1Name = $wpdb->get_results('SELECT megaliga_team_names.name as "team_name",megaliga_user_data.logo_url FROM megaliga_team_names, megaliga_user_data WHERE megaliga_team_names.team_names_id = megaliga_user_data.team_names_id AND megaliga_user_data.reached_playoff = 1 AND megaliga_user_data.ID = ' . $leg1->id_user_team1);
@@ -55,23 +55,16 @@ do_action('hestia_before_single_page_wrapper');
                                 $returnData['team1Name'] = $getTeam1Name[0]->team_name;
                                 $returnData['team2Name'] = $getTeam2Name[0]->team_name;
 
-                                //setting score for teams for  round 1 and 2
-                                $returnData['scoreTeam1Round1'] = $leg1->team1_score;
-                                $returnData['scoreTeam2Round1'] = $leg1->team2_score;
-
-                                $returnData['scoreTeam1Round2'] = $leg2->team1_score;
-                                $returnData['scoreTeam2Round2'] = $leg2->team2_score;
-
                                 //setting totalScore
-                                $returnData['totalScoreTeam1'] = $returnData['scoreTeam1Round1'] + $returnData['scoreTeam1Round2'];
-                                $returnData['totalScoreTeam2'] = $returnData['scoreTeam2Round1'] + $returnData['scoreTeam2Round2'];
+                                $returnData['totalScoreTeam1'] = $leg1->team1_score;
+                                $returnData['totalScoreTeam2'] = $leg1->team2_score;
 
                                 //setting seed number
                                 $returnData['seedNumberTeam1'] = $leg1->team1_seed;
                                 $returnData['seedNumberTeam2'] = $leg1->team2_seed;
 
                                 //setting winning team. Used to set special styling
-                                if ($returnData['scoreTeam1Round1'] != 0 && $returnData['scoreTeam1Round2'] != 0 && $returnData['scoreTeam2Round1'] != 0 && $returnData['scoreTeam2Round2'] != 0) {
+                                if ($returnData['totalScoreTeam1'] != 0 && $returnData['totalScoreTeam2'] != 0) {
                                     if ($returnData['totalScoreTeam1'] > $returnData['totalScoreTeam2']) {
                                         $returnData['winner'] = 'team1';
                                     } else if ($returnData['totalScoreTeam1'] < $returnData['totalScoreTeam2']) {
@@ -129,8 +122,6 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '        <div class="seedNumberContainer">' . $data['seedNumberTeam1'] . '</div>';
                                 echo '        <div class="teamNameContainer matchupTableFirstRow' . $team1AddedStyle . '">';
                                 echo '            <span class="playoffLadderContent">' . $data['team1Name'] . '</span>';
-                                echo '            <span class="score">' . $data['scoreTeam1Round1'] . '</span>';
-                                echo '            <span class="score">' . $data['scoreTeam1Round2'] . '</span>';
                                 echo '            <span class="score">' . $totalScoreTeam1 . '</span>';
                                 echo '        </div>';
                                 echo '    </div>';
@@ -138,8 +129,6 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '        <div class="seedNumberContainer">' . $data['seedNumberTeam2'] . '</div>';
                                 echo '        <div class="teamNameContainer' . $team2AddedStyle . '">';
                                 echo '            <span class="playoffLadderContent">' . $data['team2Name'] . '</span>';
-                                echo '            <span class="score">' . $data['scoreTeam2Round1'] . '</span>';
-                                echo '            <span class="score">' . $data['scoreTeam2Round2'] . '</span>';
                                 echo '            <span class="score">' . $totalScoreTeam2 . '</span>';
                                 echo '        </div>';
                                 echo '    </div>';
@@ -170,8 +159,6 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '      <div class="seedNumberContainer">' . $data['seedNumberTeam1'] . '</div>';
                                 echo '      <div class="teamNameContainer matchupTableFirstRow' . $team1AddedStyle . '">';
                                 echo '          <span class="playoffLadderContent">' . $data['team1Name'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam1Round1'] . '</span>';
-                                echo '          <span class="score">' .  $data['scoreTeam1Round2'] . '</span>';
                                 echo '          <span class="score">' . $totalScoreTeam1 . '</span>';
                                 echo '      </div>';
                                 echo '  </div>';
@@ -179,8 +166,6 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '      <div class="seedNumberContainer">' . $data['seedNumberTeam2'] . '</div>';
                                 echo '      <div class="teamNameContainer' . $team2AddedStyle . '">';
                                 echo '          <span class="playoffLadderContent">' . $data['team2Name'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam2Round1'] . '</span>';
-                                echo '          <span class="score">' . $data['scoreTeam2Round2'] . '</span>';
                                 echo '          <span class="score">' . $totalScoreTeam2 . '</span>';
                                 echo '      </div>';
                                 echo '  </div>';
@@ -196,15 +181,13 @@ do_action('hestia_before_single_page_wrapper');
                                 $semifinalData = array();
 
                                 $getSemifinalStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, round_number, stage, team1_score, team2_score, team1_seed, team2_seed FROM megaliga_schedule_playoff WHERE stage = "semifinal"');
-
-                                $semifinalData[0] = getStageData($getSemifinalStage[0], $getSemifinalStage[1],  'semifinals');
+                                $semifinalData[0] = getStageData($getSemifinalStage[0], 'semifinals');
 
                                 //draw 1st semifinal stage
                                 echo '<div class="phaseContainer order-1">';
                                 echo '<div class="playoffPhaseTitlePosition marginTop20"><span class="playoffPhaseTitle">półfinał</span></div>';
                                 drawFirstStageMatchup($semifinalData[0]);
                                 echo '</div>';
-
 
                                 //get data for final and 3rd place matchup stage
                                 $finalData = array();
@@ -214,8 +197,8 @@ do_action('hestia_before_single_page_wrapper');
 
                                 $getThirdPlaceStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, round_number, stage, team1_score, team2_score, team1_seed, team2_seed FROM megaliga_schedule_playoff WHERE stage = "3rdplace"');
 
-                                $finalData = getStageData($getfinalStage[0], $getfinalStage[1], 'final');
-                                $thridPlaceData = getStageData($getThirdPlaceStage[0], $getThirdPlaceStage[1], '3rdpalce');
+                                $finalData = getStageData($getfinalStage[0], 'final');
+                                $thridPlaceData = getStageData($getThirdPlaceStage[0], '3rdpalce');
 
                                 //draw 2nd stage
                                 echo '<div class="phaseContainer order-3">';
@@ -252,7 +235,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '  </div>';
                                 echo '</div>';
 
-                                $semifinalData[1] = getStageData($getSemifinalStage[2], $getSemifinalStage[3],  'semifinals');
+                                $semifinalData[1] = getStageData($getSemifinalStage[1],  'semifinals');
 
                                 //draw 2nd semifinal stage
                                 echo '<div class="phaseContainer order-2">';

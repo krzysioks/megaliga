@@ -5,7 +5,7 @@ Description: This is a custom child theme I have created.
 Author: ThemeIsle    
 URI: https://www.themeisle.com/    
 Template: hestia  
-Version: 0.314
+Version: 0.318
 */
 
 :root {
@@ -855,12 +855,14 @@ div.teamRosterContainer ul {
     display: flex;
     flex-direction: column;
     overflow-x: auto;
+    align-items: center;
 }
 
 .playoffLadder {
     box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.5);
     border: solid 1px rgb(200 200 200 / 50%);
     margin-bottom: 2em;
+    justify-content: center;
 }
 
 .playoffLadderflexDirection {
@@ -920,10 +922,11 @@ div.teamRosterContainer ul {
 
 .pairLadderContainer {
     display: flex;
-    width: 360px;
+    width: 310px;
     height: 120px;
     margin-right: 1em;
     margin-left: 1em;
+    overflow: hidden;
 }
 
 .seedNumberContainer {
@@ -949,7 +952,6 @@ img.winner {
 .teamNameContainer {
     display: flex;
     flex-direction: row;
-    width: 350px;
     height: 30px;
     background-color: white;
 }
