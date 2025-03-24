@@ -51,6 +51,9 @@ megaliga – instrukcja obsługi v.6.0
 -   w polu „season_name” wprowadź rok, w którym odbywa się dana edycja megaligi
 -   w polu „number_of_groups” podaj liczbę grup w danym sezonie megaligi
 -   w polu „current” wpisz jeden dla obecnie rozgrywanego sezonu. Jednocześnie dla wszystkich pozostałych wpisów odpowiadającym poprzednim sezonom w pole „current” wpisz wartość = 0
+-   w polu show_group_name wpisz:
+    a) 1 tytuł grupy ma się pojawić nad tabelą sezonu zasadniczęgo
+    b) 0 tytuł grupy nie ma się pojawić nad tabelą sezonu zasadniczęgo
 
 9. Wpisz do megaliga_history_champion mistrza z kończącego się sezonu:
 

@@ -115,7 +115,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</table>';
                             }
 
-                            $getSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name, number_of_groups FROM megaliga_season WHERE current = 0 ORDER BY season_name DESC');
+                            $getSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name, number_of_groups, show_group_name FROM megaliga_season WHERE current = 0 ORDER BY season_name DESC');
 
                             $getGrandPrixSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name FROM megaliga_grandprix_season WHERE current = 0 ORDER BY season_name DESC');
 
@@ -140,9 +140,10 @@ do_action('hestia_before_single_page_wrapper');
                                     drawStandings($standingsDolce, 'left', 'dolce', false);
                                     drawStandings($standingsGabbana, 'right', 'gabbana', false);
                                 } else {
+                                    $groupName = $season->show_group_name ? 'Dolce&Gabbana' : '';
                                     $standings = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND ligue_group = "dolce&gabbana" AND table_type = "regular" ORDER BY place');
 
-                                    drawStandings($standings, 'none', 'Dolce&Gabbana', false);
+                                    drawStandings($standings, 'none', $groupName, false);
                                 }
 
                                 echo '  </div>';
