@@ -70,7 +70,6 @@ megaliga – instrukcja obsługi v.6.0
 -   megaliga_schedule (AUTO_INCREMENT = 1)
 -   megaliga_schedule_playoff (AUTO_INCREMENT = 1)
 -   megaliga_starting_lineup (AUTO_INCREMENT = 1)
--   megaliga_starting_lineup_playin (AUTO_INCREMENT = 1)
 -   megaliga_starting_lineup_playoff (AUTO_INCREMENT = 1)
 -   megaliga_season_draft_order_dolce (AUTO_INCREMENT = 1)
 -   megaliga_season_draft_order_gabbana (AUTO_INCREMENT = 1)
