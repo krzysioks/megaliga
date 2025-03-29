@@ -196,59 +196,6 @@ do_action('hestia_before_single_page_wrapper');
                                 $getGames4Gabbana = $wpdb->get_results('SELECT id_schedule, id_user_team1, id_user_team2 FROM megaliga_schedule WHERE id_ligue_group = 2 AND round_number = ' . $lastPlayedRound);
                             }
 
-                            // get data for displaying scores of last GP round
-                            $getGrandPrixRoundsCalendar = $wpdb->get_results('SELECT round_number, round_date FROM megaliga_grandprix_round_calendar');
-                            //find last GP round
-                            $playedGrandPrixRounds = getPlayedRounds($getGrandPrixRoundsCalendar, $currentDateTimestamp);
-                            //last played round is the highiest round from those which have been played
-                            $lastPlayedGrandPrixRound = count($playedGrandPrixRounds) > 0 ? max($playedGrandPrixRounds) : 0;
-
-                            // defines if to show scores of trainers for current round. Scores will be visible as soon as results for given round are added by admin
-                            $showGrandPrixRoundPoints = false;
-                            if ($lastPlayedGrandPrixRound > 0) {
-                                $getUserDataQuery = $wpdb->get_results('SELECT wp_users.user_login, megaliga_user_data.ID FROM wp_users, megaliga_user_data WHERE wp_users.ID = megaliga_user_data.ID');
-
-                                $standingsData = array();
-                                foreach ($getUserDataQuery as $user) {
-                                    $standingsData[$user->ID] = array('trainerName' => $user->user_login, 'ID' => $user->ID, 'points' => 0, 'showPoints' => false);
-                                }
-
-                                $getGrandPrixResultQuery = $wpdb->get_results('SELECT * FROM megaliga_grandprix_results WHERE round_number = ' . $lastPlayedGrandPrixRound);
-
-                                if (count($getGrandPrixResultQuery) > 0) {
-                                    $showGrandPrixRoundPoints = true;
-                                    $getTrainersBetsQuery = $wpdb->get_results('SELECT * FROM megaliga_grandprix_bets WHERE round_number =' . $lastPlayedGrandPrixRound);
-
-                                    foreach ($getTrainersBetsQuery as $trainerBet) {
-                                        $fieldNameList = array('player_1', 'player_2', 'player_3', 'player_4', 'player_5', 'player_6', 'player_7', 'player_8', 'player_9', 'player_10', 'player_11', 'player_12', 'player_13', 'player_14', 'player_15', 'player_16');
-
-                                        for ($i = 0; $i < 16; $i++) {
-                                            if ($trainerBet->{$fieldNameList[$i]} == $getGrandPrixResultQuery[0]->{$fieldNameList[$i]}) {
-                                                // if trainer bet correctly position of given player -> add 1 point
-                                                $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
-
-                                                if ($trainerBet->{$fieldNameList[$i]} == 1) {
-                                                    //additionally if correctly bet position is exactly 1st place -> add additional 1 point
-                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
-                                                }
-
-                                                if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 4) {
-                                                    //additionally if correctly bet position is from place 1-4 -> add additional 1 point
-                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
-                                                }
-
-                                                if ($trainerBet->{$fieldNameList[$i]} >= 1 && $trainerBet->{$fieldNameList[$i]} <= 8) {
-                                                    //additionally if correctly bet position is from place 1-8 -> add additional 1 point
-                                                    $standingsData[$trainerBet->ID]['points'] = $standingsData[$trainerBet->ID]['points'] + 1;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    uasort($standingsData, 'compareTrainers');
-                                }
-                            }
-
                             //get data for current champion
                             $getChampionData = $wpdb->get_results('SELECT team_name, logo_url FROM megaliga_champion');
 
@@ -300,13 +247,6 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '      </div>';
                                 echo '      <div class="scoreTableGabbana">';
                                 drawCurrentRoundScore($getSchedule4GabbanaTeam1, $getSchedule4GabbanaTeam2, $getGames4Gabbana, 'gabbana', 'right', $lastPlayedRound);
-                                echo '      </div>';
-                            }
-
-                            if ($lastPlayedGrandPrixRound > 0) {
-                                echo '      <div class="individualCommentsTitle">Wyniki ' . $lastPlayedGrandPrixRound . ' kolejki Grand Prix</div>';
-                                echo '      <div class="scoreTableDolce">';
-                                drawCurrentGrandPrixRoundScore($standingsData, $showGrandPrixRoundPoints);
                                 echo '      </div>';
                             }
 
