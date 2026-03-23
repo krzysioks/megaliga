@@ -115,7 +115,7 @@ do_action('hestia_before_single_page_wrapper');
                                 echo '</table>';
                             }
 
-                            $getSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name, number_of_groups, show_group_name FROM megaliga_season WHERE current = 0 ORDER BY season_name DESC');
+                            $getSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name, number_of_groups, show_group_name, history_table_type FROM megaliga_season WHERE current = 0 ORDER BY season_name DESC');
 
                             $getGrandPrixSeasonIdToShow = $wpdb->get_results('SELECT id_season, season_name FROM megaliga_grandprix_season WHERE current = 0 ORDER BY season_name DESC');
 
@@ -133,7 +133,7 @@ do_action('hestia_before_single_page_wrapper');
                                 //HARDCODED PART - need change if in the future groups names will change, or its number will change
                                 //if 2 groups in season present -> names are dolce, gabbana; if 1 group -> dolce&gabbana
                                 //get data for regular season and draw it
-                                if ($season->number_of_groups == 2) {
+                                if ($season->history_table_type == 'separate') {
                                     $standingsDolce = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND ligue_group = "dolce" AND table_type = "regular" ORDER BY place');
                                     $standingsGabbana = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND ligue_group = "gabbana" AND table_type = "regular" ORDER BY place');
 
@@ -142,7 +142,6 @@ do_action('hestia_before_single_page_wrapper');
                                 } else {
                                     $groupName = $season->show_group_name ? 'Dolce&Gabbana' : '';
                                     $standings = $wpdb->get_results('SELECT place, team_name, played, win, draw, defeat, totalScore, balance, points  FROM megaliga_history WHERE id_season = ' . $season->id_season . ' AND ligue_group = "dolce&gabbana" AND table_type = "regular" ORDER BY place');
-
                                     drawStandings($standings, 'none', $groupName, false);
                                 }
 
