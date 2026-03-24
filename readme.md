@@ -1,4 +1,4 @@
-megaliga – instrukcja obsługi v.6.0
+megaliga – instrukcja obsługi v.8.0
 
 1. Wpisz wyniki z tabel z rundy zasadniczej, playin i playoff do tabeli megaliga_history
 

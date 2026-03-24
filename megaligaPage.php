@@ -246,9 +246,15 @@ do_action('hestia_before_single_page_wrapper');
                                         $schedule[] = $roundSchedule;
                                     }
 
-                                    foreach ($schedule as $round => $matches) {
-                                        $roundNumber = $round + 11;
-                                        foreach ($matches as $match) {
+                                    // Randomly select 4 out of 6 rounds for the lottery-based schedule
+                                    $roundIndexes = range(0, $numberOfRounds - 1); // [0,1,2,3,4,5]
+                                    shuffle($roundIndexes);
+                                    $selectedRounds = array_slice($roundIndexes, 0, 4);
+
+                                    // Insert only the selected rounds into the database
+                                    foreach ($selectedRounds as $idx => $round) {
+                                        $roundNumber = 11 + $idx; // Inter-group rounds start at 11
+                                        foreach ($schedule[$round] as $match) {
                                             $wpdb->insert('megaliga_schedule', [
                                                 'id_user_team1' => $match[0],
                                                 'id_user_team2' => $match[1],
