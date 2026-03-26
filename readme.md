@@ -119,7 +119,7 @@ II. meliga_draft_data.countRookies = 0 - jeżeli w sezonie nie ma drużyn "benia
 Zasady generowania terminarza:
 
 - Pierwsze 10 kolejek to mecz i rewanż zespołow w ramach grupy (`dolce` lub `gabbana`)
-- Kolejki 11-16 to mecze pomiędzy drużynami z przeciwnej grupy (bez rewanżu)
+- Kolejki 11-14 to mecze pomiędzy drużynami z przeciwnej grupy (bez rewanżu, pary są losowo wybierane)
 
 19. Przygotowanie fazy playoff
 
@@ -127,7 +127,7 @@ Zasady generowania terminarza:
 
     Administrator ligi w zakładce `wyniki->playoff->kolejka 1` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (półfinał)`, który automatycznie przygotuje terminarz dla fazy półfinałowej wraz z oznaczeniem w tabeli megaliga_user_data drużyn które osiągnęły faze playoff.
 
-    Po zakończonych półfinałach, administrator ligi w zakładce `wyniki->playoffs->kolejka 2` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (finał)`, który automatycznie przygotuje terminarz dla fazy finałowej i meczu o 3 miejsce.
+    Po zakończonych półfinałach, administrator ligi w zakładce `wyniki->playoffs->kolejka 3` będzie miał dostępny guzik `Generuj terminarz dla fazy play off (finał)`, który automatycznie przygotuje terminarz dla fazy finałowej i meczu o 3 miejsce.
 
 - dokonaj konfiguracji draftu w tabeli megaliga_draft_data
   a) playoff_draft_window_open = 1 – udostepnij formularz do draftowania zawodnikow; 0 – ukryj formularz draftu

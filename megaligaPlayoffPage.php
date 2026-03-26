@@ -264,6 +264,7 @@ do_action('hestia_before_single_page_wrapper');
 
                                 if (!count($checkIfRecordsExists)) {
                                     // schedule of semifinals - 1st place vs 4th place and..
+                                    // round 1
                                     $submitDataArray = array();
                                     $submitDataArray['id_user_team1'] = $reachPlayoffTeams[0]['ID'];
                                     $submitDataArray['id_user_team2'] = $reachPlayoffTeams[3]['ID'];
@@ -275,12 +276,24 @@ do_action('hestia_before_single_page_wrapper');
                                     $submitDataArray['stage'] = 'semifinal';
                                     $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
 
+                                    // round 2
+                                    // 1st place vs 4th place
+                                    $submitDataArray['round_number'] = 2;
+                                    $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
+
                                     //...2nd place vs 3rd place
+                                    // round 1
                                     $submitDataArray['id_user_team1'] = $reachPlayoffTeams[1]['ID'];
                                     $submitDataArray['id_user_team2'] = $reachPlayoffTeams[2]['ID'];
                                     $submitDataArray['round_number'] = 1;
                                     $submitDataArray['team1_seed'] = 2;
                                     $submitDataArray['team2_seed'] = 3;
+                                    $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
+
+
+                                    // 2nd place vs 3rd place
+                                    // round 2
+                                    $submitDataArray['round_number'] = 2;
                                     $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
 
                                     // set megaliga_user_data.reached_playoff = 1 for teams that have reached playins
@@ -314,13 +327,13 @@ do_action('hestia_before_single_page_wrapper');
                             }
 
                             if ($_POST['submitPlayOffScheduleR2']) {
-                                function getStageData($leg1)
+                                function getStageData($leg1, $leg2)
                                 {
                                     $returnData = array('winnerId' => 0, 'loserId' => 0, 'winnerSeed' => 0, 'loserSeed' => 0);
 
                                     //setting totalScore
-                                    $returnData['totalScoreTeam1'] = $leg1->team1_score;
-                                    $returnData['totalScoreTeam2'] =  $leg1->team2_score;
+                                    $returnData['totalScoreTeam1'] = $leg1->team1_score + $leg2->team1_score;
+                                    $returnData['totalScoreTeam2'] =  $leg1->team2_score + $leg2->team2_score;
 
                                     //setting winning team. Used to set special styling
                                     if ($returnData['totalScoreTeam1'] != 0 && $returnData['totalScoreTeam2'] != 0) {
@@ -335,7 +348,9 @@ do_action('hestia_before_single_page_wrapper');
                                             $returnData['winnerSeed'] = $leg1->team2_seed;
                                             $returnData['loserSeed'] = $leg1->team1_seed;
                                         } else {
-                                            if ($returnData['seedNumberTeam1'] > $returnData['seedNumberTeam2']) {
+                                            // case when score of both teams are equal
+                                            // team with higher seed wins (higher seed means lower number).
+                                            if ($leg1->team1_seed > $leg1->team2_seed) {
                                                 $returnData['winnerId'] = $leg1->id_user_team2;
                                                 $returnData['loserId'] = $leg1->id_user_team1;
                                                 $returnData['winnerSeed'] = $leg1->team2_seed;
@@ -355,11 +370,13 @@ do_action('hestia_before_single_page_wrapper');
                                 $getSemifinalStage = $wpdb->get_results('SELECT id_user_team1, id_user_team2, round_number, stage, team1_score, team2_score, team1_seed, team2_seed FROM megaliga_schedule_playoff WHERE stage = "semifinal"');
 
                                 $semifinalData = array();
-                                $semifinalData[0] = getStageData($getSemifinalStage[0]);
-                                $semifinalData[1] = getStageData($getSemifinalStage[1]);
+                                // semifinal data of first semifinal pair
+                                $semifinalData[0] = getStageData($getSemifinalStage[0], $getSemifinalStage[1]);
+                                // semifinal data of second semifinal pair
+                                $semifinalData[1] = getStageData($getSemifinalStage[2], $getSemifinalStage[3]);
 
-                                $checkIf3rdPlaceRecordsExists = $wpdb->get_results('SELECT id_schedule, round_number FROM megaliga_schedule_playoff WHERE stage = "3rdplace"');
-                                $checkIfFinalRecordsExists = $wpdb->get_results('SELECT id_schedule, round_number FROM megaliga_schedule_playoff WHERE stage = "final"');
+                                $checkIf3rdPlaceRecordsExists = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE stage = "3rdplace"');
+                                $checkIfFinalRecordsExists = $wpdb->get_results('SELECT id_schedule FROM megaliga_schedule_playoff WHERE stage = "final"');
 
                                 $message3rdPlace = '';
                                 $messageFinal = '';
@@ -368,12 +385,15 @@ do_action('hestia_before_single_page_wrapper');
                                     $submitDataArray = array();
                                     $submitDataArray['id_user_team1'] = $semifinalData[0]['loserId'];
                                     $submitDataArray['id_user_team2'] = $semifinalData[1]['loserId'];
-                                    $submitDataArray['round_number'] = 2;
+                                    $submitDataArray['round_number'] = 3;
                                     $submitDataArray['team1_score'] = null;
                                     $submitDataArray['team2_score'] = null;
                                     $submitDataArray['team1_seed'] = $semifinalData[0]['loserSeed'];
                                     $submitDataArray['team2_seed'] = $semifinalData[1]['loserSeed'];
                                     $submitDataArray['stage'] = '3rdplace';
+                                    $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
+
+                                    $submitDataArray['round_number'] = 4;
                                     $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
 
                                     $message3rdPlace = ' wygenerowany poprawnie';
@@ -385,12 +405,15 @@ do_action('hestia_before_single_page_wrapper');
                                     $submitDataArray = array();
                                     $submitDataArray['id_user_team1'] = $semifinalData[0]['winnerId'];
                                     $submitDataArray['id_user_team2'] = $semifinalData[1]['winnerId'];
-                                    $submitDataArray['round_number'] = 2;
+                                    $submitDataArray['round_number'] = 3;
                                     $submitDataArray['team1_score'] = null;
                                     $submitDataArray['team2_score'] = null;
                                     $submitDataArray['team1_seed'] = $semifinalData[0]['winnerSeed'];
                                     $submitDataArray['team2_seed'] = $semifinalData[1]['winnerSeed'];
                                     $submitDataArray['stage'] = 'final';
+                                    $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
+
+                                    $submitDataArray['round_number'] = 4;
                                     $wpdb->insert('megaliga_schedule_playoff', $submitDataArray);
 
                                     $messageFinal = ' wygenerowany poprawnie';
@@ -1190,8 +1213,8 @@ do_action('hestia_before_single_page_wrapper');
                                 }
                             }
 
-                            //show button to generate schedule for playoff for final and 3rd place stage only if user with ID == 14 (mbaginski) || 48 (Gabbana) and round_number == 2 and user is logged in
-                            if (($userId == 14 || $userId == 48) && $round_number == 2 && is_user_logged_in()) {
+                            //show button to generate schedule for playoff for final and 3rd place stage only if user with ID == 14 (mbaginski) || 48 (Gabbana) and round_number == 3 and user is logged in
+                            if (($userId == 14 || $userId == 48) && $round_number == 3 && is_user_logged_in()) {
                                 // get semifinals records from megaliga_schedule_playoff to check if at least one score is not added -> do not show generation button
                                 $getPlayOffSemifinalsScores = $wpdb->get_results('SELECT team1_score, team2_score FROM megaliga_schedule_playoff WHERE stage = "semifinal"');
 
