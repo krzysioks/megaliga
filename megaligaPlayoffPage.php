@@ -44,7 +44,7 @@ do_action('hestia_before_single_page_wrapper');
                             $current_user = wp_get_current_user();
                             //8 - length of "kolejka" string which is in every title of składy subpage
                             $round_number = substr($title, 0, strlen($title) - 8);
-                            $userId = $current_user->ID;
+                            // $userId = $current_user->ID;
 
                             //values for test
                             //$round_number = 1;
